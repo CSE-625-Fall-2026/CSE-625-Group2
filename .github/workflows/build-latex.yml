@@ -2,7 +2,10 @@ name: Release LaTeX PDF
 
 on:
   push:
-    tags: ['*-v*']
+    tags: ['v*']
+
+env:
+  DOC_DIR: assignment_1
 
 jobs:
   release:
@@ -12,18 +15,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Resolve assignment folder from the tag
-        id: meta
-        run: echo "dir=${GITHUB_REF_NAME%%-v*}" >> "$GITHUB_OUTPUT"
-
       - name: Compile main.tex
         uses: xu-cheng/latex-action@v3
         with:
-          working_directory: ${{ steps.meta.outputs.dir }}
+          working_directory: ${{ env.DOC_DIR }}
           root_file: main.tex
 
       - name: Name the release asset after the tag
-        run: cp "${GITHUB_REF_NAME%%-v*}/main.pdf" "$GITHUB_REF_NAME.pdf"
+        run: cp "$DOC_DIR/main.pdf" "$GITHUB_REF_NAME.pdf"
 
       - name: Publish PDF to a release
         uses: softprops/action-gh-release@v2

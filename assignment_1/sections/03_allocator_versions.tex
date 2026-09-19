@@ -1,2 +1,26 @@
 \section{Explanation of Allocator Versions}
 \label{sec:allocator-versions}
+
+The custom allocator was changed in seven tagged versions.
+Each tagged version replaces the previous implementation.
+Table~\ref{tab:allocator-versions} records what each version does and what changed from the version immediately before it.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabularx}{\textwidth}{@{}l L L@{}}
+\toprule
+Version & Behavior & Change from previous \\
+\midrule
+v1 & One ordered free list, first-fit allocation, and immediate merging of adjacent free blocks. & Baseline. \\
+v2 & Replaces first-fit with best-fit, selecting the smallest suitable free block. & Search policy on the free list changes from first-fit to best-fit. \\
+v3 & Organizes free blocks into size-segregated lists. & The single free-list organization is replaced by size-segregated lists. \\
+v4 & Adds fixed thread-local caches for small allocations. & Fixed thread-local caches are added for small allocations. \\
+v5 & Defers merging adjacent free blocks until an allocation cannot otherwise be satisfied. & Adjacent free blocks are no longer merged immediately. \\
+v6 & Adds batch cache refills and reusable small-block slabs. & Cache refills are batched and reusable small-block slabs are added. \\
+v7 & Makes cache limits adaptive by growing frequently used size classes while retaining the overall cache-memory limit. & Cache limits become adaptive for frequently used size classes; the overall cache-memory limit is retained. \\
+\bottomrule
+\end{tabularx}
+\caption{Custom allocator versions v1--v7 and the change introduced by each tag.}
+\label{tab:allocator-versions}
+\end{table}

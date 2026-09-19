@@ -1,2 +1,76 @@
 \section{Hardware and Software Environments}
 \label{sec:environments}
+
+Two machines appear in the recorded files.
+All Apple~M3~Max rows are the same Mac.
+CSV \texttt{machine\_id} values that begin with \texttt{mohamed-m3max-} are campaign labels for that Mac, not separate computers.
+The second machine is the Ryzen host used for v7 (\texttt{ryzen7900x-32gb-wsl}).
+
+All recorded rows use project commit \texttt{12617e0f943a7b68d8334aa5477dfa403a75ca21}.
+
+\subsection{Machines}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabularx}{\textwidth}{@{}l L L@{}}
+\toprule
+Field & Apple M3 Max & AMD Ryzen 9 7900X \\
+\midrule
+Processor & Apple M3 Max & AMD Ryzen 9 7900X 12-Core Processor \\
+Architecture & arm64 (v6 \texttt{environment.txt} field \texttt{architecture=arm64}) & x86\_64 (no architecture field in v7 \texttt{environment.txt}; library path \path{/usr/lib/x86_64-linux-gnu}) \\
+OS & macOS, version depends on campaign (Table~\ref{tab:macos-campaigns}) & Windows 11 Home 10.0.26200; WSL 2.7.13.0; Ubuntu 24.04 LTS \\
+Memory & 48~GB unified memory (v6 hardware addendum; per-batch core and memory fields were blank) & 32~GB DDR5-5200 host RAM; WSL \texttt{memory=24GB}, \texttt{swap=8GB} \\
+Cores & 16 total (12 performance, 4 efficiency) & 12 physical / 24 logical \\
+Compiler & Apple clang 17.0.0 (\texttt{clang-1700.6.3.2}) & Ubuntu \texttt{c++} 13.3.0 \\
+Used for & matrix v1--v7 (all scales); v6 four-workload campaign & v7 four-workload campaign \\
+\bottomrule
+\end{tabularx}
+\caption{The two machines used in the supplied run files.}
+\label{tab:machines}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{llll}
+\toprule
+Campaign & Scale(s) & macOS version & OS build \\
+\midrule
+matrix v1--v7 & short, medium & 27.0   & 26A428 \\
+matrix v1--v7 & long          & 26.6.2 & 25G83  \\
+v6 four-workload & short, medium, long & 26.5.2 & 25F84 \\
+\bottomrule
+\end{tabular}
+\caption{macOS versions recorded on the Apple M3 Max, by campaign.}
+\label{tab:macos-campaigns}
+\end{table}
+
+\subsection{CSV field comparison}
+
+The matrix CSV
+\path{matrix-v1-v7-short-medium-long.csv}
+includes \texttt{machine\_id}, \texttt{processor}, \texttt{os\_version}, \texttt{os\_build}, and \texttt{project\_commit}.
+The combined CSV
+\path{v6-v7-run-durations.csv}
+includes \texttt{machine\_id} only.
+Processor, OS, architecture, and memory for the combined CSV come from adjacent \texttt{environment.txt} files.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabularx}{\textwidth}{@{}l L L@{}}
+\toprule
+Field & Matrix CSV & Combined v6/v7 CSV \\
+\midrule
+\texttt{machine\_id} & yes (campaign labels; all M3 Max rows are the same Mac) & yes (M3 Max campaign label for v6; Ryzen label for v7) \\
+\texttt{processor} & yes (Apple M3 Max) & no (adjacent \texttt{environment.txt}) \\
+\texttt{os\_version} / \texttt{os\_build} & yes (Table~\ref{tab:macos-campaigns}) & no (adjacent \texttt{environment.txt}) \\
+architecture & no column & no column \\
+memory & no column & no column \\
+\texttt{project\_commit} & yes (\texttt{12617e0f\ldots}) & no column (present in adjacent \texttt{environment.txt}) \\
+\bottomrule
+\end{tabularx}
+\caption{Environment-field differences between the two supplied CSVs.}
+\label{tab:csv-field-diff}
+\end{table}

@@ -1,2 +1,174 @@
 \section{Statistical Results}
 \label{sec:statistical-results}
+
+Values below are copied from the supplied CSVs.
+Times are elapsed seconds.
+
+\subsection{Matrix v1--v7}
+
+Source: \path{matrix-v1-v7-short-medium-long.csv}.
+Host: Apple M3 Max.
+Workload is matrix, size 360.
+Each row is 3 runs.
+Concurrent processes in each batch: 6.
+Checksum is consistent for every row: \texttt{4.8968250157139531e+119}.
+All runs succeeded.
+Repetitions: short $=1$, medium $=37$, long $=97$.
+The column ``vs.\ regular (\%)'' is the CSV field \texttt{elapsed\_change\_vs\_regular\_percent}.
+Rank is the CSV field \texttt{elapsed\_rank\_including\_regular} and includes Regular new.
+
+\begin{table}[htbp]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}l rrr rrr rr r@{}}
+\toprule
+Allocator & Run 1 & Run 2 & Run 3 & Mean & Median & Std.\ dev. & vs.\ regular (\%) & Rank \\
+\midrule
+Regular new & 247.20 & 247.32 & 247.18 & 247.233333 & 247.20 & 0.075719 & 0.000000 & 6 \\
+v1.0.0 & 237.74 & 237.82 & 237.75 & 237.770000 & 237.75 & 0.043589 & $-3.827693$ & 1 \\
+v2.0.0 & 237.85 & 237.85 & 237.87 & 237.856667 & 237.85 & 0.011547 & $-3.792639$ & 2 \\
+v3.0.0 & 239.93 & 239.86 & 239.88 & 239.890000 & 239.88 & 0.036056 & $-2.970204$ & 3 \\
+v4.0.0 & 241.05 & 241.01 & 241.03 & 241.030000 & 241.03 & 0.020000 & $-2.509101$ & 5 \\
+v5.0.0 & 253.67 & 253.96 & 253.77 & 253.800000 & 253.77 & 0.147309 & 2.656060 & 8 \\
+v6.0.0 & 240.35 & 240.23 & 240.24 & 240.273333 & 240.24 & 0.066583 & $-2.815154$ & 4 \\
+v7.0.0 & 251.51 & 251.65 & 251.58 & 251.580000 & 251.58 & 0.070000 & 1.758123 & 7 \\
+\bottomrule
+\end{tabular}
+\caption{Matrix short (360, 1 repetition), 3 runs. Times in seconds. Apple M3 Max, macOS 27.0.}
+\label{tab:matrix-short}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}l rrr rrr rr r@{}}
+\toprule
+Allocator & Run 1 & Run 2 & Run 3 & Mean & Median & Std.\ dev. & vs.\ regular (\%) & Rank \\
+\midrule
+Regular new & 9138.76 & 9138.39 & 9140.12 & 9139.090000 & 9138.76 & 0.910988 & 0.000000 & 6 \\
+v1.0.0 & 8820.11 & 8821.59 & 8822.81 & 8821.503333 & 8821.59 & 1.352085 & $-3.475036$ & 2 \\
+v2.0.0 & 8819.94 & 8819.70 & 8820.01 & 8819.883333 & 8819.94 & 0.162583 & $-3.492762$ & 1 \\
+v3.0.0 & 8897.76 & 8901.31 & 8899.44 & 8899.503333 & 8899.44 & 1.775847 & $-2.621559$ & 3 \\
+v4.0.0 & 8944.05 & 8944.77 & 8949.60 & 8946.140000 & 8944.77 & 3.017996 & $-2.111261$ & 5 \\
+v5.0.0 & 9413.85 & 9411.98 & 9410.25 & 9412.026667 & 9411.98 & 1.800454 & 2.986475 & 8 \\
+v6.0.0 & 8920.78 & 8920.32 & 8918.25 & 8919.783333 & 8920.32 & 1.347677 & $-2.399655$ & 4 \\
+v7.0.0 & 9298.53 & 9298.39 & 9297.97 & 9298.296667 & 9298.39 & 0.291433 & 1.742041 & 7 \\
+\bottomrule
+\end{tabular}
+\caption{Matrix medium (360, 37 repetitions), 3 runs. Times in seconds. Apple M3 Max, macOS 27.0.}
+\label{tab:matrix-medium}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}l rrr rrr rr r@{}}
+\toprule
+Allocator & Run 1 & Run 2 & Run 3 & Mean & Median & Std.\ dev. & vs.\ regular (\%) & Rank \\
+\midrule
+Regular new & 24050.25 & 24048.46 & 24049.80 & 24049.503333 & 24049.80 & 0.931146 & 0.000000 & 6 \\
+v1.0.0 & 23134.62 & 23135.86 & 23137.38 & 23135.953333 & 23135.86 & 1.382365 & $-3.798623$ & 1 \\
+v2.0.0 & 23135.86 & 23137.51 & 23139.69 & 23137.686667 & 23137.51 & 1.921102 & $-3.791416$ & 2 \\
+v3.0.0 & 23345.92 & 23345.17 & 23345.81 & 23345.633333 & 23345.81 & 0.405010 & $-2.926755$ & 3 \\
+v4.0.0 & 23453.50 & 23453.57 & 23457.00 & 23454.690000 & 23453.57 & 2.000825 & $-2.473287$ & 5 \\
+v5.0.0 & 24652.24 & 24648.64 & 24654.78 & 24651.886667 & 24652.24 & 3.085212 & 2.504764 & 8 \\
+v6.0.0 & 23383.91 & 23384.51 & 23384.08 & 23384.166667 & 23384.08 & 0.309246 & $-2.766530$ & 4 \\
+v7.0.0 & 24474.50 & 24477.54 & 24473.17 & 24475.070000 & 24474.50 & 2.240067 & 1.769545 & 7 \\
+\bottomrule
+\end{tabular}
+\caption{Matrix long (360, 97 repetitions), 3 runs. Times in seconds. Apple M3 Max, macOS 26.6.2.}
+\label{tab:matrix-long}
+\end{table}
+
+\subsection{v6 and v7 four-workload campaigns}
+
+Source: \path{v6-v7-run-durations.csv}.
+240 rows.
+Five runs per (version, workload, scale, regular/overloaded) group.
+Workloads: list, matrix, nodes, stress.
+Scales: short, medium, long.
+v6 ran on the Apple M3 Max.
+v7 ran on the Ryzen 7900X WSL host.
+
+\begin{longtable}{@{}lllr r l@{}}
+\caption{v6.0.0 elapsed-time summary, 5 runs. Host: Apple M3 Max. Times in seconds.}
+\label{tab:v6-means}\\
+\toprule
+Workload & Scale & Kind & $n$ & Mean (s) & Min--Max (s) \\
+\midrule
+\endfirsthead
+\caption[]{v6.0.0 elapsed-time summary (continued)}\\
+\toprule
+Workload & Scale & Kind & $n$ & Mean (s) & Min--Max (s) \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+list & short & regular & 5 & 276.5800 & 276.3400--276.8700 \\
+list & short & overloaded & 5 & 277.3040 & 277.1200--277.5800 \\
+list & medium & regular & 5 & 8810.2780 & 8807.1100--8814.0800 \\
+list & medium & overloaded & 5 & 8832.6760 & 8830.7000--8835.1200 \\
+list & long & regular & 5 & 23115.3800 & 23111.7500--23120.8500 \\
+list & long & overloaded & 5 & 23161.0860 & 23159.1600--23163.6600 \\
+matrix & short & regular & 5 & 248.0780 & 248.0400--248.1100 \\
+matrix & short & overloaded & 5 & 242.1760 & 242.0800--242.3000 \\
+matrix & medium & regular & 5 & 9156.1680 & 9155.4300--9157.8200 \\
+matrix & medium & overloaded & 5 & 8943.7400 & 8942.2100--8945.0600 \\
+matrix & long & regular & 5 & 24003.9360 & 24001.8900--24005.9500 \\
+matrix & long & overloaded & 5 & 23445.8280 & 23443.2300--23448.4200 \\
+nodes & short & regular & 5 & 248.6060 & 248.3700--249.4000 \\
+nodes & short & overloaded & 5 & 240.9960 & 240.8900--241.1900 \\
+nodes & medium & regular & 5 & 9173.6780 & 9168.4400--9177.8500 \\
+nodes & medium & overloaded & 5 & 8893.1780 & 8891.0200--8895.7000 \\
+nodes & long & regular & 5 & 24054.8500 & 24045.8500--24059.3300 \\
+nodes & long & overloaded & 5 & 23320.3000 & 23318.0200--23323.9900 \\
+stress & short & regular & 5 & 251.9720 & 251.8200--252.1800 \\
+stress & short & overloaded & 5 & 269.6060 & 269.2500--269.8900 \\
+stress & medium & regular & 5 & 8500.3520 & 8498.2700--8501.7300 \\
+stress & medium & overloaded & 5 & 9038.6980 & 9035.1000--9041.0300 \\
+stress & long & regular & 5 & 23317.4020 & 23225.6700--23417.2100 \\
+stress & long & overloaded & 5 & 24683.3260 & 24679.3600--24686.2200 \\
+\end{longtable}
+
+\begin{longtable}{@{}lllr r l@{}}
+\caption{v7.0.0 elapsed-time summary, 5 runs. Host: AMD Ryzen 9 7900X (WSL). Times in seconds.}
+\label{tab:v7-means}\\
+\toprule
+Workload & Scale & Kind & $n$ & Mean (s) & Min--Max (s) \\
+\midrule
+\endfirsthead
+\caption[]{v7.0.0 elapsed-time summary (continued)}\\
+\toprule
+Workload & Scale & Kind & $n$ & Mean (s) & Min--Max (s) \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+list & short & regular & 5 & 191.4180 & 189.5900--192.5100 \\
+list & short & overloaded & 5 & 216.4060 & 214.8800--217.2200 \\
+list & medium & regular & 5 & 8349.2000 & 8306.0000--8396.0000 \\
+list & medium & overloaded & 5 & 9363.4000 & 9343.0000--9407.0000 \\
+list & long & regular & 5 & 23348.6000 & 23290.0000--23427.0000 \\
+list & long & overloaded & 5 & 25921.0000 & 25888.0000--25947.0000 \\
+matrix & short & regular & 5 & 195.3200 & 193.8800--197.4900 \\
+matrix & short & overloaded & 5 & 216.3020 & 213.8600--217.7800 \\
+matrix & medium & regular & 5 & 8348.6000 & 8326.0000--8394.0000 \\
+matrix & medium & overloaded & 5 & 9082.0000 & 9066.0000--9103.0000 \\
+matrix & long & regular & 5 & 23198.6000 & 23170.0000--23234.0000 \\
+matrix & long & overloaded & 5 & 25438.2000 & 25384.0000--25506.0000 \\
+nodes & short & regular & 5 & 197.3820 & 196.2500--198.8400 \\
+nodes & short & overloaded & 5 & 216.4000 & 214.6600--217.5800 \\
+nodes & medium & regular & 5 & 8268.4000 & 8253.0000--8290.0000 \\
+nodes & medium & overloaded & 5 & 9067.2000 & 9040.0000--9098.0000 \\
+nodes & long & regular & 5 & 22537.8000 & 22524.0000--22560.0000 \\
+nodes & long & overloaded & 5 & 24730.6000 & 24675.0000--24779.0000 \\
+stress & short & regular & 5 & 219.4720 & 217.6200--221.6800 \\
+stress & short & overloaded & 5 & 230.0680 & 228.2100--231.2300 \\
+stress & medium & regular & 5 & 8368.0000 & 8339.0000--8398.0000 \\
+stress & medium & overloaded & 5 & 8738.8000 & 8719.0000--8754.0000 \\
+stress & long & regular & 5 & 22473.2000 & 22414.0000--22542.0000 \\
+stress & long & overloaded & 5 & 23413.2000 & 23398.0000--23424.0000 \\
+\end{longtable}

@@ -1,0 +1,2 @@
+repetition=1/1 regular new uniform nodes: size=350 passes=700 nodes=256 checksum=1.6301277146679058e+127
+repeat summary: repetitions=1 checksum=1.6301277146679058e+127

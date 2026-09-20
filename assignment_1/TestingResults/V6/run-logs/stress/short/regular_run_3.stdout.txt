@@ -1,0 +1,2 @@
+repetition=1/1 regular new nested stress: rounds=800 calculations=237937 new_calls=44013064 delete_calls=44013064 checksum=25155.179804543972
+repeat summary: repetitions=1 checksum=25155.179804543972

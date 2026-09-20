@@ -1,0 +1,2 @@
+Program,Arg1,Arg2,Time,UserTime,SysTime,CPU,PeakMemoryKB,MajorFaults,MinorFaults,VoluntaryCS,InvoluntaryCS
+regular_new,100,,0:15.86,15.76,0.02,99.496,23944,0,5357,1,1642

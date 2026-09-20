@@ -1,0 +1,2 @@
+repetition=1/1 regular new linked list: maximum=3512841 operations=702568200 final=3512840 peak=3512841 appended=105821004 inserted=105831448 erased=209896032 updated=175647192 replaced=105372524 seed=6252026 checksum=1541966748840417294
+repeat summary: repetitions=1 checksum=1541966748840417294

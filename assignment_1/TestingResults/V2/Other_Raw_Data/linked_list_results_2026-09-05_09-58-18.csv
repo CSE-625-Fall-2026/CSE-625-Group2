@@ -1,0 +1,3 @@
+Program,Arg1,Arg2,Time,UserTime,SysTime,CPU,PeakMemoryKB,MajorFaults,MinorFaults,VoluntaryCS,InvoluntaryCS
+regular_linked_list,625000,,0:30.13,30.08,0.04,99.967,82952,0,20105,1,297
+overloaded_linked_list,625000,,3:14:58,11692.34,0.27,99.954,161056,0,39590,1,67837

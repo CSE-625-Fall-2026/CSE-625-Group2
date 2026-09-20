@@ -1,0 +1,7 @@
+Program,Arg1,Arg2,Time,UserTime,SysTime,CPU,PeakMemoryKB,MajorFaults,MinorFaults,VoluntaryCS,InvoluntaryCS
+regular_linked_list,125000,,0:04.57,4.55,0.01,99.781,18952,0,4141,1,146
+overloaded_linked_list,125000,,4:09.60,248.17,0.34,99.563,34796,0,8032,1,10188
+regular_linked_list,580000,,0:30.15,29.96,0.10,99.701,77192,0,18667,1,641
+overloaded_linked_list,580000,,2:41:39,9695.14,0.93,99.970,149664,0,36746,1,41363
+regular_linked_list,875000,,0:44.68,44.59,0.06,99.933,114816,0,28082,1,330
+overloaded_linked_list,875000,,6:34:37,23668.01,0.74,99.965,224032,0,55367,1,166120

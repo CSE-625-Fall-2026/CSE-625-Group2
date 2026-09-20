@@ -1,0 +1,41 @@
+V6 Mac hardware addendum
+========================
+
+Purpose:
+The per-batch v6 environment.txt files recorded the processor and operating
+system but left their core-count and installed-memory fields blank because the
+profiling sandbox could not query those sysctl values. This addendum supplies
+the missing assignment environment fields without modifying raw measurements.
+
+Machine used for every v6 measured batch:
+  Model: MacBook Pro (Mac15,9)
+  Processor: Apple M3 Max
+  Core count: 16 total (12 performance and 4 efficiency cores)
+  Installed memory: 48 GB unified memory
+  Operating system: macOS 26.5.2
+  Operating-system build: 25F84
+  Architecture: arm64
+
+Profiling configuration already recorded in each batch:
+  Machine ID: mohamed-m3max-10proc
+  Concurrent processes: 10 (5 regular and 5 overloaded)
+  Compiler: Apple clang 17.0.0 (clang-1700.6.3.2)
+  Allocator tag: v6.0.0
+  Allocator commit: f68dadcfc67e8764cbdbcf2768390284d43e2f32
+  Project commit: 12617e0f943a7b68d8334aa5477dfa403a75ca21
+  Timing mode: macos-portable
+
+Verification source:
+  system_profiler SPHardwareDataType and sw_vers, queried on the same machine
+  on 2026-09-09 after the profiling campaign. Hardware configuration and OS
+  version matched the values identifying the campaign machine.
+
+No timing, checksum, workload, or result CSV was changed.
+
+started_utc=2026-09-07T15:23:32Z
+machine_id=mohamed-m3max-10proc
+allocator_version=v6.0.0
+runs_per_kind=5
+concurrent_processes=10
+duration_plan=original assignment times
+calibration_file=/Users/mohamedkonsowa/CLionProjects/cse_625/UsingMatrixClass/scripts/v6_mac_calibration.csv

@@ -1,0 +1,3 @@
+Program,Arg1,Arg2,Time,UserTime,SysTime,CPU,PeakMemoryKB,MajorFaults,MinorFaults,VoluntaryCS,InvoluntaryCS
+regular_memory_stress,500,,6:13.46,373.26,0.12,99.979,181996,0,53778,1,2647
+overloaded_memory_stress,500,,3:24:19,12259.29,0.13,100.003,189904,0,46847,11,7691

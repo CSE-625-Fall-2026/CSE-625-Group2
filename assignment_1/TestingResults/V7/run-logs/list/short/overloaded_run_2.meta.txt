@@ -1,0 +1,8 @@
+allocator=overloaded
+run_number=2
+program=/mnt/c/Users/mkonm/OneDrive/Desktop/parallel/UsingMatrixClass/build-CMA-V7/overloaded_linked_list
+repetitions=1
+arg1=3512841
+arg2=
+workload=list
+scale=short

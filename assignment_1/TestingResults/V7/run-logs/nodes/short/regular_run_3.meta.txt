@@ -1,0 +1,8 @@
+allocator=regular
+run_number=3
+program=/mnt/c/Users/mkonm/OneDrive/Desktop/parallel/UsingMatrixClass/build-CMA-V7/regular_uniform_nodes
+repetitions=1
+arg1=350
+arg2=700
+workload=nodes
+scale=short

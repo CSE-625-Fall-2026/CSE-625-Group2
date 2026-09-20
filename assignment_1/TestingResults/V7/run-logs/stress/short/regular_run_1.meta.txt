@@ -1,0 +1,8 @@
+allocator=regular
+run_number=1
+program=/mnt/c/Users/mkonm/OneDrive/Desktop/parallel/UsingMatrixClass/build-CMA-V7/regular_memory_stress
+repetitions=1
+arg1=800
+arg2=
+workload=stress
+scale=short

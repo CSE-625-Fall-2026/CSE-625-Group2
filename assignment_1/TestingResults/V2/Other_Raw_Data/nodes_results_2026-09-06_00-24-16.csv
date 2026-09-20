@@ -1,0 +1,5 @@
+Program,Arg1,Arg2,Time,UserTime,SysTime,CPU,PeakMemoryKB,MajorFaults,MinorFaults,VoluntaryCS,InvoluntaryCS
+regular_uniform_nodes,275,600,3:43.61,223.21,0.11,99.870,156620,0,38535,1,5290
+regular_uniform_nodes,300,600,4:44.86,284.64,0.09,99.954,186368,0,45956,1,2186
+overloaded_uniform_nodes,275,600,3:43.71,223.28,0.09,99.848,161308,0,39651,1,3438
+overloaded_uniform_nodes,300,600,4:46.57,286.51,0.11,100.017,191284,0,47173,1,1207

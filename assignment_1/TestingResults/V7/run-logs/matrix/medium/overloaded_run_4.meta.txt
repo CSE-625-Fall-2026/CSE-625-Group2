@@ -1,0 +1,8 @@
+allocator=overloaded
+run_number=4
+program=/mnt/c/Users/mkonm/OneDrive/Desktop/parallel/UsingMatrixClass/build-CMA-V7/overloaded_new
+repetitions=42
+arg1=360
+arg2=
+workload=matrix
+scale=medium

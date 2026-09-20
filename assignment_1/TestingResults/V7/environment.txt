@@ -1,0 +1,62 @@
+Machine and environment evidence
+================================
+
+machine_id=ryzen7900x-32gb-wsl
+processor=AMD Ryzen 9 7900X 12-Core Processor
+physical_cores=12
+logical_cores=24
+installed_memory=32 GB DDR5-5200 (33377656832 bytes)
+windows=Microsoft Windows 11 Home 10.0.26200
+wsl=2.7.13.0
+linux=Ubuntu 24.04 LTS
+kernel=6.18.33.2-microsoft-standard-WSL2
+timing_tool=/usr/bin/time -v (GNU Time, Ubuntu time 1.9-0.2build1)
+
+Background load during measured batches was light. Typical environment.txt
+snapshots show systemd, udev, journald, and unattended-upgrades only. No other
+benchmark workloads were started on this machine during --run-all.
+
+See also:
+  WSL_CONFIG_AND_RESOURCES.txt
+  wslconfig/.wslconfig
+  scripts/windows_host_info.txt
+  per-batch environment.txt files under profiling-results/
+
+Build and source evidence
+=========================
+
+Project commit: 12617e0f943a7b68d8334aa5477dfa403a75ca21
+Allocator tag: v7.0.0
+Allocator commit: d3c2ee7437cdb768b1f69de76287d33c539d6973
+Build type: Release
+BUILD_TESTING: OFF
+CUSTOM_MEMORY_ALLOCATOR_VERSION: v7.0.0
+C++ compiler: /usr/bin/c++  (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+Standard library: libstdc++.so.6 from GCC 13 (/usr/lib/x86_64-linux-gnu/libstdc++.so.6)
+glibc: Ubuntu GLIBC 2.39-0ubuntu8.8
+CMake: 3.28.3
+Build directory: build-CMA-V7
+CMake cache copied from: UsingMatrixClass/build-CMA-V7/CMakeCache.txt
+
+Configure and build commands:
+  cmake -S . -B build-CMA-V7 \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_TESTING=OFF \
+    -DCUSTOM_MEMORY_ALLOCATOR_VERSION=v7.0.0
+  cmake --build build-CMA-V7 --parallel 12
+
+Allocator verification:
+  git -C build-CMA-V7/_deps/custommemoryallocator-src describe --tags --exact-match
+    -> v7.0.0
+  git -C build-CMA-V7/_deps/custommemoryallocator-src rev-parse HEAD
+    -> d3c2ee7437cdb768b1f69de76287d33c539d6973
+
+Calibration command:
+  wsl -d Ubuntu-24.04 -- bash -lc "cd /mnt/c/Users/mkonm/OneDrive/Desktop/parallel/UsingMatrixClass && scripts/profile_v7_pc.sh --calibrate"
+  (first attempt stopped after elapsed-time parser bug; resumed with RESUME_CALIBRATION=1 after matrix short input was accepted from the repaired first ten-process batch)
+
+Measured campaign command:
+  wsl -d Ubuntu-24.04 -- bash -lc "cd /mnt/c/Users/mkonm/OneDrive/Desktop/parallel/UsingMatrixClass && scripts/profile_v7_pc.sh --run-all 2>&1 | tee profiling-results/ryzen7900x-32gb-wsl/v7.0.0/run-all.log"
+
+Smoke tests:
+  scripts/profile_v7_pc.sh --smoke

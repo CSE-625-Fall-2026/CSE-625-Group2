@@ -1,0 +1,8 @@
+allocator=overloaded
+run_number=4
+program=/mnt/c/Users/mkonm/OneDrive/Desktop/parallel/UsingMatrixClass/build-CMA-V7/overloaded_memory_stress
+repetitions=38
+arg1=800
+arg2=
+workload=stress
+scale=medium

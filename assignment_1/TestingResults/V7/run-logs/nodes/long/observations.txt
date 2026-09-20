@@ -1,0 +1,10 @@
+regular run 1 status=success checksum=1.6301277146679046e+127 elapsed=22527.000000
+overloaded run 1 status=success checksum=1.6301277146679046e+127 elapsed=24688.000000
+regular run 2 status=success checksum=1.6301277146679046e+127 elapsed=22536.000000
+overloaded run 2 status=success checksum=1.6301277146679046e+127 elapsed=24760.000000
+regular run 3 status=success checksum=1.6301277146679046e+127 elapsed=22542.000000
+overloaded run 3 status=success checksum=1.6301277146679046e+127 elapsed=24751.000000
+regular run 4 status=success checksum=1.6301277146679046e+127 elapsed=22524.000000
+overloaded run 4 status=success checksum=1.6301277146679046e+127 elapsed=24779.000000
+regular run 5 status=success checksum=1.6301277146679046e+127 elapsed=22560.000000
+overloaded run 5 status=success checksum=1.6301277146679046e+127 elapsed=24675.000000

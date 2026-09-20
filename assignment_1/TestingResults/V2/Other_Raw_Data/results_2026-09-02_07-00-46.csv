@@ -1,0 +1,9 @@
+Program,Arg1,Arg2,Time,UserTime,SysTime,CPU,PeakMemoryKB,MajorFaults,MinorFaults,VoluntaryCS,InvoluntaryCS
+regular_new,320,,3:26.39,206.17,0.21,99.995,212272,0,faults:,,
+overloaded_new,320,,4:06.87,246.73,0.08,99.976,217628,0,faults:,,
+regular_memory_stress,230,,1:51.69,111.59,0.06,99.964,164524,0,faults:,,
+overloaded_memory_stress,230,,31:34.33,1894.26,0.08,100.001,171580,0,faults:,,
+regular_uniform_nodes,350,1200,11:27.48,687.40,0.09,100.001,252168,0,faults:,,
+overloaded_uniform_nodes,350,1200,10:49.26,648.73,0.10,99.934,257844,0,faults:,,
+regular_linked_list,1000000,,0:40.02,40.01,0.04,100.075,130728,0,faults:,,
+overloaded_linked_list,1000000,,7:35:17,27313.66,0.29,99.989,255520,0,faults:,,

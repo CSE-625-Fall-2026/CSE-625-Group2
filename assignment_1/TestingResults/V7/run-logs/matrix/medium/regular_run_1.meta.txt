@@ -1,0 +1,8 @@
+allocator=regular
+run_number=1
+program=/mnt/c/Users/mkonm/OneDrive/Desktop/parallel/UsingMatrixClass/build-CMA-V7/regular_new
+repetitions=42
+arg1=360
+arg2=
+workload=matrix
+scale=medium

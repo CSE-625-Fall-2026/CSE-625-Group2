@@ -20,9 +20,9 @@ That intercept file does not change across v1--v8; the versions differ in how
 \texttt{MemoryPool} implements \texttt{allocate} and \texttt{deallocate}.
 
 v8 is a matrix-oriented revision of v7.
-It is faster than regular \texttt{new} and than v1--v7 on the 360$\times$360
-matrix workload, and it is a poor fit for workloads that allocate millions of
-tiny objects.
+The design target is packed 360$\times$360 matrix rows; the same policy is a
+poor fit for workloads that allocate millions of tiny objects.
+Measured times belong in the later results section.
 The descriptions below are taken from the tagged sources (v1--v7) and from the
 \texttt{v8.0.0} overlay that was profiled, not from the one-line README
 changelog.
@@ -422,10 +422,10 @@ after it created a cyclic free list in \texttt{findBestFit}.
 v8 keeps v5's deferred merge: adjacent free blocks are combined only when an
 allocation cannot be satisfied from existing bins.
 
-The matrix result of that combination is consistent across scales on the M3
-Max 6-process method: v8 is about 4.2\%--5.3\% faster than the original
-regular-\texttt{new} baseline, and it is faster than v1 and v2, which had been
-the previous best custom versions.
+Whether that combination actually wins on matrix is left to the later results
+section.
+This section only records the policy: packed rows, no hot-path thread cache,
+and an accepted miss on tiny-object lists.
 
 \subsection{Why v8 misses other allocation patterns}
 
@@ -438,10 +438,8 @@ whose working set is many small, independent objects.
 6.5 million \texttt{Node} objects, each a small header plus a separately
 allocated \texttt{int[]} payload, then mixes insert, erase, and update for
 $200$ operations per node.
-Regular \texttt{new} finishes a short run in about five to seven minutes on
-the M3 Max.
-v8's three overloaded processes were still at 99\% CPU after ten hours with
-no checksum line, and were killed (exit 143).
+Regular \texttt{new} finishes that short list; v8 overloaded list runs did
+not, and were killed.
 Two mechanisms explain that miss.
 
 First, the thread cache is off.
@@ -468,22 +466,19 @@ benefit, but they also allocate and free many smaller objects (node wrappers,
 temporaries, nested blocks).
 They are not as cache-hostile as the 6.5 million node list, and they are not
 as regular as 360 fixed rows.
-v8 can still run them, and short nodes/stress completed in the same overnight
-campaign, but they are not the design target.
+v8 can still run them, but they are not the design target.
 A version that wins all four UsingMatrixClass workloads would need the v4--v7
 small-object cache \emph{and} the v8 packed-row region, with a policy that
 sends matrix-sized requests to the packed region and tiny nodes to the cache.
 v8 does not do that split on the allocate path; it optimized the matrix side
 and accepted the list miss.
 
-\paragraph{How to read the later tables.}
-Matrix short, medium, and long compare v8 to regular \texttt{new} and to
-v1--v7 under the same 6-process method.
-Those numbers are the intended evaluation of v8.
-Linked-list times for v8 are not a valid performance comparison: the run did
-not finish.
-Where a later section reports v8 only on matrix, that is the specialization,
-not missing data.
+\paragraph{Where the numbers go.}
+This section does not report elapsed times.
+Matrix comparisons of regular \texttt{new} and v1--v8 belong in the later
+results section.
+Linked-list times for v8 should not be treated as a finished comparison: the
+run did not complete.
 
 \subsection{Version progression}
 

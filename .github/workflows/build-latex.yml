@@ -1,31 +1,60 @@
-name: Release LaTeX PDF
+name: Build LaTeX PDFs
 
 on:
   push:
+    branches: ['**']
     tags: ['v*']
+  pull_request:
+  workflow_dispatch:
 
 env:
-  DOC_DIR: assignment_1
+  REPORT_DIR: assignment_1
+  SLIDES_DIR: assignment_1/slides
 
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
 
-      - name: Compile main.tex
+      - name: Compile report
         uses: xu-cheng/latex-action@v3
         with:
-          working_directory: ${{ env.DOC_DIR }}
+          working_directory: ${{ env.REPORT_DIR }}
           root_file: main.tex
 
-      - name: Name the release asset after the tag
-        run: cp "$DOC_DIR/main.pdf" "$GITHUB_REF_NAME.pdf"
+      - name: Compile slideshow
+        uses: xu-cheng/latex-action@v3
+        with:
+          working_directory: ${{ env.SLIDES_DIR }}
+          root_file: main.tex
 
-      - name: Publish PDF to a release
+      - name: Collect PDFs
+        run: |
+          mkdir -p artifacts
+          cp "$REPORT_DIR/main.pdf" artifacts/report.pdf
+          cp "$SLIDES_DIR/main.pdf" artifacts/slides.pdf
+
+      - name: Upload PDFs as a workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: latex-pdfs
+          path: artifacts/
+          if-no-files-found: error
+
+      - name: Name release assets after the tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          cp artifacts/report.pdf "$GITHUB_REF_NAME-report.pdf"
+          cp artifacts/slides.pdf "$GITHUB_REF_NAME-slides.pdf"
+
+      - name: Publish PDFs to a release
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ github.ref_name }}.pdf
+          files: |
+            ${{ github.ref_name }}-report.pdf
+            ${{ github.ref_name }}-slides.pdf
           generate_release_notes: true

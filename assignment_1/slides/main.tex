@@ -1,0 +1,68 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+
+% --- Theme ---
+% Madrid/whale are part of base Beamer, so this compiles with a stock
+% TeX Live installation and needs no extra font packages.
+\usetheme{Madrid}
+\usecolortheme{whale}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{caption}[numbered]
+\setbeamerfont{footnote}{size=\tiny}
+
+% --- Encoding and fonts ---
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+
+% --- Math ---
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% --- Figures and tables ---
+\usepackage{graphicx}
+\graphicspath{{figures/}{../figures/}}
+\usepackage{booktabs}
+
+\usepackage{listings}
+\lstset{
+    basicstyle=\ttfamily\scriptsize,
+    keywordstyle=\color{blue!60!black},
+    commentstyle=\itshape\color{gray},
+    breaklines=true,
+    showstringspaces=false,
+    language=C++,
+}
+
+% --- Title block ---
+\title[Allocator Profiling]{Assignment 1 --- Custom Memory Allocator Profiling}
+\author[Group 2]{%
+    Jacob Nance \quad Fernanda Gonzalez \quad Francisco Chagua \\[0.3em]
+    Nicholas Hooper \quad Nicholas Johnson \quad Mohamed Konsowa
+}
+\institute[CSE-625]{CSE-625 --- Fall 2026}
+\date{September 22, 2026}
+
+\AtBeginSection[]{
+    \begin{frame}{Outline}
+        \tableofcontents[currentsection, hideothersubsections]
+    \end{frame}
+}
+
+\begin{document}
+
+\begin{frame}[plain]
+    \titlepage
+\end{frame}
+
+\begin{frame}{Outline}
+    \tableofcontents
+\end{frame}
+
+\input{sections/01_overview_motivation}
+\input{sections/02_profiling_methodology}
+\input{sections/03_allocator_version_analysis}
+\input{sections/04_environmental_effects}
+\input{sections/05_v8_improvement}
+\input{sections/06_limitations_conclusions}
+
+\end{document}

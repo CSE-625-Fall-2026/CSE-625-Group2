@@ -1,26 +1,512 @@
 \section{Explanation of Allocator Versions}
 \label{sec:allocator-versions}
 
-The custom allocator was changed in seven tagged versions.
-Each tagged version replaces the previous implementation.
-Table~\ref{tab:allocator-versions} records what each version does and what changed from the version immediately before it.
+The experiments always compare two programs that run the same workload source.
+The \emph{regular} program uses ordinary C++ \texttt{new}/\texttt{delete} and
+never links CustomMemoryAllocator.
+The \emph{overloaded} program links the global-\texttt{new} target, calls
+\texttt{initialize} on a process-wide pool, and then routes every ordinary
+\texttt{new} in the caller and its dependencies through that pool.
+
+CustomMemoryAllocator tags \texttt{v1.0.0} through \texttt{v8.0.0} each replace
+the previous \texttt{MemoryPool} implementation rather than adding a second
+allocator.
+Every tag exposes the same public interface:
+\texttt{initialize}, \texttt{shutdown}, \texttt{allocate}, \texttt{deallocate},
+\texttt{owns}, and \texttt{statistics}.
+When the overloaded target is linked, the same \texttt{GlobalNew.cpp}
+intercepts \texttt{new}, \texttt{new[]}, \texttt{delete}, and \texttt{delete[]}.
+That intercept file does not change across v1--v8; the versions differ in how
+\texttt{MemoryPool} implements \texttt{allocate} and \texttt{deallocate}.
+
+v8 is a matrix-oriented revision of v7.
+It is faster than regular \texttt{new} and than v1--v7 on the 360$\times$360
+matrix workload, and it is a poor fit for workloads that allocate millions of
+tiny objects.
+The descriptions below are taken from the tagged sources (v1--v7) and from the
+\texttt{v8.0.0} overlay that was profiled, not from the one-line README
+changelog.
+
+\subsection{Machinery shared by every custom version}
+
+The pool is a singleton constructed with placement \texttt{new} into static
+storage so that \path{MemoryPool::instance()} does not allocate through the
+same allocator.
+\texttt{initialize(bytes)} rounds the request up to a page multiple and maps one
+anonymous region with \texttt{mmap}
+(\path{PROT_READ|PROT_WRITE}, \path{MAP_PRIVATE|MAP_ANONYMOUS}).
+That region is the only heap the pool owns.
+\texttt{shutdown} unmaps it, and only if no live allocations remain.
+
+A request of size 0 is treated as 1 byte.
+The requested alignment must be a power of two; otherwise
+\texttt{allocate} throws \texttt{std::bad\_alloc}.
+Each live block stores this layout, in order:
+
+\begin{itemize}
+  \item a \texttt{BlockHeader} aligned to \texttt{alignof(std::max\_align\_t)};
+  \item a back-pointer to that header;
+  \item a 32-bit front canary \texttt{0xCAFEBABE};
+  \item padding so the user pointer meets the requested alignment;
+  \item the user payload;
+  \item a 32-bit rear canary \texttt{0xDEADBEEF};
+  \item padding so the next header remains aligned.
+\end{itemize}
+
+The header records total block size, requested payload size, the user pointer,
+and doubly linked free-list pointers.
+A 64-bit magic word distinguishes live, free, and retired blocks
+(\texttt{CMALLOC}, \texttt{FREEBLOC}, and \texttt{RETIREDB} as ASCII in the
+\texttt{uint64} constants).
+Later versions add cached and reserved magics.
+On \texttt{deallocate}, the allocator recovers the header from the back-pointer,
+rejects pointers outside the mapped region, reports double-free if the magic is
+already free, cached, or retired, and reports front, rear, or both canary
+corruption.
+The default handler writes a message to standard error; it does not abort.
+Canary values are unchanged in every tag.
+
+If the remainder after an allocation is large enough for another header, two
+canaries, a back-pointer, and a \texttt{max\_align\_t} payload, the block is
+split and the leftover is returned to the free structure.
+Otherwise the whole block is used.
+
+Overloaded \texttt{new} calls \texttt{MemoryPool::allocate} only after
+\texttt{initialize} has succeeded.
+If the pool is not initialized, it falls back to \texttt{malloc} /
+\texttt{posix\_memalign}.
+\texttt{delete} uses \texttt{owns}: pool pointers go to
+\texttt{deallocate}, others to \texttt{std::free}.
+That split is the same on every custom version.
+
+\subsection{Regular \texttt{new}: the system allocator}
+
+Regular \texttt{new} is the baseline, not a CustomMemoryAllocator tag.
+\texttt{regular\_new}, \texttt{regular\_uniform\_nodes},
+\texttt{regular\_linked\_list}, and \texttt{regular\_memory\_stress} do not
+link \texttt{CustomMemoryAllocator::global\_new} and never call
+\texttt{initialize}.
+A C++ \texttt{new T} therefore goes to the compiler's \texttt{operator new},
+which calls the platform \texttt{malloc}.
+\texttt{delete} goes to \texttt{free}.
+There is no process-wide mmap pool, no canary, and no
+\texttt{BlockHeader} in front of the payload.
+
+On macOS the C library is libmalloc.
+Small objects typically come from a per-thread magazine / nano zone: the
+thread keeps a private cache of size classes so a hot \texttt{malloc}/\texttt{free}
+pair often never takes a process-wide lock.
+Larger objects go to a shared tiny/small/large allocator, and sufficiently
+large requests are satisfied with \texttt{mmap} of their own.
+On Linux the same call is glibc ptmalloc2 (or an equivalent): multiple arenas,
+per-thread caches, and size classes, with \texttt{mmap} above a large-size
+threshold.
+Windows uses the CRT / Win32 heap, again with size classes and a lock around
+the shared heap.
+
+The important properties for this project are the same on every host we used:
+
+\begin{itemize}
+  \item Regular \texttt{new} is a general-purpose allocator.
+    It is not told that the next million requests will be 32-byte list nodes,
+    or that the next 360 requests will be 2880-byte matrix rows.
+  \item It is allowed to return memory to the OS, to keep per-thread caches,
+    and to use more than one mapped region.
+    CustomMemoryAllocator cannot: after \texttt{initialize(bytes)} it owns
+    exactly one anonymous mapping of that size.
+  \item It has had decades of tuning on mixed workloads.
+    Beating it on one workload usually means specializing; that specialization
+    is visible as a miss on a different allocation pattern.
+\end{itemize}
+
+All later custom versions are therefore not ``malloc plus a few flags.''
+They are a single mmap arena with an explicit free-block policy, compared
+against a production general-purpose heap on the same binary, arguments, and
+host.
+
+\subsection{v1.0.0: address-ordered free list, first-fit, immediate merge}
+
+v1 keeps every free block on one doubly linked list headed by
+\texttt{free\_head\_}.
+\texttt{insertFreeBlock} walks that list and splices the block in by address, so
+the list is always sorted from low to high in the mapped region.
+
+Allocation walks \texttt{free\_head\_} and takes the first block for which
+\texttt{calculateLayout} can place the payload and both canaries
+(first-fit).
+It then removes that block, splits if the remainder is large enough, marks the
+chosen block live, and writes the canaries.
+
+Deallocation inserts the block back into the address-ordered list and
+immediately calls \texttt{coalesce}.
+Because neighbors on the free list are also physical neighbors when they are
+adjacent in the region, coalescing checks the previous and next free-list
+nodes:
+if \texttt{previous + previous->total\_size} equals the current block, the two
+are merged; the same test is then applied to the next node.
+The absorbed header is marked retired so a stale pointer cannot be treated as
+live.
+
+The entire \texttt{allocate} / \texttt{deallocate} path holds one
+\texttt{std::mutex}.
+\texttt{owns} and \texttt{statistics} take the same lock.
+
+First-fit with immediate coalescing keeps the free list short and tends to
+reuse low addresses, but a search may skip a later, tighter fit, and every
+allocation scans from the head.
+Immediate merge reduces external fragmentation at the cost of extra list
+surgery on every free.
+
+\subsection{v2.0.0: best-fit on the same list}
+
+v2 does not change the free-list structure, splitting, coalescing, canaries, or
+locking.
+The only change is the search in \texttt{allocate}: the loop no longer
+\texttt{break}s at the first usable block.
+It continues through the whole list and keeps the usable block with the
+smallest \texttt{total\_size}.
+
+That is global best-fit on one address-ordered list.
+A request is more likely to leave a small remainder, which can reduce
+fragmentation compared with first-fit.
+The cost is that every allocation inspects every free block, so search time
+grows with the number of free nodes.
+
+\subsection{v3.0.0: size-segregated free lists}
+
+v3 replaces the single list with size-segregated bins.
+The bin count is \path{std::numeric_limits<std::size_t>::digits}
+(64 bins on a 64-bit host).
+\texttt{binIndex} is the number of times the block size can be shifted right
+until it becomes 1, i.e.\ a floor-log$_2$ class.
+Each bin is a doubly linked list of free blocks in that size class.
+\texttt{occupied\_bins\_} is a bitmask so empty bins are skipped.
+
+Search still uses best-fit, but only inside successive bins.
+\texttt{findBestFit} starts at the bin that can hold the minimum header-plus-payload
+size and walks larger bins until one contains a block that fits.
+Within that bin it selects the smallest usable block, then returns without
+searching still-larger bins.
+That is segregated best-fit, not a global walk of every free block.
+
+Because free-list order is no longer address order, v3 cannot find physical
+neighbors from list pointers.
+Each header stores \texttt{previous\_size}.
+\texttt{previousPhysicalBlock} subtracts that size from the current address;
+\texttt{nextPhysicalBlock} adds \texttt{total\_size}.
+\texttt{updateFollowingBlock} writes the new previous size into the next header
+after a split or merge.
+\texttt{coalesce} still runs on every deallocation: it pulls adjacent free
+physical neighbors out of their bins, merges sizes, and reinserts the combined
+block into the bin for the new size.
+
+\texttt{owns} and \texttt{isInitialized} become lock-free by publishing the
+mapped range in \texttt{std::atomic} begin/end addresses.
+Allocation and deallocation still take the pool mutex.
+
+Segregation avoids scanning small blocks when a large request can only come
+from a large bin.
+The bitmask makes empty classes cheap to skip.
+The remaining costs are bin maintenance on every insert/remove and the extra
+\texttt{previous\_size} field in every header.
+
+\subsection{v4.0.0: fixed thread-local caches for small blocks}
+
+v4 splits free storage into small and large classes and adds a
+\texttt{thread\_local} cache.
+
+Small bins use a 64-byte quantum and 128 classes, so the small-block limit is
+$64 \times 128 = 8192$ bytes.
+\texttt{smallBinIndex} is $\min(\lfloor (size-1)/64 \rfloor, 127)$.
+Large free blocks remain in log$_2$ bins as in v3.
+A request whose payload is at least 64\,KiB is forced to page alignment
+(\texttt{effectiveAlignment}).
+
+Each thread has a \texttt{ThreadCache} with a fixed array of 128 free-list heads
+and a matching count array.
+The arrays are members of the cache object so cache bookkeeping does not
+allocate through \texttt{MemoryPool}.
+\texttt{registerThreadCache} is the only lock required before a thread can use
+its cache.
+A destructor flushes the cache back to the central pool.
+
+The common allocate path calls \texttt{takeCachedBlock} with no mutex.
+It searches the thread's small classes from the narrowest usable class upward
+and, inside a class, takes the smallest fitting cached block (best-fit within
+that class).
+On a cache hit, \texttt{activateBlock} writes canaries and returns.
+On a miss, the thread locks the pool, runs \texttt{findBestFit} on the central
+small and large bins, and if that fails it flushes its own cache and retries.
+A successful central allocation still splits a remainder back into the central
+bins.
+
+Small deallocations go to \texttt{cacheBlock} instead of the central free lists.
+Each class may retain 64 blocks.
+When a class exceeds that cap, the cache returns a batch of 32 blocks to the
+pool under one lock.
+v4 still coalesces those returned blocks immediately
+(\texttt{flushCacheBinUnlocked} calls \texttt{coalesce} on each).
+Large deallocations lock the pool and coalesce immediately, as in v3.
+
+Headers use atomic \texttt{previous\_size} and atomic magic because a block's
+physical neighbor may sit in another thread's cache.
+Statistics counters become atomics so a cache hit can update them without the
+mutex.
+A new \texttt{cached} magic marks blocks that are in a thread cache rather than
+on a central free list; freeing such a block is reported as a double-free.
+
+The cache avoids the central lock and the bin walk for repeated small sizes.
+The caveats are the 64-block-per-class cap, the 8192-byte small limit, extra
+per-thread retained memory, and the fact that cached blocks are not coalesced
+with neighbors until they are flushed.
+
+\subsection{v5.0.0: coalesce only when an allocation cannot be satisfied}
+
+v5 keeps v4's bins, cache caps, batch flush, and 64\,KiB page-align rule.
+It changes when adjacent free blocks are merged.
+
+Small deallocation still returns the block to the thread cache, but the comment
+and the code no longer coalesce as part of that path.
+When a cache class overflows, flushed blocks are inserted into the central bins
+with \texttt{insertFreeBlock} only; \texttt{coalesce} is not called.
+Large deallocation likewise inserts the block into the central free structure
+and returns.
+
+\texttt{coalesce} remains for the rare path that still needs it.
+\texttt{allocate} tries the thread cache, then central \texttt{findBestFit}, then
+a cache flush and another \texttt{findBestFit}.
+Only if those fail does it call \texttt{coalesceFreeBlocksUnlocked}, which walks
+the mapped region from the first header to the last and merges runs of
+physically adjacent free blocks, then searches again.
+
+Deferred coalescing makes free cheaper and leaves more small blocks sitting in
+caches or in segregated bins.
+The cost is that a later request may fail until a full-heap merge is paid for,
+and free adjacent blocks can sit unmerged for a long time, which increases
+external fragmentation until that miss occurs.
+
+\subsection{v6.0.0: batch cache refills and small-block slabs}
+
+v6 keeps deferred coalescing and the 8192-byte small-class layout.
+It changes how a cache miss is refilled.
+
+A successful central allocation for a small, naturally aligned request calls
+\path{refillSmallCacheUnlocked} instead of handing back a single split block.
+The first block is reserved as a slab whose size is the used layout size rounded
+up to the 64-byte quantum (\texttt{reserveFreeBlock}).
+The function then pulls additional slabs, up to 32
+(\texttt{cache\_refill\_batch}), as long as the class is below 64 cached blocks
+and the thread cache is below 4\,MiB of retained blocks
+(\path{maximum_thread_cache_bytes}).
+Each extra slab is pushed onto the thread cache with
+\texttt{pushCachedBlock}.
+The first reserved slab is activated for the caller.
+
+\texttt{reserveFreeBlock} marks the reserved region with a new
+\texttt{reserved} magic, splits any leftover back into the central free bins,
+and does not coalesce.
+The 4\,MiB cap is also enforced when caching a deallocated block: if
+\texttt{cached\_bytes} would exceed the limit, the cache flushes batches until
+it is back under the cap.
+
+Physical-neighbor \texttt{previous\_size} is no longer maintained.
+\texttt{coalesceFreeBlocksUnlocked} still starts at the first mapped header and
+walks \texttt{nextPhysicalBlock} until the end of the region, merging adjacent
+free blocks only on an allocation miss.
+
+Batch refill reduces lock acquisitions when a size class is hot.
+Slabs aligned to the small-bin quantum make later reuse of that class more
+regular.
+The 4\,MiB ceiling bounds retained cache memory per thread.
+The caveats are more memory held aside in unused cached slabs, and refill work
+that still runs under the central mutex on a miss.
+
+\subsection{v7.0.0: adaptive per-class cache targets}
+
+v7 keeps v6 slabs, batch refills of 32, deferred coalescing, and the 4\,MiB
+thread-cache memory limit.
+The fixed 64-block-per-class cap is replaced by a per-class target.
+
+Each \texttt{ThreadCache} stores \texttt{targets} and \texttt{refill\_events}
+arrays.
+On registration every class starts at 16 cached blocks
+(\path{initial_cached_blocks_per_bin}).
+Each refill of that class increments \texttt{refill\_events[bin]}.
+After four refill events (\path{cache_growth_interval}), the target doubles,
+capped at 256 (\path{maximum_cached_blocks_per_bin}), and the event
+counter resets.
+\path{refillSmallCacheUnlocked} uses that target, together with remaining
+4\,MiB budget, to decide how many extra slabs to pull.
+
+Classes that miss often therefore keep more blocks; idle classes stay near 16.
+The overall 4\,MiB limit still prevents unbounded growth.
+The caveats are that a noisy class can grow to 256 cached blocks, refill
+accounting is per thread, and the growth rule is a simple miss count rather than
+a measured working-set size.
+v7 still links \texttt{Threads::Threads}, but the pool lock is
+\texttt{std::mutex} and the cache is a C++ \texttt{thread\_local}.
+The pthread library is present and unused on the allocate path.
+
+\subsection{v8.0.0: matrix-oriented layout, no small-object thread cache}
+
+v8 starts from v7's bins, deferred coalescing, and public interface, then
+changes the paths that dominate the 360$\times$360 matrix workload.
+
+The matrix program is not one large allocation of a 360$\times$360 block.
+It is 360 separately allocated rows, each about 2880 bytes of doubles, plus
+the usual object overhead.
+Those rows are small by the allocator's 8192-byte small-block limit, and they
+are reused for the whole run.
+v1 and v2 already beat regular \texttt{new} on that pattern because they pack
+rows from one free list without scattering them through a thread cache.
+v4--v7's per-thread cache, which helps a linked list of tiny nodes, is the
+wrong structure for packed rows: a cache hit returns a block that was freed
+earlier into a per-class LIFO, not the physically adjacent remainder of the
+row region.
+
+v8 therefore does the following.
+
+\paragraph{Pthread lock and thread key.}
+The pool mutex is a real \texttt{pthread\_mutex\_t}, not \texttt{std::mutex}.
+The thread cache, when it exists, is registered with \texttt{pthread\_key\_t}
+rather than relying only on C++ \texttt{thread\_local} lifetime.
+v7 already linked pthreads; v8 actually uses them.
+This does not by itself explain the matrix win, but it removes an unused
+abstraction on a single-threaded process.
+
+\paragraph{Allocate no longer takes from the thread cache.}
+\texttt{allocate} still calls \texttt{registerThreadCache} so the thread is
+known to the pool, then skips \texttt{takeCachedBlock}.
+The next step is a lock-free check of one \texttt{thread\_local} ``recent
+large'' pointer (the last freed block above the small-block limit).
+If that block does not fit, the thread takes the pool mutex and runs central
+\texttt{findBestFit} on the segregated bins, with the same miss path as v5--v7:
+flush any remaining cache, then a full-region coalesce, then search again.
+Small deallocation likewise does not push into the thread cache: after canary
+checks it either stashes a large block as the recent-large pointer or
+\texttt{insertFreeBlock}s under the mutex.
+The v4--v7 cache and v6--v7 slab-refill machinery remain in the source, but
+they are not on the hot allocate/free path that the matrix actually runs.
+
+\paragraph{Split arena with a reserved guard.}
+\texttt{initialize} no longer carves the whole mmap as one free block.
+It splits the mapping into a small-object region of at most 16\,MiB
+(or one quarter of the mapping, whichever is smaller), a one-page reserved
+guard block, and a remaining large region for packed payloads.
+The guard uses a reserved magic so neither region can merge across it.
+Small objects therefore cannot punch holes in the packed row area by being
+satisfied from the middle of a large free span and then freed later as
+scattered 64-byte-class fragments.
+
+\paragraph{Alignment for matrix rows, not for every large request.}
+\texttt{effectiveAlignment} forces 64-byte alignment for requests of 2048
+bytes or more, so a 2880-byte row is 64-byte aligned.
+Page alignment is delayed until 2\,MiB instead of v4--v7's 64\,KiB threshold.
+Page-aligning a 2880-byte row would waste almost a whole page per row and
+destroy packing; 64-byte alignment is enough for SIMD-friendly rows without
+that waste.
+
+\paragraph{Exact remainder sizes.}
+When a block is reserved or split, v8 keeps the allocator's natural used
+size instead of rounding every leftover up to the 64-byte small-bin quantum.
+Rounding to the quantum made cache refill more regular for v6/v7; it also
+changed the stride between adjacent matrix rows.
+v8 prefers the packed stride.
+
+\paragraph{What was rejected.}
+Per-thread arenas were considered and not used.
+Each profiled matrix process is already a single thread, so a second arena
+would only partition the same mmap and add empty-space waste.
+Immediate coalescing of large frees at insert time was tried and reverted
+after it created a cyclic free list in \texttt{findBestFit}.
+v8 keeps v5's deferred merge: adjacent free blocks are combined only when an
+allocation cannot be satisfied from existing bins.
+
+The matrix result of that combination is consistent across scales on the M3
+Max 6-process method: v8 is about 4.2\%--5.3\% faster than the original
+regular-\texttt{new} baseline, and it is faster than v1 and v2, which had been
+the previous best custom versions.
+
+\subsection{Why v8 misses other allocation patterns}
+
+v8 is not a better general-purpose malloc.
+The same changes that pack 360 matrix rows make a bad allocator for workloads
+whose working set is many small, independent objects.
+
+\paragraph{Linked list.}
+\texttt{regular\_linked\_list 6500000} builds a doubly linked list of up to
+6.5 million \texttt{Node} objects, each a small header plus a separately
+allocated \texttt{int[]} payload, then mixes insert, erase, and update for
+$200$ operations per node.
+Regular \texttt{new} finishes a short run in about five to seven minutes on
+the M3 Max.
+v8's three overloaded processes were still at 99\% CPU after ten hours with
+no checksum line, and were killed (exit 143).
+Two mechanisms explain that miss.
+
+First, the thread cache is off.
+v4--v7 satisfy a repeated tiny size from a per-thread LIFO without taking the
+central mutex or walking bins.
+v8 does a locked \texttt{findBestFit} on every node \texttt{new} and every
+\texttt{delete}.
+The free-list walk grows with the number of live fragments; a few million
+nodes turn that walk into the whole runtime.
+
+Second, the small arena is capped at 16\,MiB.
+The list's pool request is on the order of $6500000 \times 2048$ bytes, most
+of it small objects.
+Once the 16\,MiB small span is full, further small requests are carved out of
+the large region, which is exactly the hole-punching the guard was meant to
+prevent for matrix, and it leaves a long chain of small free blocks in the
+large bins.
+Deferred coalescing then pays a full-region merge only after a failed search,
+which is the common case rather than the rare case.
+
+\paragraph{Uniform nodes and nested-matrix stress.}
+Those programs still allocate matrices, so they share some of the row-packing
+benefit, but they also allocate and free many smaller objects (node wrappers,
+temporaries, nested blocks).
+They are not as cache-hostile as the 6.5 million node list, and they are not
+as regular as 360 fixed rows.
+v8 can still run them, and short nodes/stress completed in the same overnight
+campaign, but they are not the design target.
+A version that wins all four UsingMatrixClass workloads would need the v4--v7
+small-object cache \emph{and} the v8 packed-row region, with a policy that
+sends matrix-sized requests to the packed region and tiny nodes to the cache.
+v8 does not do that split on the allocate path; it optimized the matrix side
+and accepted the list miss.
+
+\paragraph{How to read the later tables.}
+Matrix short, medium, and long compare v8 to regular \texttt{new} and to
+v1--v7 under the same 6-process method.
+Those numbers are the intended evaluation of v8.
+Linked-list times for v8 are not a valid performance comparison: the run did
+not finish.
+Where a later section reports v8 only on matrix, that is the specialization,
+not missing data.
+
+\subsection{Version progression}
 
 \begin{table}[htbp]
 \centering
 \small
-\begin{tabularx}{\textwidth}{@{}l L L@{}}
+\begin{tabularx}{\textwidth}{@{}l L L L@{}}
 \toprule
-Version & Behavior & Change from previous \\
+Ver. & Free structure & Search & Merge / cache \\
 \midrule
-v1 & One ordered free list, first-fit allocation, and immediate merging of adjacent free blocks. & Baseline. \\
-v2 & Replaces first-fit with best-fit, selecting the smallest suitable free block. & Search policy on the free list changes from first-fit to best-fit. \\
-v3 & Organizes free blocks into size-segregated lists. & The single free-list organization is replaced by size-segregated lists. \\
-v4 & Adds fixed thread-local caches for small allocations. & Fixed thread-local caches are added for small allocations. \\
-v5 & Defers merging adjacent free blocks until an allocation cannot otherwise be satisfied. & Adjacent free blocks are no longer merged immediately. \\
-v6 & Adds batch cache refills and reusable small-block slabs. & Cache refills are batched and reusable small-block slabs are added. \\
-v7 & Makes cache limits adaptive by growing frequently used size classes while retaining the overall cache-memory limit. & Cache limits become adaptive for frequently used size classes; the overall cache-memory limit is retained. \\
+regular & system heap (libmalloc / ptmalloc) & size-class + per-thread cache & OS-tuned; multiple mappings \\
+v1 & one address-ordered list & first-fit & merge on every free \\
+v2 & same list & global best-fit & merge on every free \\
+v3 & $\log_2$ segregated bins & best-fit in the first usable bin & merge on every free; \texttt{previous\_size} links \\
+v4 & 64-byte small bins $+$ $\log_2$ large bins & thread cache, then central best-fit & 64 cached blocks/class; flush still coalesces \\
+v5 & same as v4 & same, then full-heap merge on miss & no merge on free; merge only if allocation fails \\
+v6 & same bins & cache hit, or slab refill of up to 32 & 4\,MiB cache cap; deferred merge retained \\
+v7 & same bins & same refill path & per-class target 16$\rightarrow$256 after 4 refills; 4\,MiB cap kept \\
+v8 & split small/large arena with a reserved guard & central best-fit; no hot-path thread cache & deferred merge; 64-byte align $\ge$2048; page-align at 2\,MiB \\
 \bottomrule
 \end{tabularx}
-\caption{Custom allocator versions v1--v7 and the change introduced by each tag.}
+\caption{Regular \texttt{new} and custom allocator versions v1--v8.
+v8 is specialized for packed matrix rows and is the wrong policy for
+millions of tiny linked-list nodes.}
 \label{tab:allocator-versions}
 \end{table}

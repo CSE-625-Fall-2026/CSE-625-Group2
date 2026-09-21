@@ -10,9 +10,11 @@ All recorded rows use project commit \texttt{12617e0f943a7b68d8334aa5477dfa403a7
 
 \subsection{Machines}
 
-\begin{table}[htbp]
+\begin{table*}[!t]
 \centering
-\small
+\caption{The two machines used in the supplied run files.}
+\label{tab:machines}
+\footnotesize
 \begin{tabularx}{\textwidth}{@{}l L L@{}}
 \toprule
 Field & Apple M3 Max & AMD Ryzen 9 7900X \\
@@ -26,14 +28,15 @@ Compiler & Apple clang 17.0.0 (\texttt{clang-1700.6.3.2}) & Ubuntu \texttt{c++} 
 Used for & matrix v1--v7 (all scales); v6 four-workload campaign & v7 four-workload campaign \\
 \bottomrule
 \end{tabularx}
-\caption{The two machines used in the supplied run files.}
-\label{tab:machines}
-\end{table}
+\end{table*}
 
-\begin{table}[htbp]
+\begin{table}[!t]
 \centering
-\small
-\begin{tabular}{llll}
+\caption{macOS versions recorded on the Apple M3 Max, by campaign.}
+\label{tab:macos-campaigns}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llll@{}}
 \toprule
 Campaign & Scale(s) & macOS version & OS build \\
 \midrule
@@ -42,8 +45,6 @@ matrix v1--v7 & long          & 26.6.2 & 25G83  \\
 v6 four-workload & short, medium, long & 26.5.2 & 25F84 \\
 \bottomrule
 \end{tabular}
-\caption{macOS versions recorded on the Apple M3 Max, by campaign.}
-\label{tab:macos-campaigns}
 \end{table}
 
 \subsection{CSV field comparison}
@@ -56,9 +57,11 @@ The combined CSV
 includes \texttt{machine\_id} only.
 Processor, OS, architecture, and memory for the combined CSV come from adjacent \texttt{environment.txt} files.
 
-\begin{table}[htbp]
+\begin{table*}[!t]
 \centering
-\small
+\caption{Environment-field differences between the two supplied CSVs.}
+\label{tab:csv-field-diff}
+\footnotesize
 \begin{tabularx}{\textwidth}{@{}l L L@{}}
 \toprule
 Field & Matrix CSV & Combined v6/v7 CSV \\
@@ -71,6 +74,4 @@ memory & no column & no column \\
 \texttt{project\_commit} & yes (\texttt{12617e0f\ldots}) & no column (present in adjacent \texttt{environment.txt}) \\
 \bottomrule
 \end{tabularx}
-\caption{Environment-field differences between the two supplied CSVs.}
-\label{tab:csv-field-diff}
-\end{table}
+\end{table*}

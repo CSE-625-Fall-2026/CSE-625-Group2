@@ -1,42 +1,56 @@
-\documentclass[11pt]{article}
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
 
 % --- Encoding and fonts ---
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{lmodern}
 
 % --- Layout ---
-\usepackage[margin=1in]{geometry}
 \usepackage{microtype}
 
 % --- Math ---
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{amsfonts}
 
 % --- Figures and tables ---
 \usepackage{graphicx}
 \graphicspath{{figures/}}
 \usepackage{array}
 \usepackage{tabularx}
-\usepackage{longtable}
 \usepackage{booktabs}
-\usepackage{xurl}
+\usepackage{textcomp}
+\usepackage{xcolor}
 
 % --- Bibliography ---
-\usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
+\usepackage[backend=biber,style=ieee,sorting=none]{biblatex}
 \addbibresource{bibliography.bib}
+\renewcommand*{\bibfont}{\footnotesize}
 
 % --- Links ---
+\usepackage{xurl}
 \usepackage[hidelinks]{hyperref}
 \usepackage{cleveref}
 
 \newcolumntype{L}{>{\raggedright\arraybackslash}X}
 
-\title{CSE 625 Group 2}
-\author{}
-\date{\today}
-
 \begin{document}
+
+\title{Custom Memory Allocator Profiling}
+
+\author{%
+\IEEEauthorblockN{Jacob Nance}
+\and
+\IEEEauthorblockN{Fernanda Gonzalez}
+\and
+\IEEEauthorblockN{Francisco Chagua}
+\and
+\IEEEauthorblockN{Nicholas Hooper}
+\and
+\IEEEauthorblockN{Nicholas Johnson}
+\and
+\IEEEauthorblockN{Mohamed Konsowa}
+}
 
 \maketitle
 
@@ -58,10 +72,10 @@
 \input{sections/15_conclusions}
 \input{sections/16_contributions}
 
-% --- References ---
-\printbibliography
-
 % --- Appendices ---
 \input{sections/17_appendices}
+
+% --- References ---
+\printbibliography
 
 \end{document}

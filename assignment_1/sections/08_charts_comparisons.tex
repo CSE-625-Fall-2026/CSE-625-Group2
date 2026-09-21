@@ -1,2 +1,199 @@
 \section{Charts and Comparisons}
 \label{sec:charts-comparisons}
+
+\subsection{Environment Comparison Across Same Version and Workload}
+
+\begin{table*}[!t]\caption{Environment ANOVA}
+\centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.075\textwidth}>{\raggedright\arraybackslash}p{0.115\textwidth}>{\raggedright\arraybackslash}p{0.095\textwidth}>{\raggedright\arraybackslash}p{0.14\textwidth}>{\raggedright\arraybackslash}p{0.03\textwidth}>{\raggedright\arraybackslash}p{0.115\textwidth}>{\raggedright\arraybackslash}p{0.14\textwidth}>{\raggedright\arraybackslash}p{0.105\textwidth}}
+\toprule
+Version & Data Structure & Comparison & Environment Table IDs & N & F statistic & p-value & Significant (alpha=0.05) \\ \midrule
+v7.0.0 & Matrix Array & All Sizes & 1, 2 & 20 & 60.3979 & $3.6929\times10^{-7}$ & Yes \\
+v7.0.0 & Matrix Array & Short & 1, 2 & 10 & 47.5496 & $1.2508\times10^{-4}$ & Yes \\
+v6.0.0 & Matrix Array & All Sizes & 1, 2 & 20 & 374.4904 & $1.6999\times10^{-13}$ & Yes \\
+v6.0.0 & Matrix Array & Short & 1, 2 & 10 & 111.9952 & $5.5525\times10^{-6}$ & Yes \\
+v5.0.0 & Matrix Array & All Sizes & 1, 2 & 25 & 0.6923 & 0.4139 & No \\
+v5.0.0 & Matrix Array & Short & 1, 2 & 10 & 0.5489 & 0.4799 & No \\
+v5.0.0 & Matrix Array & Medium & 1, 2 & 10 & 0.4851 & 0.5058 & No \\
+v5.0.0 & Uniform Nodes & All Sizes & 1, 2, 3 & 35 & 2,866.2357 & $8.1329\times10^{-37}$ & Yes \\
+v5.0.0 & Uniform Nodes & Short & 1, 2, 3 & 15 & 874.0824 & $1.0041\times10^{-13}$ & Yes \\
+v5.0.0 & Uniform Nodes & Medium & 1, 2 & 10 & 7,014.0642 & $4.6085\times10^{-13}$ & Yes \\
+v5.0.0 & Uniform Nodes & Long & 1, 2 & 10 & 1,389.704 & $2.9414\times10^{-10}$ & Yes \\
+v4.0.0 & Matrix Array & All Sizes & 1, 2 & 25 & 0.0879 & 0.7696 & No \\
+v4.0.0 & Matrix Array & Short & 1, 2 & 10 & 35.7068 & $3.3235\times10^{-4}$ & Yes \\
+v4.0.0 & Matrix Array & Medium & 1, 2 & 10 & 1.996 & 0.1954 & No \\
+v4.0.0 & Uniform Nodes & All Sizes & 1, 2, 3 & 35 & 3,193.9375 & $1.4520\times10^{-37}$ & Yes \\
+v4.0.0 & Uniform Nodes & Short & 1, 2, 3 & 15 & 1,376.1068 & $6.6936\times10^{-15}$ & Yes \\
+v4.0.0 & Uniform Nodes & Medium & 1, 2 & 10 & 7,087.5386 & $4.4205\times10^{-13}$ & Yes \\
+v4.0.0 & Uniform Nodes & Long & 1, 2 & 10 & 818.6869 & $2.4074\times10^{-9}$ & Yes \\
+v3.0.0 & Matrix Array & All Sizes & 1, 2 & 15 & 1.452 & 0.2497 & No \\
+v3.0.0 & Matrix Array & Short & 1, 2 & 10 & 4.1199 & 0.0769 & No \\
+v2.0.0 & Matrix Array & All Sizes & 1, 2 & 20 & 4.6506 & 0.0448 & Yes \\
+v2.0.0 & Matrix Array & Short & 1, 2 & 10 & 20.9244 & 0.0018 & Yes \\
+\bottomrule\end{tabular}
+
+\end{table*}
+
+\subsection{Metric Comparison}
+
+
+\begin{table*}[!t]\caption{Peak Memory (KB) (Significance: $p$-value $<0.05$)}
+\centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lllllll}
+\toprule
+Version & ID & Size & Regular Mean & Overloaded Mean & \% Change & Significant \\ \midrule
+\multicolumn{7}{l}{\textit{Matrix Array}} \\
+v8.0.0 & 1 & Short & 267,632 & 276,528 & 3.324 & Missing \\
+v8.0.0 & 1 & Medium & 267,686.4 & 276,528 & 3.303 & Missing \\
+v8.0.0 & 1 & Long & 267,708.8 & 276,533.3333 & 3.2963 & Missing \\
+\multicolumn{7}{l}{\textit{Uniform Nodes}} \\
+v7.0.0 & 1 & Short & 204,431.2 & 261,565.6 & 27.948 & Yes \\
+v7.0.0 & 1 & Medium & 204,605.6 & 261,572 & 27.8421 & Yes \\
+v7.0.0 & 1 & Long & 204,652 & 261,572 & 27.8131 & Yes \\
+\multicolumn{7}{l}{\textit{Linked List}} \\
+v7.0.0 & 1 & Short & 451,561.6 & 1,153,277.6 & 155.3976 & Yes \\
+v7.0.0 & 1 & Medium & 451,616 & 1,153,299.2 & 155.3716 & Yes \\
+v7.0.0 & 1 & Long & 451,620 & 1,153,302.4 & 155.3701 & Yes \\
+v2.0.0 & 1 & Short & 19,088 & 34,840 & 82.5231 & Yes \\
+v2.0.0 & 1 & Medium & 77,212.8 & 149,642.4 & 93.8052 & Yes \\
+v2.0.0 & 1 & Long & 114,898.4 & 224,116 & 95.0558 & Yes \\
+\bottomrule\end{tabular}
+\par\smallskip\parbox{0.95\textwidth}{\scriptsize Include Significant=Yes and absolute change >10.000\%; retain all v8.0.0 rows. Data-structure subheadings identify IDs. Missing means unavailable, not zero.}
+\end{table*}
+
+\begin{table*}[!t]\caption{Major Faults (Significance: $p$-value $<0.05$)}
+\centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lllllll}
+\toprule
+Version & ID & Size & Regular Mean & Overloaded Mean & \% Change & Significant \\ \midrule
+\multicolumn{7}{l}{\textit{Matrix Array}} \\
+v8.0.0 & 1 & Short & 0.2 & 7 & 3,400 & Missing \\
+v8.0.0 & 1 & Medium & 5 & 170.6667 & 3,313.3333 & Missing \\
+v8.0.0 & 1 & Long & 17 & 397.3333 & 2,237.2549 & Missing \\
+v7.0.0 & 1 & Short & 0.2 & 0.8 & 300 & Yes \\
+v7.0.0 & 1 & Medium & 5 & 7.4 & 48 & Yes \\
+v7.0.0 & 1 & Long & 17 & 21.4 & 25.8824 & Yes \\
+v2.0.0 & 1 & Medium & 21,317.8 & 0 & -100 & Yes \\
+\multicolumn{7}{l}{\textit{Uniform Nodes}} \\
+v7.0.0 & 1 & Short & 0.8 & 0.4 & -50 & Yes \\
+v7.0.0 & 1 & Medium & 4.2 & 6.8 & 61.9048 & Yes \\
+v7.0.0 & 1 & Long & 11.8 & 13.2 & 11.8644 & Yes \\
+\multicolumn{7}{l}{\textit{Memory Stress}} \\
+v7.0.0 & 1 & Short & 0.4 & 0.6 & 50 & Yes \\
+\multicolumn{7}{l}{\textit{Linked List}} \\
+v7.0.0 & 1 & Short & 0.2 & 0.8 & 300 & Yes \\
+v7.0.0 & 1 & Medium & 5 & 6.4 & 28 & Yes \\
+v7.0.0 & 1 & Long & 11.8 & 17.8 & 50.8475 & Yes \\
+\bottomrule\end{tabular}
+\par\smallskip\parbox{0.95\textwidth}{\scriptsize Include Significant=Yes and absolute change >10.000\%; retain all v8.0.0 rows. Data-structure subheadings identify IDs. Missing means unavailable, not zero.}
+\end{table*}
+
+\begin{table*}[!t]\caption{Minor Faults (Significance: $p$-value $<0.05$)}
+\centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lllllll}
+\toprule
+Version & ID & Size & Regular Mean & Overloaded Mean & \% Change & Significant \\ \midrule
+\multicolumn{7}{l}{\textit{Matrix Array}} \\
+v8.0.0 & 1 & Short & 209,378.4 & 21,106.6667 & -89.9194 & Missing \\
+v8.0.0 & 1 & Medium & 8,788,586.2 & 769,318 & -91.2464 & Missing \\
+v8.0.0 & 1 & Long & $2.4482\times10^{7}$ & 2,016,354.6667 & -91.764 & Missing \\
+v7.0.0 & 1 & Short & 209,378.4 & 1,484.2 & -99.2911 & Yes \\
+v7.0.0 & 1 & Medium & 8,788,586.2 & 56,837.4 & -99.3533 & Yes \\
+v7.0.0 & 1 & Long & $2.4482\times10^{7}$ & 158,845.6 & -99.3512 & Yes \\
+v2.0.0 & 1 & Short & 113,209.2 & 39,798.4 & -64.8453 & Yes \\
+v2.0.0 & 1 & Medium & 1,417,321 & 414,906.4 & -70.726 & Yes \\
+v2.0.0 & 1 & Long & 2,610,338.6 & 781,363.8 & -70.0666 & Yes \\
+\multicolumn{7}{l}{\textit{Uniform Nodes}} \\
+v7.0.0 & 1 & Short & 74,880.4 & 1,349.4 & -98.1979 & Yes \\
+v7.0.0 & 1 & Medium & 2,840,567.2 & 46,697.6 & -98.356 & Yes \\
+v7.0.0 & 1 & Long & 7,624,442.2 & 124,714 & -98.3643 & Yes \\
+\multicolumn{7}{l}{\textit{Memory Stress}} \\
+v7.0.0 & 1 & Short & 63,486 & 1,627.2 & -97.4369 & Yes \\
+v7.0.0 & 1 & Medium & 2,660,760 & 62,773.6 & -97.6408 & Yes \\
+v7.0.0 & 1 & Long & 7,284,943.4 & 170,919.4 & -97.6538 & Yes \\
+v2.0.0 & 1 & Long & 74,633.8 & 52,787.4 & -29.2715 & Yes \\
+\multicolumn{7}{l}{\textit{Linked List}} \\
+v7.0.0 & 1 & Short & 113,336.2 & 2,049 & -98.1921 & Yes \\
+v7.0.0 & 1 & Medium & 4,868,054.2 & 82,779.8 & -98.2995 & Yes \\
+v7.0.0 & 1 & Long & $1.3586\times10^{7}$ & 230,538 & -98.3031 & Yes \\
+v2.0.0 & 1 & Short & 4,141.6 & 8,034.4 & 93.9927 & Yes \\
+v2.0.0 & 1 & Medium & 18,666.4 & 36,747 & 96.8617 & Yes \\
+v2.0.0 & 1 & Long & 28,078.4 & 55,368 & 97.1907 & Yes \\
+\bottomrule\end{tabular}
+\par\smallskip\parbox{0.95\textwidth}{\scriptsize Include Significant=Yes and absolute change >10.000\%; retain all v8.0.0 rows. Data-structure subheadings identify IDs. Missing means unavailable, not zero.}
+\end{table*}
+
+\begin{table*}[!t]\caption{Voluntary CS (Significance: $p$-value $<0.05$)}
+\centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lllllll}
+\toprule
+Version & ID & Size & Regular Mean & Overloaded Mean & \% Change & Significant \\ \midrule
+\multicolumn{7}{l}{\textit{Matrix Array}} \\
+v8.0.0 & 1 & Short & 66 & 13 & -80.303 & Missing \\
+v8.0.0 & 1 & Medium & 1,124.6 & 447.3333 & -60.2229 & Missing \\
+v8.0.0 & 1 & Long & 3,092 & 1,134.3333 & -63.3139 & Missing \\
+v2.0.0 & 1 & Medium & 23,758 & 2.4 & -99.9899 & Yes \\
+v2.0.0 & 1 & Long & 2.2 & 72,899.2 & 3,313,500 & Yes \\
+\multicolumn{7}{l}{\textit{Uniform Nodes}} \\
+v2.0.0 & 1 & Long & 2.6 & 25,928 & 997,130.7692 & Yes \\
+\multicolumn{7}{l}{\textit{Memory Stress}} \\
+v2.0.0 & 1 & Short & 1.2 & 1 & -16.6667 & Yes \\
+v2.0.0 & 1 & Long & 1 & 2 & 100 & Yes \\
+\multicolumn{7}{l}{\textit{Linked List}} \\
+v2.0.0 & 1 & Long & 1 & 2.2 & 120 & Yes \\
+\bottomrule\end{tabular}
+\par\smallskip\parbox{0.95\textwidth}{\scriptsize Include Significant=Yes and absolute change >10.000\%; retain all v8.0.0 rows. Data-structure subheadings identify IDs. Missing means unavailable, not zero.}
+\end{table*}
+
+\begin{table*}[!t]\caption{Involuntary CS (Significance: $p$-value $<0.05$)}
+\centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lllllll}
+\toprule
+Version & ID & Size & Regular Mean & Overloaded Mean & \% Change & Significant \\ \midrule
+\multicolumn{7}{l}{\textit{Matrix Array}} \\
+v8.0.0 & 1 & Short & 284 & 75,444 & 26,464.7887 & Missing \\
+v8.0.0 & 1 & Medium & 12,041.6 & 1,909,678.3333 & 15,759.0082 & Missing \\
+v8.0.0 & 1 & Long & 33,652.2 & 4,497,776.3333 & 13,265.4749 & Missing \\
+v7.0.0 & 1 & Short & 284 & 130.4 & -54.0845 & Yes \\
+v7.0.0 & 1 & Medium & 12,041.6 & 4,098 & -65.968 & Yes \\
+v7.0.0 & 1 & Long & 33,652.2 & 11,418.2 & -66.07 & Yes \\
+v2.0.0 & 1 & Short & 2,420.8 & 1,250.4 & -48.3477 & Yes \\
+v2.0.0 & 1 & Medium & 340,484.2 & 221,768.8 & -34.8666 & Yes \\
+\multicolumn{7}{l}{\textit{Uniform Nodes}} \\
+v7.0.0 & 1 & Short & 315.2 & 189 & -40.0381 & Yes \\
+v7.0.0 & 1 & Medium & 12,084.2 & 6,001.8 & -50.3335 & Yes \\
+v7.0.0 & 1 & Long & 33,053.4 & 14,772.4 & -55.3075 & Yes \\
+v2.0.0 & 1 & Short & 1,617.8 & 1,802.8 & 11.4353 & Yes \\
+v2.0.0 & 1 & Medium & 43,618 & 67,530.6 & 54.8228 & Yes \\
+v2.0.0 & 1 & Long & 382,419.6 & 337,394.2 & -11.7738 & Yes \\
+\multicolumn{7}{l}{\textit{Memory Stress}} \\
+v7.0.0 & 1 & Short & 72 & 148.6 & 106.3889 & Yes \\
+v7.0.0 & 1 & Medium & 3,931.2 & 4,341.2 & 10.4294 & Yes \\
+v7.0.0 & 1 & Long & 11,173 & 12,554.2 & 12.3619 & Yes \\
+v2.0.0 & 1 & Short & 4,480.4 & 2,600.6 & -41.9561 & Yes \\
+v2.0.0 & 1 & Medium & 1,330 & 43,951 & 3,204.5865 & Yes \\
+v2.0.0 & 1 & Long & 1,193.4 & 315,081 & 26,301.9608 & Yes \\
+\multicolumn{7}{l}{\textit{Linked List}} \\
+v7.0.0 & 1 & Short & 231.6 & 143 & -38.2556 & Yes \\
+v2.0.0 & 1 & Short & 421 & 3,552.2 & 743.753 & Yes \\
+v2.0.0 & 1 & Medium & 115.6 & 55,580.4 & 47,979.9308 & Yes \\
+v2.0.0 & 1 & Long & 321.6 & 281,289 & 87,365.4851 & Yes \\
+\bottomrule\end{tabular}
+\par\smallskip\parbox{0.95\textwidth}{\scriptsize Include Significant=Yes and absolute change >10.000\%; retain all v8.0.0 rows. Data-structure subheadings identify IDs. Missing means unavailable, not zero.}
+\end{table*}
+
+\begin{figure*}[!t]\centering
+\begin{tikzpicture}\begin{axis}[ybar stacked,width=0.90\textwidth,height=5.6cm,ymin=0,ymax=100,ylabel={Testable comparisons (\%)},xtick=data,xticklabels={Matrix Array,Uniform Nodes,Memory Stress,Linked List},x tick label style={font=\scriptsize,rotate=15,anchor=east},legend style={at={(0.5,-0.28)},anchor=north,legend columns=2,font=\scriptsize},bar width=16pt]
+\addplot coordinates {(0,33.33333333) (1,8.00000000) (2,27.27272727) (3,0.00000000)};\addlegendentry{Significant improvement}
+\addplot coordinates {(0,23.33333333) (1,8.00000000) (2,0.00000000) (3,0.00000000)};\addlegendentry{Non-significant improvement}
+\addplot coordinates {(0,36.66666667) (1,84.00000000) (2,72.72727273) (3,100.00000000)};\addlegendentry{Significant worsening}
+\addplot coordinates {(0,6.66666667) (1,0.00000000) (2,0.00000000) (3,0.00000000)};\addlegendentry{Other tested outcomes}
+\end{axis}\end{tikzpicture}\caption{Runtime outcomes by data structure. All testable rows are included; missing tests are excluded.}\end{figure*}
+
+\begin{figure*}[!t]\centering
+\begin{tikzpicture}\begin{axis}[ybar stacked,width=0.90\textwidth,height=5.6cm,ymin=0,ymax=100,ylabel={Testable comparisons (\%)},xtick=data,xticklabels={Runtime,Peak Memory (KB),Major Faults,Minor Faults,Voluntary CS,Involuntary CS},x tick label style={font=\scriptsize,rotate=15,anchor=east},legend style={at={(0.5,-0.28)},anchor=north,legend columns=2,font=\scriptsize},bar width=16pt]
+\addplot coordinates {(0,22.80701754) (1,0.00000000) (2,23.07692308) (3,70.83333333) (4,41.66666667) (5,54.16666667)};\addlegendentry{Significant improvement}
+\addplot coordinates {(0,14.03508772) (1,0.00000000) (2,0.00000000) (3,0.00000000) (4,0.00000000) (5,0.00000000)};\addlegendentry{Non-significant improvement}
+\addplot coordinates {(0,59.64912281) (1,100.00000000) (2,76.92307692) (3,29.16666667) (4,33.33333333) (5,45.83333333)};\addlegendentry{Significant worsening}
+\addplot coordinates {(0,3.50877193) (1,0.00000000) (2,0.00000000) (3,0.00000000) (4,25.00000000) (5,0.00000000)};\addlegendentry{Other tested outcomes}
+\end{axis}\end{tikzpicture}\caption{Metric outcomes excluding CPU usage. All testable rows are included; missing tests are excluded.}\end{figure*}

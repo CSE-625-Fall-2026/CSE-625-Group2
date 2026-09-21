@@ -83,88 +83,207 @@ v7.0.0 & 24474.50 & 24477.54 & 24473.17 & 24475.070000 & 24474.50 & 2.240067 & 1
 \end{tabular}
 \end{table*}
 
-\subsection{v6 and v7 four-workload campaigns}
+\subsection{ANOVA Test}
 
-Source: \path{v6-v7-run-durations.csv}.
-240 rows.
-Five runs per (version, workload, scale, regular/overloaded) group.
-Workloads: list, matrix, nodes, stress.
-Scales: short, medium, long.
-v6 ran on the Apple M3 Max.
-v7 ran on the Ryzen 7900X WSL host.
-
-\begin{table}[!ht]
-\centering
-\caption{v6.0.0 elapsed-time summary, 5 runs. Host: Apple M3 Max. Times in seconds.}
-\label{tab:v6-means}
-\scriptsize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}lllr r l@{}}
+\begin{table*}[!t]\caption{Matrix Array: Runtime ANOVA by Run Length (Significance: $p$-value $<0.05$)}
+\centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{llllllll}
 \toprule
-Workload & Scale & Kind & $n$ & Mean (s) & Min--Max (s) \\
-\midrule
-list & short & regular & 5 & 276.5800 & 276.3400--276.8700 \\
-list & short & overloaded & 5 & 277.3040 & 277.1200--277.5800 \\
-list & medium & regular & 5 & 8810.2780 & 8807.1100--8814.0800 \\
-list & medium & overloaded & 5 & 8832.6760 & 8830.7000--8835.1200 \\
-list & long & regular & 5 & 23115.3800 & 23111.7500--23120.8500 \\
-list & long & overloaded & 5 & 23161.0860 & 23159.1600--23163.6600 \\
-matrix & short & regular & 5 & 248.0780 & 248.0400--248.1100 \\
-matrix & short & overloaded & 5 & 242.1760 & 242.0800--242.3000 \\
-matrix & medium & regular & 5 & 9156.1680 & 9155.4300--9157.8200 \\
-matrix & medium & overloaded & 5 & 8943.7400 & 8942.2100--8945.0600 \\
-matrix & long & regular & 5 & 24003.9360 & 24001.8900--24005.9500 \\
-matrix & long & overloaded & 5 & 23445.8280 & 23443.2300--23448.4200 \\
-nodes & short & regular & 5 & 248.6060 & 248.3700--249.4000 \\
-nodes & short & overloaded & 5 & 240.9960 & 240.8900--241.1900 \\
-nodes & medium & regular & 5 & 9173.6780 & 9168.4400--9177.8500 \\
-nodes & medium & overloaded & 5 & 8893.1780 & 8891.0200--8895.7000 \\
-nodes & long & regular & 5 & 24054.8500 & 24045.8500--24059.3300 \\
-nodes & long & overloaded & 5 & 23320.3000 & 23318.0200--23323.9900 \\
-stress & short & regular & 5 & 251.9720 & 251.8200--252.1800 \\
-stress & short & overloaded & 5 & 269.6060 & 269.2500--269.8900 \\
-stress & medium & regular & 5 & 8500.3520 & 8498.2700--8501.7300 \\
-stress & medium & overloaded & 5 & 9038.6980 & 9035.1000--9041.0300 \\
-stress & long & regular & 5 & 23317.4020 & 23225.6700--23417.2100 \\
-stress & long & overloaded & 5 & 24683.3260 & 24679.3600--24686.2200 \\
-\bottomrule
-\end{tabular}
-\end{table}
+Version & ID & Run Length & ANOVA F & ANOVA p-value & Mean \% Change & Improved & Significant \\ \midrule
+v8.0.0 & 1 & Short & 289,994.0769 & $3.4483\times10^{-6}$ & -4.5187 & Yes & Yes \\
+v8.0.0 & 1 & Medium & 292,199.3768 & $3.4223\times10^{-6}$ & -4.9728 & Yes & Yes \\
+v8.0.0 & 1 & Long & $1.3060\times10^{8}$ & $7.6569\times10^{-9}$ & -5.108 & Yes & Yes \\
+v7.0.0 & 1 & Short & 552.0554 & $1.9452\times10^{-5}$ & 10.7466 & No & Yes \\
+v7.0.0 & 1 & Medium & 2,251.8444 & $1.1797\times10^{-6}$ & 8.7858 & No & Yes \\
+v7.0.0 & 1 & Long & 21,185.2009 & $1.3364\times10^{-8}$ & 9.654 & No & Yes \\
+v7.0.0 & 2 & Short & 61.6428 & 0.0014 & 5.1038 & No & Yes \\
+v6.0.0 & 1 & Short & 17,295.7319 & $2.0050\times10^{-8}$ & -2.3791 & Yes & Yes \\
+v6.0.0 & 1 & Medium & 236,230.2914 & $1.0751\times10^{-10}$ & -2.3201 & Yes & Yes \\
+v6.0.0 & 1 & Long & 2,059,892.2035 & $1.4140\times10^{-12}$ & -2.3251 & Yes & Yes \\
+v6.0.0 & 2 & Short & 62.0456 & 0.0014 & 6.5161 & No & Yes \\
+v5.0.0 & 1 & Short & 72.0829 & 0.0011 & 2.7374 & No & Yes \\
+v5.0.0 & 1 & Medium & 13.4511 & 0.0214 & -0.9099 & Yes & Yes \\
+v4.0.0 & 1 & Short & 23.3645 & 0.0084 & -7.0358 & Yes & Yes \\
+v4.0.0 & 2 & Short & 7.8191 & 0.049 & 2.2741 & No & Yes \\
+v4.0.0 & 2 & Medium & 55.0396 & 0.0018 & -3.8824 & Yes & Yes \\
+v3.0.0 & 1 & Medium & 1,029.3647 & $5.6261\times10^{-6}$ & 29.4722 & No & Yes \\
+v2.0.0 & 1 & Short & 14.0453 & 0.02 & -16.6802 & Yes & Yes \\
+v2.0.0 & 2 & Short & 64.4049 & 0.0013 & 3.815 & No & Yes \\
+v1.0.0 & 2 & Short & 46.0777 & 0.0025 & 3.3866 & No & Yes \\
+v1.0.0 & 2 & Medium & 11,695.7222 & $4.3838\times10^{-8}$ & 41.7714 & No & Yes \\
+\bottomrule\end{tabular}
+\par\smallskip\parbox{0.95\textwidth}{\scriptsize ID is the final component of Table ID. Negative change means lower overloaded runtime. All v8.0.0 rows are retained.}
+\end{table*}
 
-\begin{table}[!ht]
-\centering
-\caption{v7.0.0 elapsed-time summary, 5 runs. Host: AMD Ryzen 9 7900X (WSL). Times in seconds.}
-\label{tab:v7-means}
-\scriptsize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}lllr r l@{}}
+\begin{table*}[!t]\caption{Uniform Nodes: Runtime ANOVA by Run Length (Significance: $p$-value $<0.05$)}
+\centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{llllllll}
 \toprule
-Workload & Scale & Kind & $n$ & Mean (s) & Min--Max (s) \\
-\midrule
-list & short & regular & 5 & 191.4180 & 189.5900--192.5100 \\
-list & short & overloaded & 5 & 216.4060 & 214.8800--217.2200 \\
-list & medium & regular & 5 & 8349.2000 & 8306.0000--8396.0000 \\
-list & medium & overloaded & 5 & 9363.4000 & 9343.0000--9407.0000 \\
-list & long & regular & 5 & 23348.6000 & 23290.0000--23427.0000 \\
-list & long & overloaded & 5 & 25921.0000 & 25888.0000--25947.0000 \\
-matrix & short & regular & 5 & 195.3200 & 193.8800--197.4900 \\
-matrix & short & overloaded & 5 & 216.3020 & 213.8600--217.7800 \\
-matrix & medium & regular & 5 & 8348.6000 & 8326.0000--8394.0000 \\
-matrix & medium & overloaded & 5 & 9082.0000 & 9066.0000--9103.0000 \\
-matrix & long & regular & 5 & 23198.6000 & 23170.0000--23234.0000 \\
-matrix & long & overloaded & 5 & 25438.2000 & 25384.0000--25506.0000 \\
-nodes & short & regular & 5 & 197.3820 & 196.2500--198.8400 \\
-nodes & short & overloaded & 5 & 216.4000 & 214.6600--217.5800 \\
-nodes & medium & regular & 5 & 8268.4000 & 8253.0000--8290.0000 \\
-nodes & medium & overloaded & 5 & 9067.2000 & 9040.0000--9098.0000 \\
-nodes & long & regular & 5 & 22537.8000 & 22524.0000--22560.0000 \\
-nodes & long & overloaded & 5 & 24730.6000 & 24675.0000--24779.0000 \\
-stress & short & regular & 5 & 219.4720 & 217.6200--221.6800 \\
-stress & short & overloaded & 5 & 230.0680 & 228.2100--231.2300 \\
-stress & medium & regular & 5 & 8368.0000 & 8339.0000--8398.0000 \\
-stress & medium & overloaded & 5 & 8738.8000 & 8719.0000--8754.0000 \\
-stress & long & regular & 5 & 22473.2000 & 22414.0000--22542.0000 \\
-stress & long & overloaded & 5 & 23413.2000 & 23398.0000--23424.0000 \\
-\bottomrule
-\end{tabular}
-\end{table}
+Version & ID & Run Length & ANOVA F & ANOVA p-value & Mean \% Change & Improved & Significant \\ \midrule
+v7.0.0 & 1 & Short & 99.7881 & $5.6432\times10^{-4}$ & 4.834 & No & Yes \\
+v7.0.0 & 1 & Medium & 830.5705 & $8.6282\times10^{-6}$ & 4.4319 & No & Yes \\
+v7.0.0 & 1 & Long & 2,272.0494 & $1.1589\times10^{-6}$ & 4.1831 & No & Yes \\
+v6.0.0 & 1 & Short & 9,098.723 & $7.2422\times10^{-8}$ & 6.9985 & No & Yes \\
+v6.0.0 & 1 & Medium & 191,105.4711 & $1.6428\times10^{-10}$ & 6.3332 & No & Yes \\
+v6.0.0 & 1 & Long & 1,757.6483 & $1.9348\times10^{-6}$ & 5.8588 & No & Yes \\
+v5.0.0 & 1 & Short & 22,792.2812 & $1.1546\times10^{-8}$ & 42.3447 & No & Yes \\
+v5.0.0 & 1 & Medium & 198,052.8294 & $1.5296\times10^{-10}$ & 41.8889 & No & Yes \\
+v5.0.0 & 1 & Long & 3,048.1912 & $6.4434\times10^{-7}$ & 42.9318 & No & Yes \\
+v5.0.0 & 2 & Short & 418.1136 & $3.3781\times10^{-5}$ & 15.5883 & No & Yes \\
+v5.0.0 & 2 & Medium & 3,159.5785 & $5.9976\times10^{-7}$ & 15.6477 & No & Yes \\
+v5.0.0 & 2 & Long & 1,900.7848 & $1.6549\times10^{-6}$ & 16.5836 & No & Yes \\
+v5.0.0 & 3 & Short & 54.1648 & 0.0018 & 5.3913 & No & Yes \\
+v4.0.0 & 1 & Short & 6,030.059 & $1.6483\times10^{-7}$ & 46.28 & No & Yes \\
+v4.0.0 & 1 & Medium & 43,339.3707 & $3.1939\times10^{-9}$ & 45.2018 & No & Yes \\
+v4.0.0 & 1 & Long & 3,655.1795 & $4.4827\times10^{-7}$ & 46.2238 & No & Yes \\
+v4.0.0 & 2 & Short & 786.6286 & $9.6148\times10^{-6}$ & 19.388 & No & Yes \\
+v4.0.0 & 2 & Medium & 12,032.7047 & $4.1418\times10^{-8}$ & 18.6972 & No & Yes \\
+v4.0.0 & 2 & Long & 813.2441 & $8.9982\times10^{-6}$ & 19.4533 & No & Yes \\
+v4.0.0 & 3 & Short & 23.9612 & 0.0081 & 2.5464 & No & Yes \\
+v3.0.0 & 1 & Short & 29.6343 & 0.0055 & -22.1266 & Yes & Yes \\
+v3.0.0 & 1 & Medium & 1,313.8206 & $3.4584\times10^{-6}$ & -19.5403 & Yes & Yes \\
+v2.0.0 & 1 & Short & 24.4281 & 0.0078 & 0.818 & No & Yes \\
+\bottomrule\end{tabular}
+\par\smallskip\parbox{0.95\textwidth}{\scriptsize ID is the final component of Table ID. Negative change means lower overloaded runtime. All v8.0.0 rows are retained.}
+\end{table*}
+
+\begin{table*}[!t]\caption{Memory Stress: Runtime ANOVA by Run Length (Significance: $p$-value $<0.05$)}
+\centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{llllllll}
+\toprule
+Version & ID & Run Length & ANOVA F & ANOVA p-value & Mean \% Change & Improved & Significant \\ \midrule
+v7.0.0 & 1 & Short & 708.693 & $1.1835\times10^{-5}$ & 9.6384 & No & Yes \\
+v7.0.0 & 1 & Medium & 3,618.4725 & $4.5741\times10^{-7}$ & 9.6612 & No & Yes \\
+v7.0.0 & 1 & Long & 7,902.7872 & $9.5990\times10^{-8}$ & 9.7295 & No & Yes \\
+v6.0.0 & 1 & Short & 1,403.2493 & $3.0326\times10^{-6}$ & -3.0608 & Yes & Yes \\
+v6.0.0 & 1 & Medium & 12,815.8132 & $3.6512\times10^{-8}$ & -3.0576 & Yes & Yes \\
+v6.0.0 & 1 & Long & 118,684.5503 & $4.2593\times10^{-10}$ & -3.0536 & Yes & Yes \\
+v3.0.0 & 1 & Short & 71.5822 & 0.0011 & 82.6306 & No & Yes \\
+v3.0.0 & 1 & Medium & 34,215.398 & $5.1242\times10^{-9}$ & 367.8985 & No & Yes \\
+v2.0.0 & 1 & Short & 4,875.9888 & $2.5202\times10^{-7}$ & 445.8633 & No & Yes \\
+v2.0.0 & 1 & Medium & 3,828.1053 & $4.0872\times10^{-7}$ & 2,959.08 & No & Yes \\
+v2.0.0 & 1 & Long & 1,972.656 & $1.5367\times10^{-6}$ & 3,595.8985 & No & Yes \\
+\bottomrule\end{tabular}
+\par\smallskip\parbox{0.95\textwidth}{\scriptsize ID is the final component of Table ID. Negative change means lower overloaded runtime. All v8.0.0 rows are retained.}
+\end{table*}
+
+\begin{table*}[!t]\caption{Linked List: Runtime ANOVA by Run Length (Significance: $p$-value $<0.05$)}
+\centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{llllllll}
+\toprule
+Version & ID & Run Length & ANOVA F & ANOVA p-value & Mean \% Change & Improved & Significant \\ \midrule
+v7.0.0 & 1 & Short & 1,029.7108 & $5.6223\times10^{-6}$ & 13.0587 & No & Yes \\
+v7.0.0 & 1 & Medium & 1,712.7946 & $2.0373\times10^{-6}$ & 12.1493 & No & Yes \\
+v7.0.0 & 1 & Long & 8,303.104 & $8.6960\times10^{-8}$ & 11.0179 & No & Yes \\
+v6.0.0 & 1 & Short & 32.5454 & 0.0047 & 0.2618 & No & Yes \\
+v6.0.0 & 1 & Medium & 161.2759 & $2.2145\times10^{-4}$ & 0.2542 & No & Yes \\
+v6.0.0 & 1 & Long & 501.0038 & $2.3589\times10^{-5}$ & 0.1977 & No & Yes \\
+v2.0.0 & 1 & Short & 2,650.3733 & $8.5201\times10^{-7}$ & 4,277.1935 & No & Yes \\
+v2.0.0 & 1 & Medium & 4,005.8189 & $3.7329\times10^{-7}$ & 36,521.4313 & No & Yes \\
+v2.0.0 & 1 & Long & 671.1798 & $1.3188\times10^{-5}$ & 56,572.7853 & No & Yes \\
+\bottomrule\end{tabular}
+\par\smallskip\parbox{0.95\textwidth}{\scriptsize ID is the final component of Table ID. Negative change means lower overloaded runtime. All v8.0.0 rows are retained.}
+\end{table*}
+
+\subsection{Chi-Squared Test}
+
+\begin{table*}[!t]\caption{Matrix Array: Chi-Square by Run Length (Significance: $p$-value $<0.05$)}
+\centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{llllllll}
+\toprule
+Version & Run Length & Increases & Decreases & Chi-Square & p-value & Significant & Direction \\ \midrule
+v8.0.0 & Short & 0 & 3 & 3 & 0.0833 & No & improved \\
+v8.0.0 & Medium & 0 & 3 & 3 & 0.0833 & No & improved \\
+v8.0.0 & Long & 0 & 3 & 3 & 0.0833 & No & improved \\
+v7.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v7.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v7.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v7.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v6.0.0 & Short & 0 & 5 & 5 & 0.0253 & Yes & improved \\
+v6.0.0 & Medium & 0 & 5 & 5 & 0.0253 & Yes & improved \\
+v6.0.0 & Long & 0 & 5 & 5 & 0.0253 & Yes & improved \\
+v6.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v5.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v5.0.0 & Medium & 0 & 5 & 5 & 0.0253 & Yes & improved \\
+v4.0.0 & Short & 0 & 5 & 5 & 0.0253 & Yes & improved \\
+v4.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v4.0.0 & Medium & 0 & 5 & 5 & 0.0253 & Yes & improved \\
+v3.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v2.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v1.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v1.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+\bottomrule\end{tabular}
+\par\smallskip\parbox{0.95\textwidth}{\scriptsize Rows retain source order. Repeated version/run-length rows represent different environments. All v8.0.0 rows are retained.}
+\end{table*}
+
+\begin{table*}[!t]\caption{Uniform Nodes: Chi-Square by Run Length (Significance: $p$-value $<0.05$)}
+\centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{llllllll}
+\toprule
+Version & Run Length & Increases & Decreases & Chi-Square & p-value & Significant & Direction \\ \midrule
+v7.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v7.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v7.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v6.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v6.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v6.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v5.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v5.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v5.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v5.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v5.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v5.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v5.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v4.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v4.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v4.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v4.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v4.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v4.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v4.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v3.0.0 & Short & 0 & 5 & 5 & 0.0253 & Yes & improved \\
+v3.0.0 & Medium & 0 & 5 & 5 & 0.0253 & Yes & improved \\
+v2.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+\bottomrule\end{tabular}
+\par\smallskip\parbox{0.95\textwidth}{\scriptsize Rows retain source order. Repeated version/run-length rows represent different environments. All v8.0.0 rows are retained.}
+\end{table*}
+
+\begin{table*}[!t]\caption{Memory Stress: Chi-Square by Run Length (Significance: $p$-value $<0.05$)}
+\centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{llllllll}
+\toprule
+Version & Run Length & Increases & Decreases & Chi-Square & p-value & Significant & Direction \\ \midrule
+v7.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v7.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v7.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v6.0.0 & Short & 0 & 5 & 5 & 0.0253 & Yes & improved \\
+v6.0.0 & Medium & 0 & 5 & 5 & 0.0253 & Yes & improved \\
+v6.0.0 & Long & 0 & 5 & 5 & 0.0253 & Yes & improved \\
+v3.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v3.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v2.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v2.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v2.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+\bottomrule\end{tabular}
+\par\smallskip\parbox{0.95\textwidth}{\scriptsize Rows retain source order. Repeated version/run-length rows represent different environments. All v8.0.0 rows are retained.}
+\end{table*}
+
+\begin{table*}[!t]\caption{Linked List: Chi-Square by Run Length (Significance: $p$-value $<0.05$)}
+\centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{llllllll}
+\toprule
+Version & Run Length & Increases & Decreases & Chi-Square & p-value & Significant & Direction \\ \midrule
+v7.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v7.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v7.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v6.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v6.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v6.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v2.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v2.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v2.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+\bottomrule\end{tabular}
+\par\smallskip\parbox{0.95\textwidth}{\scriptsize Rows retain source order. Repeated version/run-length rows represent different environments. All v8.0.0 rows are retained.}
+\end{table*}
+
+

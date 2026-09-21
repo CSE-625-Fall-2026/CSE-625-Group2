@@ -19,6 +19,9 @@
 \usepackage{array}
 \usepackage{tabularx}
 \usepackage{booktabs}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{stfloats}
 \usepackage{textcomp}
 \usepackage{xcolor}
 
@@ -33,6 +36,11 @@
 \usepackage{cleveref}
 
 \newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+% Keep wide IEEE floats inside the printable area and make their spacing
+% consistent across the report.
+\setlength{\dblfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\dbltextfloatsep}{10pt plus 2pt minus 2pt}
 
 \begin{document}
 

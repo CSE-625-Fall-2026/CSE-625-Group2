@@ -13,10 +13,14 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 
-% --- Figures ---
+% --- Figures and tables ---
 \usepackage{graphicx}
 \graphicspath{{figures/}}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{longtable}
 \usepackage{booktabs}
+\usepackage{xurl}
 
 % --- Bibliography ---
 \usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
@@ -26,7 +30,9 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{cleveref}
 
-\title{}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+\title{CSE 625 Group 2}
 \author{}
 \date{\today}
 

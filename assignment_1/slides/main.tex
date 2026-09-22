@@ -4,6 +4,8 @@
 \usecolortheme{whale}
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{caption}[numbered]
+\setbeamerfont{footnote}{size=\tiny}
+
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern,amsmath,amssymb,graphicx,booktabs,array,listings,pgfplots}
@@ -25,8 +27,25 @@
 \title[Allocator Profiling]{Assignment 1 --- Custom Memory Allocator Profiling}
 \subtitle{Workload choices, code behavior, and statistical evidence}
 \author[Group 2]{Jacob Nance \quad Fernanda Gonzalez \quad Francisco Chagua\\[.3em]Nicholas Hooper \quad Nicholas Johnson \quad Mohamed Konsowa}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\graphicspath{{figures/}{../figures/}}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+\title[Group 2 --- CMA]{Custom Memory Allocator Profiling}
+\subtitle{CSE-625 Assignment 1 --- Group 2}
+\author[Group 2]{%
+    Jacob Nance \quad Fernanda Gonzalez \quad Francisco Chagua \\[0.3em]
+    Nicholas Hooper \quad Nicholas Johnson \quad Mohamed Konsowa
+}
 \institute[CSE-625]{CSE-625 --- Fall 2026}
 \date{September 22, 2026}
+
 \begin{document}
 \begin{frame}[plain]\titlepage\end{frame}
 \begin{frame}{Research questions}
@@ -387,7 +406,9 @@ Long & +1.48\% & $5.24\times10^{-8}$ & -76.84\% & $8.59\times10^{-6}$\\
 \begin{frame}{Appendix: paired ANOVA components for v8 E2}
 \scriptsize\centering
 \begin{tabular}{lrrrrrl}\toprule
-Length & $SS_{m cond}$ & $df_1$ & $SS_{m error}$ & $df_2$ & $F$ & $p$\\\midrule
+Length & $SS_{
+m cond}$ & $df_1$ & $SS_{
+m error}$ & $df_2$ & $F$ & $p$\\\midrule
 Short & 19,092.53 & 1 & 699.98 & 4 & 109.1038 & $4.75\times10^{-4}$\\
 Medium & 107,601.20 & 1 & 3,475.31 & 4 & 123.8465 & $3.71\times10^{-4}$\\
 Long & 124,347.03 & 1 & 70,491.33 & 4 & 7.0560 & 0.0566\\

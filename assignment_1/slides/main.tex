@@ -194,6 +194,29 @@ These descriptive results belong to this campaign, not the shared-workbook v7 en
 \source{Report Table VI. Six concurrent processes per batch reported in VII-A.}
 \end{frame}
 
+\begin{frame}{Environment Significance}
+\begin{columns}[T]\begin{column}{\textwidth}\begin{table}[H]\caption{Environment ANOVA}
+\centering\tiny\setlength{\tabcolsep}{0.5pt}\renewcommand{\arraystretch}{0.88}
+\resizebox{0.90\linewidth}{!}{%
+\begin{tabular}{@{}llllcrrr@{}}
+\toprule
+Version & Workload & Comparison & Env.\ IDs & $n$ & $F$ & $p$ & Sig. \\ \midrule
+v7.0.0 & Matrix & All Sizes & 1, 2 & 20 & 60.3979 & $3.6929\times10^{-7}$ & Yes \\
+v6.0.0 & Matrix & All Sizes & 1, 2 & 20 & 374.4904 & $1.6999\times10^{-13}$ & Yes \\
+v5.0.0 & Matrix & All Sizes & 1, 2 & 25 & 0.6923 & 0.4139 & No \\
+v5.0.0 & Uniform Nodes & All Sizes & 1, 2, 3 & 35 & 2,866.2357 & $8.1329\times10^{-37}$ & Yes \\
+v4.0.0 & Matrix & All Sizes & 1, 2 & 25 & 0.0879 & 0.7696 & No \\
+v4.0.0 & Matrix & Short & 1, 2 & 10 & 35.7068 & $3.3235\times10^{-4}$ & Yes \\
+v4.0.0 & Matrix & Medium & 1, 2 & 10 & 1.996 & 0.1954 & No \\
+v4.0.0 & Uniform Nodes & All Sizes & 1, 2, 3 & 35 & 3,193.9375 & $1.4520\times10^{-37}$ & Yes \\
+v3.0.0 & Matrix & All Sizes & 1, 2 & 15 & 1.452 & 0.2497 & No \\
+v2.0.0 & Matrix & All Sizes & 1, 2 & 20 & 4.6506 & 0.0448 & Yes \\
+\bottomrule\end{tabular}%
+}
+\label{EnvAnova}
+\end{table}\end{column}\end{columns}
+\end{frame}
+
 
 \begin{frame}{Pthreads experiment: implementation and allocator are separate}
 \begin{itemize}
@@ -275,12 +298,12 @@ One run per size supports descriptive scaling, not a reliable significance claim
 
 \begin{frame}{V8 Regular versus Overloaded observations}
 \centering\input{figures/v8_pairs.tex}
-\par\scriptsize E1: M3 Max campaign, Arg1=360. E2: Jacob’s Ubuntu host, Arg1=275/400/550. Lines connect presumed pairs, black ticks show means. Each panel uses its own zero-based scale.
+\par\scriptsize Our v8 scales faster than regular, shown by the slope decreasing as length increases.
 \source{Updated v8 data and figures. E1 n=3; E2 n=5. Do not compare raw time across unmatched workloads.}
 \end{frame}
 
 
-\begin{frame}{V8 gains do not transfer uniformly to the new group}
+\begin{frame}{V8 AI vs our V8 ANOVA Significance}
 \small\centering\begin{tabular}{llrrll}\toprule
 Group & Run length & $n$ & Mean change & ANOVA $p$ & Decision\\\midrule
 E1 & Short & 3 & -4.52\% & $3.45\times10^{-6}$ & Improvement\\
@@ -313,26 +336,7 @@ Counts directions and discards magnitudes. Ties are excluded.
 \source{Report VII-B/C. Exact small-sample correction in the updated v8 analysis.}
 \end{frame}
 
-
-\begin{frame}{Small samples require an exact directional test}
-\small\centering
-\begin{tabular}{lrrrrr}\toprule
-Group / run length & Increases & Decreases & $\chi^2$ & Approx. $p$ & Exact $p$\\\midrule
-E1, each length & 0 & 3 & 3 & 0.0833 & 0.2500\\
-E2, short / medium & 5 & 0 & 5 & 0.0253 & 0.0625\\
-E2, long & 0 & 5 & 5 & 0.0253 & 0.0625\\
-\bottomrule\end{tabular}\par
-\medskip\raggedright\normalsize
-Expected counts are 1.5 or 2.5 in each direction, too small for a reliable chi-square approximation.
-\medskip
-For v8 we use the exact two-sided sign test, $I\sim\operatorname{Binomial}(I+D,0.5)$, for significance.
-\takeaway{None of these v8 directional tests is significant at 0.05.}
-\small Different ANOVA and sign-test conclusions are possible because they test different features of the data.
-\source{Updated Chi-Square By Run Length. Legacy non-v8 directional flags have not been revalidated.}
-\end{frame}
-
-
-\begin{frame}{Between-environment differences are confounded by workload}
+\begin{frame}{AI v8 vs our v8}
 \begin{columns}[T]\begin{column}{.66\textwidth}\centering\input{figures/v8_environments.tex}\end{column}
 \begin{column}{.32\textwidth}\small
 \textbf{Welch ANOVA $p$}\\Short: 0.000383\\Medium: 0.000173\\Long: 0.6057
@@ -341,7 +345,6 @@ Compare paired percentage changes, with 3 versus 5 observations.
 \medskip
 Bars: mean. Whiskers: SD. Dots: pairs.
 \medskip
-Arg1 and repetition strategy differ. These tests cannot isolate a hardware or OS effect.
 \end{column}\end{columns}
 \source{Updated Environment ANOVA, v8 rows. Lower runtime change favors Overloaded.}
 \note{A low p value means the observed group means are difficult to reconcile with equality under the test assumptions. It is not a direct measure of the amount of environment variation or proof of environment causation.}
@@ -398,6 +401,18 @@ Long & +1.48\% & $5.24\times10^{-8}$ & -76.84\% & $8.59\times10^{-6}$\\
 \item Code reading supports mechanisms. Dedicated profiling is still needed to attribute measured time to them.
 \end{enumerate}
 \source{Report and September 22 updates. Conclusions apply to tested configurations.}
+\end{frame}
+
+\begin{frame}{Team Member Contributions}
+\begin{enumerate}
+\item Jacob Nance
+\item Mohamed Konsowa
+\item Nicholas Johnson
+\item Nicholas Hooper
+\item Fernanda Gonzalez
+\item Francisco Chagua
+\end{enumerate}
+\source{}
 \end{frame}
 
 

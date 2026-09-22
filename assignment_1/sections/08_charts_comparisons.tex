@@ -1,13 +1,64 @@
 \section{Charts and Comparisons}
 \label{sec:charts-comparisons}
 
+Figures~\ref{fig:runtime-outcomes} and~\ref{fig:metric-outcomes}
+summarize testable runtime and metric outcomes.
+The tables that follow report the environment ANOVA and the
+metric comparisons those charts are built from.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  ieee stacked bars,
+  bar width=26pt,
+  xticklabels={Matrix Array, Uniform Nodes, Memory Stress, Linked List},
+]
+\addplot coordinates {(0,33.33333333) (1,8.00000000) (2,27.27272727) (3,0.00000000)};
+\addlegendentry{Significant improvement}
+\addplot coordinates {(0,23.33333333) (1,8.00000000) (2,0.00000000) (3,0.00000000)};
+\addlegendentry{Non-significant improvement}
+\addplot coordinates {(0,36.66666667) (1,84.00000000) (2,72.72727273) (3,100.00000000)};
+\addlegendentry{Significant worsening}
+\addplot coordinates {(0,6.66666667) (1,0.00000000) (2,0.00000000) (3,0.00000000)};
+\addlegendentry{Other tested outcomes}
+\end{axis}
+\end{tikzpicture}
+\caption{Runtime outcomes by data structure. All testable rows are included; missing tests are excluded.}
+\label{fig:runtime-outcomes}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  ieee stacked bars,
+  bar width=18pt,
+  enlarge x limits=0.10,
+  x tick label style={font=\scriptsize, align=center, text width=1.7cm},
+  xticklabels={Runtime, Peak Memory (KB), Major Faults, Minor Faults, Voluntary CS, Involuntary CS},
+]
+\addplot coordinates {(0,22.80701754) (1,0.00000000) (2,23.07692308) (3,70.83333333) (4,41.66666667) (5,54.16666667)};
+\addlegendentry{Significant improvement}
+\addplot coordinates {(0,14.03508772) (1,0.00000000) (2,0.00000000) (3,0.00000000) (4,0.00000000) (5,0.00000000)};
+\addlegendentry{Non-significant improvement}
+\addplot coordinates {(0,59.64912281) (1,100.00000000) (2,76.92307692) (3,29.16666667) (4,33.33333333) (5,45.83333333)};
+\addlegendentry{Significant worsening}
+\addplot coordinates {(0,3.50877193) (1,0.00000000) (2,0.00000000) (3,0.00000000) (4,25.00000000) (5,0.00000000)};
+\addlegendentry{Other tested outcomes}
+\end{axis}
+\end{tikzpicture}
+\caption{Metric outcomes excluding CPU usage. All testable rows are included; missing tests are excluded.}
+\label{fig:metric-outcomes}
+\end{figure}
+
 \subsection{Environment Comparison Across Same Version and Workload}
 
-\begin{table*}[!t]\caption{Environment ANOVA}
-\centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.075\textwidth}>{\raggedright\arraybackslash}p{0.115\textwidth}>{\raggedright\arraybackslash}p{0.095\textwidth}>{\raggedright\arraybackslash}p{0.14\textwidth}>{\raggedright\arraybackslash}p{0.03\textwidth}>{\raggedright\arraybackslash}p{0.115\textwidth}>{\raggedright\arraybackslash}p{0.14\textwidth}>{\raggedright\arraybackslash}p{0.105\textwidth}}
+\begin{table}[H]\caption{Environment ANOVA}
+\centering\footnotesize\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.12}
+\begin{tabular}{@{}llllcrrr@{}}
 \toprule
-Version & Data Structure & Comparison & Environment Table IDs & N & F statistic & p-value & Significant (alpha=0.05) \\ \midrule
+Version & Workload & Comparison & Env.\ IDs & $n$ & $F$ & $p$ & Sig. \\ \midrule
 v7.0.0 & Matrix Array & All Sizes & 1, 2 & 20 & 60.3979 & $3.6929\times10^{-7}$ & Yes \\
 v7.0.0 & Matrix Array & Short & 1, 2 & 10 & 47.5496 & $1.2508\times10^{-4}$ & Yes \\
 v6.0.0 & Matrix Array & All Sizes & 1, 2 & 20 & 374.4904 & $1.6999\times10^{-13}$ & Yes \\
@@ -32,12 +83,11 @@ v2.0.0 & Matrix Array & All Sizes & 1, 2 & 20 & 4.6506 & 0.0448 & Yes \\
 v2.0.0 & Matrix Array & Short & 1, 2 & 10 & 20.9244 & 0.0018 & Yes \\
 \bottomrule\end{tabular}
 
-\end{table*}
+\end{table}
 
 \subsection{Metric Comparison}
 
-
-\begin{table*}[!t]\caption{Peak Memory (KB) (Significance: $p$-value $<0.05$)}
+\begin{table}[H]\caption{Peak Memory (KB) (Significance: $p$-value $<0.05$)}
 \centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
 \begin{tabular}{lllllll}
 \toprule
@@ -59,9 +109,9 @@ v2.0.0 & 1 & Medium & 77,212.8 & 149,642.4 & 93.8052 & Yes \\
 v2.0.0 & 1 & Long & 114,898.4 & 224,116 & 95.0558 & Yes \\
 \bottomrule\end{tabular}
 \par\smallskip\parbox{0.95\textwidth}{\scriptsize Include Significant=Yes and absolute change >10.000\%; retain all v8.0.0 rows. Data-structure subheadings identify IDs. Missing means unavailable, not zero.}
-\end{table*}
+\end{table}
 
-\begin{table*}[!t]\caption{Major Faults (Significance: $p$-value $<0.05$)}
+\begin{table}[H]\caption{Major Faults (Significance: $p$-value $<0.05$)}
 \centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
 \begin{tabular}{lllllll}
 \toprule
@@ -86,9 +136,9 @@ v7.0.0 & 1 & Medium & 5 & 6.4 & 28 & Yes \\
 v7.0.0 & 1 & Long & 11.8 & 17.8 & 50.8475 & Yes \\
 \bottomrule\end{tabular}
 \par\smallskip\parbox{0.95\textwidth}{\scriptsize Include Significant=Yes and absolute change >10.000\%; retain all v8.0.0 rows. Data-structure subheadings identify IDs. Missing means unavailable, not zero.}
-\end{table*}
+\end{table}
 
-\begin{table*}[!t]\caption{Minor Faults (Significance: $p$-value $<0.05$)}
+\begin{table}[H]\caption{Minor Faults (Significance: $p$-value $<0.05$)}
 \centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
 \begin{tabular}{lllllll}
 \toprule
@@ -121,9 +171,9 @@ v2.0.0 & 1 & Medium & 18,666.4 & 36,747 & 96.8617 & Yes \\
 v2.0.0 & 1 & Long & 28,078.4 & 55,368 & 97.1907 & Yes \\
 \bottomrule\end{tabular}
 \par\smallskip\parbox{0.95\textwidth}{\scriptsize Include Significant=Yes and absolute change >10.000\%; retain all v8.0.0 rows. Data-structure subheadings identify IDs. Missing means unavailable, not zero.}
-\end{table*}
+\end{table}
 
-\begin{table*}[!t]\caption{Voluntary CS (Significance: $p$-value $<0.05$)}
+\begin{table}[H]\caption{Voluntary CS (Significance: $p$-value $<0.05$)}
 \centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
 \begin{tabular}{lllllll}
 \toprule
@@ -143,9 +193,9 @@ v2.0.0 & 1 & Long & 1 & 2 & 100 & Yes \\
 v2.0.0 & 1 & Long & 1 & 2.2 & 120 & Yes \\
 \bottomrule\end{tabular}
 \par\smallskip\parbox{0.95\textwidth}{\scriptsize Include Significant=Yes and absolute change >10.000\%; retain all v8.0.0 rows. Data-structure subheadings identify IDs. Missing means unavailable, not zero.}
-\end{table*}
+\end{table}
 
-\begin{table*}[!t]\caption{Involuntary CS (Significance: $p$-value $<0.05$)}
+\begin{table}[H]\caption{Involuntary CS (Significance: $p$-value $<0.05$)}
 \centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
 \begin{tabular}{lllllll}
 \toprule
@@ -179,21 +229,5 @@ v2.0.0 & 1 & Short & 421 & 3,552.2 & 743.753 & Yes \\
 v2.0.0 & 1 & Medium & 115.6 & 55,580.4 & 47,979.9308 & Yes \\
 v2.0.0 & 1 & Long & 321.6 & 281,289 & 87,365.4851 & Yes \\
 \bottomrule\end{tabular}
-\par\smallskip\parbox{0.95\textwidth}{\scriptsize Include Significant=Yes and absolute change >10.000\%; retain all v8.0.0 rows. Data-structure subheadings identify IDs. Missing means unavailable, not zero.}
-\end{table*}
-
-\begin{figure*}[!t]\centering
-\begin{tikzpicture}\begin{axis}[ybar stacked,width=0.90\textwidth,height=5.6cm,ymin=0,ymax=100,ylabel={Testable comparisons (\%)},xtick=data,xticklabels={Matrix Array,Uniform Nodes,Memory Stress,Linked List},x tick label style={font=\scriptsize,rotate=15,anchor=east},legend style={at={(0.5,-0.28)},anchor=north,legend columns=2,font=\scriptsize},bar width=16pt]
-\addplot coordinates {(0,33.33333333) (1,8.00000000) (2,27.27272727) (3,0.00000000)};\addlegendentry{Significant improvement}
-\addplot coordinates {(0,23.33333333) (1,8.00000000) (2,0.00000000) (3,0.00000000)};\addlegendentry{Non-significant improvement}
-\addplot coordinates {(0,36.66666667) (1,84.00000000) (2,72.72727273) (3,100.00000000)};\addlegendentry{Significant worsening}
-\addplot coordinates {(0,6.66666667) (1,0.00000000) (2,0.00000000) (3,0.00000000)};\addlegendentry{Other tested outcomes}
-\end{axis}\end{tikzpicture}\caption{Runtime outcomes by data structure. All testable rows are included; missing tests are excluded.}\end{figure*}
-
-\begin{figure*}[!t]\centering
-\begin{tikzpicture}\begin{axis}[ybar stacked,width=0.90\textwidth,height=5.6cm,ymin=0,ymax=100,ylabel={Testable comparisons (\%)},xtick=data,xticklabels={Runtime,Peak Memory (KB),Major Faults,Minor Faults,Voluntary CS,Involuntary CS},x tick label style={font=\scriptsize,rotate=15,anchor=east},legend style={at={(0.5,-0.28)},anchor=north,legend columns=2,font=\scriptsize},bar width=16pt]
-\addplot coordinates {(0,22.80701754) (1,0.00000000) (2,23.07692308) (3,70.83333333) (4,41.66666667) (5,54.16666667)};\addlegendentry{Significant improvement}
-\addplot coordinates {(0,14.03508772) (1,0.00000000) (2,0.00000000) (3,0.00000000) (4,0.00000000) (5,0.00000000)};\addlegendentry{Non-significant improvement}
-\addplot coordinates {(0,59.64912281) (1,100.00000000) (2,76.92307692) (3,29.16666667) (4,33.33333333) (5,45.83333333)};\addlegendentry{Significant worsening}
-\addplot coordinates {(0,3.50877193) (1,0.00000000) (2,0.00000000) (3,0.00000000) (4,25.00000000) (5,0.00000000)};\addlegendentry{Other tested outcomes}
-\end{axis}\end{tikzpicture}\caption{Metric outcomes excluding CPU usage. All testable rows are included; missing tests are excluded.}\end{figure*}
+\par\smallskip\parbox{0.95\textwidth}{\scriptsize Include Significant=Yes and absolute change $>10.000\%$; retain all v8.0.0 rows. Data-structure subheadings identify IDs. Missing means unavailable, not zero.}
+\end{table}

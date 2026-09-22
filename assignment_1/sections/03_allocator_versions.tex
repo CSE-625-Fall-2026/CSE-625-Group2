@@ -482,7 +482,8 @@ run did not complete.
 
 \subsection{Version progression}
 
-\begin{table*}[!t]
+\onecolumn
+\begin{table}[H]
 \centering
 \caption{Regular \texttt{new} and custom allocator versions v1--v8}
 \label{tab:allocator-versions}
@@ -502,4 +503,4 @@ v7 & same bins & same refill path & per-class target 16$\rightarrow$256 after 4 
 v8 & split small/large arena with a reserved guard & central best-fit; no hot-path thread cache & deferred merge; 64-byte align $\ge$2048; page-align at 2\,MiB \\
 \bottomrule
 \end{tabularx}
-\end{table*}
+\end{table}

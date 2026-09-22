@@ -1,0 +1,237 @@
+\section{PThreads Experiments}
+\label{sec:pthreads-experiments}
+
+\subsection{Methodology}
+
+Pthreads performance under different memory-allocation strategies is compared on a single machine using both Windows WSL and native Linux (Linux Mint, based on Ubuntu). For the general summary-statistics experiments, the matrix-size parameter, $n$, is fixed at 800 and the number of threads is fixed at 8. Each experiment performs multiplication involving 200 $n \times n$ matrices. Pthreads versions v4.0.0 and v6.0.0 are tested with either CMA v7.0.0 or regular \texttt{new} as the memory-allocation strategy. Pthreads v4.0.0 uses queues and mutexes, whereas v6.0.0 removes these mechanisms to improve cache locality and throughput at the expense of code readability and implementation simplicity.
+
+After obtaining the summary statistics, assumption checks are performed before subsequent statistical testing. The Shapiro--Wilk test is used to evaluate normality, while Levene's test is used to evaluate equality of variances among methods. When these assumptions are reasonably satisfied, one-way ANOVA and Tukey HSD are used for inferential comparisons. ANOVA tests the null hypothesis that all method mean runtimes are equal, while Tukey HSD provides pairwise comparisons among methods while controlling the family-wise error rate. These pairwise results are then used to identify groups of methods with statistically distinguishable performance. Tukey HSD comparisons are also performed across the Linux and Windows WSL environments for corresponding methods.
+
+A more detailed empirical scaling analysis is performed on two methods of particular interest: pthreads v4 -- CMA v7 and pthreads v6 -- regular \texttt{new}, both under native Linux. These methods are selected to examine the central trade-off of whether a simpler calculation implementation can remain competitive when paired with a custom memory allocator that improves memory-access behavior. In particular, the comparison asks whether the runtime cost of the simpler pthreads v4 implementation can be sufficiently reduced by CMA to make its increased readability and simplicity practically worthwhile.
+
+Each method is first fit to a power-law model of the form $T(n)=cn^p$ in order to estimate its empirical scaling exponent and determine whether the two methods exhibit approximately equivalent growth rates. Each method is also fit to a full cubic polynomial. These polynomial models are used descriptively to evaluate how well cubic-shaped runtime growth represents the observed data and to investigate whether any broader runtime comparison can be supported. Because these fits are based on a finite experimental range, asymptotic extrapolations are interpreted cautiously.
+
+\subsection{Results}
+
+The experiments indicate that, under the appropriate execution environment, the simpler pthreads implementation can remain reasonably competitive when combined with a custom memory allocator, although it retains a runtime disadvantage relative to the highest-performing implementation.
+
+Table~\ref{tab:pthreads-wsl-summary} presents summary statistics for the Windows WSL pthreads experiments. The results indicate a slight performance degradation when CMA v7.0.0 is used with either pthreads v4 or pthreads v6 compared with regular \texttt{new}. Table~\ref{tab:pthreads-wsl-tests} reports the Shapiro--Wilk, Levene, and one-way ANOVA results, while Tables~\ref{tab:pthreads-wsl-tukey} and~\ref{tab:pthreads-wsl-ranking} present the corresponding pairwise significance tests and performance groupings. Tukey HSD comparisons at $\alpha=0.05$ show that pthreads v6 with regular \texttt{new} has significantly lower mean runtime than all other tested methods. No statistically significant difference is found between the two memory-allocation strategies when used with pthreads v4.
+
+The same experiments under native Linux, shown in Tables~\ref{tab:pthreads-linux-summary},~\ref{tab:pthreads-linux-tests},~\ref{tab:pthreads-linux-tukey}, and~\ref{tab:pthreads-linux-ranking}, exhibit a substantially different pattern. For pthreads v6, no statistically significant difference is found between the two memory-allocation strategies, although regular \texttt{new} has a slightly lower mean runtime. In contrast, a statistically significant difference is found between the allocation strategies for pthreads v4: using CMA v7 produces a substantially lower mean runtime than using regular \texttt{new}. The mean runtime of pthreads v4 with CMA v7 remains higher than that of pthreads v6, but the remaining performance gap may be small enough in some contexts to justify the simpler and more readable pthreads v4 implementation. These results also demonstrate that the custom allocator can substantially improve the performance of the otherwise slower implementation.
+
+Table~\ref{tab:pthreads-linuxwindows-tukey} shows statistically significant differences for corresponding methods across the Linux and Windows WSL environments. Together with the substantially different performance groupings shown in Tables~\ref{tab:pthreads-wsl-ranking} and~\ref{tab:pthreads-linux-ranking}, these results indicate that the execution environment affects not only absolute runtime but also the relative effectiveness of the custom memory-allocation strategy.
+
+Figure~\ref{fig:pthreads-comparison} shows runtime growth for pthreads v4 -- CMA v7 and pthreads v6 -- regular \texttt{new}. The matrix-size parameter is varied from 400 to 1800, with a single run performed for each method at each value of $n$. The pthreads v6 -- regular \texttt{new} curve exhibits very smooth growth despite the absence of repeated trials at each point, whereas pthreads v4 -- CMA v7 exhibits substantially greater size-dependent variability.
+
+Table~\ref{tab:pthreads-runtime-fits} presents power-law and cubic-polynomial models fitted to the runtime data. The power-law fits are consistent with approximately cubic empirical scaling, with fitted exponents of 3.064 for pthreads v4 -- CMA v7 and 2.938 for pthreads v6 -- regular \texttt{new}. The regular-allocation implementation follows the fitted model particularly closely, with $R^2=0.99992$, while the CMA implementation is less regular, with $R^2=0.98632$. Full cubic-polynomial fits increase the descriptive $R^2$ values to 0.99334 and 0.99998, respectively. These results support approximately cubic growth for both methods while also showing that the CMA implementation exhibits substantially greater size-dependent variation.
+
+Across the measured parameter values, the observed runtime ratio
+$$
+\frac{T_{\mathrm{CMA}}}{T_{\mathrm{regular}}}
+$$
+ranges from approximately 1.085 to 1.379. Thus, pthreads v4 -- CMA v7 is approximately 8.5\% to 37.9\% slower than pthreads v6 -- regular \texttt{new} over the tested range, subject to uncertainty from the use of only a single run at each parameter value. The relative disadvantage generally becomes larger at higher values of $n$, although the sequence is not monotonic.
+
+Extrapolation beyond the measured range should be treated cautiously. The fitted power-law models have different exponents and therefore imply a runtime ratio that continues to increase with $n$. In contrast, the leading cubic terms of the polynomial fits imply an asymptotic ratio of approximately
+$$
+\frac{1.325\times10^{-6}}{4.232\times10^{-7}}\approx 3.13,
+$$
+which would correspond to CMA requiring approximately 3.13 times the runtime, or about 213\% greater runtime, in the asymptotic limit of that fitted model. These extrapolations disagree substantially and are both based on a limited finite range. Furthermore, the size-dependent variability observed for pthreads v4 -- CMA v7 suggests that its runtime may be influenced by discrete or piecewise hardware effects involving memory allocation, cache behavior, paging, alignment, or related mechanisms. Consequently, the measured runtime ratios provide a more reliable characterization of performance within the tested range than either model provides for long-range extrapolation.
+
+\begin{table}[H]
+\centering
+\caption{Windows WSL Experiments -- Summary statistics by method.}
+\label{tab:pthreads-wsl-summary}
+\footnotesize
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrrr}
+\toprule
+Method & Mean & Std.\ Dev. & Min & Max \\
+\midrule
+pthreads v6.0.0 - regular new & \textbf{292.769} & 1.618 & 290.947 & 294.582 \\
+pthreads v6.0.0 - CMA v7.0.0 & 300.914 & 0.627 & 299.988 & 301.544 \\
+pthreads v4.0.0 - regular new & 395.795 & 3.762 & 390.184 & 400.669 \\
+pthreads v4.0.0 - CMA v7.0.0 & 397.664 & 6.023 & 388.333 & 402.081 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Windows WSL Experiments -- Shapiro--Wilk, Levene, and one-way ANOVA results.}
+\label{tab:pthreads-wsl-tests}
+\footnotesize
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrl}
+\toprule
+Test & Test Statistic & $p$-value & Result \\
+\midrule
+Shapiro--Wilk & $W = 0.9111$ & 0.0668 & Normality assumption satisfied \\
+Levene's test & $W = 1.1853$ & 0.3466 & Equal-variance assumption satisfied \\
+One-way ANOVA & $F = 1249.0073$ & $3.560\times10^{-19}$ & Significant difference among means \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Windows WSL Experiments -- Tukey HSD pairwise comparisons ($\alpha = 0.05$).}
+\label{tab:pthreads-wsl-tukey}
+\footnotesize
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llrl}
+\toprule
+Method A & Method B & $p$ & Significant \\
+\midrule
+pthreads v4.0.0 - regular new & pthreads v4.0.0 - CMA v7.0.0 & 0.8495 & No \\
+pthreads v4.0.0 - regular new & pthreads v6.0.0 - regular new & $<0.0001$ & Yes \\
+pthreads v4.0.0 - regular new & pthreads v6.0.0 - CMA v7.0.0 & $<0.0001$ & Yes \\
+pthreads v4.0.0 - CMA v7.0.0 & pthreads v6.0.0 - regular new & $<0.0001$ & Yes \\
+pthreads v4.0.0 - CMA v7.0.0 & pthreads v6.0.0 - CMA v7.0.0 & $<0.0001$ & Yes \\
+pthreads v6.0.0 - regular new & pthreads v6.0.0 - CMA v7.0.0 & 0.0135 & Yes \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Windows WSL Experiments -- Final ranking of methods.}
+\label{tab:pthreads-wsl-ranking}
+\footnotesize
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{clrl}
+\toprule
+Rank & Method & Mean Time (s) & Significance Group \\
+\midrule
+1 & pthreads v6.0.0 - regular new & \textbf{292.769} & A \\
+2 & pthreads v6.0.0 - CMA v7.0.0 & 300.914 & B \\
+3 & pthreads v4.0.0 - regular new & 395.795 & C \\
+4 & pthreads v4.0.0 - CMA v7.0.0 & 397.664 & C \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Linux Experiments -- Summary statistics by method.}
+\label{tab:pthreads-linux-summary}
+\footnotesize
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrrr}
+\toprule
+Method & Mean & Std.\ Dev. & Min & Max \\
+\midrule
+pthreads v6.0.0 - regular new & \textbf{224.896} & 1.057 & 224.144 & 226.726 \\
+pthreads v6.0.0 - CMA v7.0.0 & 226.776 & 0.843 & 225.551 & 227.932 \\
+pthreads v4.0.0 - CMA v7.0.0 & 246.981 & 2.615 & 244.008 & 250.656 \\
+pthreads v4.0.0 - regular new & 348.573 & 2.909 & 343.810 & 351.048 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Linux Experiments -- Shapiro--Wilk, Levene, and one-way ANOVA results.}
+\label{tab:pthreads-linux-tests}
+\footnotesize
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrl}
+\toprule
+Test & Test Statistic & $p$-value & Result \\
+\midrule
+Shapiro--Wilk & $W = 0.9627$ & 0.5985 & Normality assumption satisfied \\
+Levene's test & $W = 1.5435$ & 0.2418 & Equal-variance assumption satisfied \\
+One-way ANOVA & $F = 4023.3356$ & $3.148\times10^{-23}$ & Significant difference among means \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Linux Experiments -- Tukey HSD pairwise comparisons ($\alpha = 0.05$).}
+\label{tab:pthreads-linux-tukey}
+\footnotesize
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llrl}
+\toprule
+Method A & Method B & $p$ & Significant \\
+\midrule
+pthreads v4.0.0 - regular new & pthreads v4.0.0 - CMA v7.0.0 & $<0.0001$ & Yes \\
+pthreads v4.0.0 - regular new & pthreads v6.0.0 - regular new & $<0.0001$ & Yes \\
+pthreads v4.0.0 - regular new & pthreads v6.0.0 - CMA v7.0.0 & $<0.0001$ & Yes \\
+pthreads v4.0.0 - CMA v7.0.0 & pthreads v6.0.0 - regular new & $<0.0001$ & Yes \\
+pthreads v4.0.0 - CMA v7.0.0 & pthreads v6.0.0 - CMA v7.0.0 & $<0.0001$ & Yes \\
+pthreads v6.0.0 - regular new & pthreads v6.0.0 - CMA v7.0.0 & 0.4965 & No \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Linux Experiments -- Final ranking of methods.}
+\label{tab:pthreads-linux-ranking}
+\footnotesize
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{clrl}
+\toprule
+Rank & Method & Mean Time (s) & Significance Group \\
+\midrule
+1 & pthreads v6.0.0 - regular new & \textbf{224.896} & A \\
+2 & pthreads v6.0.0 - CMA v7.0.0 & 226.776 & A \\
+3 & pthreads v4.0.0 - CMA v7.0.0 & 246.981 & B \\
+4 & pthreads v4.0.0 - regular new & 348.573 & C \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Linux vs Windows Significance Experiments -- Tukey HSD pairwise comparisons ($\alpha = 0.05$).}
+\label{tab:pthreads-linuxwindows-tukey}
+\footnotesize
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llrl}
+\toprule
+Method & $p$ & Significant \\
+\midrule
+pthreads v4.0.0 - regular new & $<0.0001$ & Yes \\
+pthreads v4.0.0 - CMA v7.0.0 & $<0.0001$ & Yes \\
+pthreads v6.0.0 - regular new  & $<0.0001$ & Yes \\
+pthreads v6.0.0 - CMA v7.0.0 & $<0.0001$ & Yes \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{pthreads_figure.png}
+\caption{Runtime complexity comparison of pthreads v4 -- CMA v7 with pthreads v6 -- regular \texttt{new} on Linux.}
+\label{fig:pthreads-comparison}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{Empirical runtime model fits.}
+\label{tab:pthreads-runtime-fits}
+\footnotesize
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llll}
+\toprule
+Method & Fit Type & Fitted Model & $R^2$ \\
+\midrule
+pthreads v4 -- CMA v7 & Power law & {\small $3.29\times10^{-7} n^{3.064}$} & 0.98632 \\
+pthreads v6 -- regular new & Power law & {\small $6.71\times10^{-7} n^{2.938}$} & 0.99992 \\
+pthreads v4 -- CMA v7 & Polynomial & {\small $1.325\times10^{-6}n^3 - 2.268\times10^{-3}n^2 + 1.912n - 478.4$} & 0.99334 \\
+pthreads v6 -- regular new & Polynomial & {\small $4.232\times10^{-7}n^3 - 1.311\times10^{-5}n^2 + 3.558\times10^{-2}n - 10.07$} & 0.99998 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}

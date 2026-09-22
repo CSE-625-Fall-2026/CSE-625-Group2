@@ -117,7 +117,10 @@ Intel i7-1165G7, 16 GB & x86-64, Ubuntu 24.04.3 & Jacob v2 and new v8 E2\\
 Intel i7-11370H, 16 GB & x86-64, WSL and Linux Mint & 8-thread pthread comparison\\
 Shared-team inventory & M5 Pro, other Intel and Ryzen & macOS, Arch Linux, WSL\\
 \bottomrule\end{tabular}\par
-\medskip\raggedright\normalsize Coverage spans two architecture families and several OS/runtime environments. Versions and parameters are not balanced across them.
+\medskip\raggedright\normalsize
+Two arches (\textbf{ARM64}, \textbf{x86-64}) and several OS runtimes
+(\textbf{macOS}, \textbf{WSL}, \textbf{native Linux}), plus shared-team hosts.
+\takeaway{Versions and parameters are not balanced across hosts --- compare within an environment.}
 \source{Report Tables II--V and XXII--XXIII, Section XII. Updated v8 inventory.}
 \note{Some inventory fields are missing. Campaign IDs on the M3 Max denote runs on the same Mac, not separate machines. OS and toolchain versions also differ by campaign.}
 \end{frame}
@@ -127,13 +130,15 @@ Shared-team inventory & M5 Pro, other Intel and Ryzen & macOS, Arch Linux, WSL\\
 \small\centering
 \begin{tabular}{p{.27\textwidth}p{.35\textwidth}p{.29\textwidth}}\toprule
 Question & Method & What it establishes\\\midrule
-Regular vs Overloaded & Paired, two-condition ANOVA & Mean within-pair difference\\
-More increases than decreases? & Directional $\chi^2$; exact sign test & Evidence about direction frequency\\
-v8 groups across environments & Welch ANOVA on paired \% changes & Difference between observed groups\\
-Four pthread methods & One-way ANOVA + Tukey HSD & Overall and adjusted pairwise differences\\
+Regular vs Overloaded & Paired, two-condition ANOVA & \textbf{How big} the mean within-pair gap is\\
+More increases than decreases? & Directional $\chi^2$; exact sign test & \textbf{How often} one side wins (direction only)\\
+v8 groups across environments & Welch ANOVA on paired \% changes & Whether \% changes differ by group\\
+Four pthread methods & One-way ANOVA + Tukey HSD & Which methods differ (pairwise-adjusted)\\
 Assumptions and scaling & Shapiro--Wilk, Levene, fitted models & Diagnostics and descriptive growth\\
 \bottomrule\end{tabular}\par
-\medskip\raggedright\normalsize Significance uses $\alpha=0.05$. A small $p$ value does not measure effect size or establish a causal mechanism.
+\medskip\raggedright\normalsize
+Means still report typical time; these tests ask whether the pattern is reliable.
+Significance uses $\alpha=0.05$. A small $p$ is not effect size and not a causal proof.
 \source{Report VII and XII. Updated v8 methods. Tukey controls its pairwise family; v8 p values are unadjusted.}
 \end{frame}
 
@@ -141,13 +146,15 @@ Assumptions and scaling & Shapiro--Wilk, Levene, fitted models & Diagnostics and
 \begin{frame}{Allocator evolution: search and reuse}
 \small\centering
 \begin{tabular}{p{.09\textwidth}p{.54\textwidth}p{.28\textwidth}}\toprule
-Version & Implementation described in the report & Tradeoff\\\midrule
-v1 & Address-ordered list, first-fit, merge on free & Simple path; list search\\
-v2 & Global best-fit on the same list & Tighter fit; full-list scan\\
+Version & What changes (CMA intercepts \texttt{new}/\texttt{delete}) & Tradeoff\\\midrule
+v1 & Address-ordered list, \textbf{first-fit}, merge on free & Simple path; list search\\
+v2 & Same list, \textbf{best-fit} & Tighter fit; full-list scan\\
 v3 & Size bins, bitmap, physical-neighbor metadata & Narrower search; bin bookkeeping\\
 v4 & Thread caches, 64 blocks/class, 8192-byte limit & Cheap cache hits; retained memory\\
 \bottomrule\end{tabular}\par
-\medskip\raggedright\normalsize The public API and global \texttt{new/delete} interception stay consistent. The free-block policy changes.
+\medskip\raggedright\normalsize
+These are CMA versions, not ``regular \texttt{new} plus a tweak.''
+The public API stays the same; the free-block policy changes.
 \source{Report Section III and Table I. Code details are reported descriptions, not a new source-code audit.}
 \end{frame}
 
@@ -155,26 +162,29 @@ v4 & Thread caches, 64 blocks/class, 8192-byte limit & Cheap cache hits; retaine
 \begin{frame}{Allocator evolution: deferred work and specialization}
 \small\centering
 \begin{tabular}{p{.09\textwidth}p{.54\textwidth}p{.28\textwidth}}\toprule
-Version & Implementation described in the report & Tradeoff\\\midrule
+Version & What changes & Tradeoff\\\midrule
 v5 & Merge only after allocation cannot be satisfied & Cheaper free; expensive miss path\\
-v6 & Batch refill up to 32 slabs; 4 MiB cache cap & Amortized refill; reserved capacity\\
+v6 & Batch refill up to 32 slabs; \textbf{4 MiB} cache cap & Amortized refill; reserved capacity\\
 v7 & Per-class targets grow from 16 to 256 & Adapts to misses; extra accounting\\
-v8 & Packed row layout, split regions, cache bypass & Matrix focus; tiny-object regression\\
+v8 & \textbf{Written v8:} keep thread cache; raise cap $256\rightarrow512$;
+      retune every 256 allocs; live-block accounting; bin bitmaps
+      & Better tiny-object cache; not a packing win\\
 \bottomrule\end{tabular}\par
-\takeaway{A newer policy can improve one request pattern while making another worse.}
-\source{Report Section III and Table I.}
+\takeaway{A newer policy can help one pattern and hurt another. AI-generated v8 is separate --- compared later.}
+\source{Report Section III and Table I. Written v8 = cache-tuned line from v7.}
 \end{frame}
 
 
 \begin{frame}{What happens when the program requests memory}
 \begin{enumerate}
-\item A matrix operation constructs a result. Each matrix row requests its own allocation.
-\item Global \texttt{new} routes the request to the initialized custom pool.
-\item The version-specific path checks reuse structures, finds a block, and splits it when possible.
+\item Matrix needs a result row $\rightarrow$ each row calls \texttt{new}.
+\item Global \texttt{new} routes into the initialized \textbf{custom pool}.
+\item Version path checks reuse structures, finds a block, splits when possible.
 \item Metadata, alignment, back-pointer, and canaries surround the payload.
-\item On deletion, ownership and canary checks precede caching or insertion into free bins. Merge timing depends on the version.
+\item On \texttt{delete}: ownership + canary checks, then cache or free bins.
+      Merge timing depends on the version (v1--v8).
 \end{enumerate}
-\takeaway{We can explain the path and its costs. Total runtime does not reveal how much time each step consumed.}
+\takeaway{We can describe the path. Total runtime is overall cost --- it does not say how long each step took.}
 \source{Report Sections III and VI.}
 \note{The singleton uses static storage and placement new to avoid allocator recursion. An uninitialized pool falls back to malloc/posix_memalign. The presentation does not claim to have independently audited the repository.}
 \end{frame}
@@ -283,16 +293,43 @@ One run per size supports descriptive scaling, not a reliable significance claim
 \end{frame}
 
 
-\begin{frame}{V8 deliberately targets matrix row layout}
-\begin{itemize}
-\item Target: separately allocated rows in a $360\times360$ matrix, about 2880 bytes per row of doubles.
-\item Split small/large regions with a reserved guard and preserve exact split sizes.
-\item Use 64-byte alignment from 2048 bytes; defer page alignment until 2 MiB.
-\item Bypass the small-object thread cache on the hot allocation path and retain deferred coalescing.
-\end{itemize}
-\takeaway{Yes, we changed the allocator for a specific implementation.}
-\small The report says v8 linked-list runs were terminated before completion. They are incomplete trials, not finite slowdown estimates.
-\source{Report Sections III-J/K and XVI-D. Row-locality benefits remain an implementation-based explanation.}
+\begin{frame}{Written v8 vs AI-generated v8}
+\small
+Group~2 has \textbf{two} v8 designs. Opposite bets.
+\medskip
+\centering
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{@{}l
+  >{\raggedright\arraybackslash}p{0.38\linewidth}
+  >{\raggedright\arraybackslash}p{0.38\linewidth}@{}}
+\toprule
+& \centering\textbf{Written v8} &
+  \centering\textbf{AI-generated v8}\tabularnewline
+\midrule
+Hot path &
+  Keeps thread cache; retunes every 256 allocs &
+  Skips cache; central best-fit \\
+Cache &
+  Cap $256\rightarrow512$ / class &
+  Off on hot path \\
+Arena &
+  One mmap (like v7) &
+  Small + guard + large \\
+Align &
+  Page @ 64\,KiB (like v7) &
+  64-byte if $\ge$2\,KiB; page only @ 2\,MiB \\
+Remainders &
+  Round to 64-byte quantum &
+  Exact size (packed stride) \\
+Focus &
+  Better tiny-object cache &
+  Pack reused medium matrix rows \\
+\bottomrule
+\end{tabular}
+\par
+\medskip\raggedright\normalsize
+Matrix result tables later are for the \textbf{AI-generated v8} unless labeled otherwise.
+\source{Written v8: cache-tuned from v7. AI-generated v8: packed-row policies profiled on M3 Max / E2.}
 \end{frame}
 
 

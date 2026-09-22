@@ -44,46 +44,47 @@
 \end{frame}
 
 \begin{frame}{What changed from v7}
-    {\scriptsize
-    \renewcommand{\arraystretch}{1.4}
-    \setlength{\tabcolsep}{4pt}
-    \begin{tabular}{@{}p{0.22\textwidth}p{0.35\textwidth}p{0.35\textwidth}@{}}
+    \centering
+    \footnotesize
+    \renewcommand{\arraystretch}{1.45}
+    \setlength{\tabcolsep}{8pt}
+    \begin{tabular}{@{}l
+      >{\raggedright\arraybackslash}p{0.36\linewidth}
+      >{\raggedright\arraybackslash}p{0.36\linewidth}@{}}
         \toprule
-        & \textbf{Our v8} & \textbf{The AI version} \\
+        & \centering\textbf{Our v8} &
+          \centering\textbf{The AI version}\tabularnewline
         \midrule
         Hot path &
-          Still thread cache; smarter
-          retune (peak live, every 256) &
-          Cache skipped; central best-fit \\
-        Cache size &
+          Keeps thread cache;
+          retunes every 256 allocs &
+          Skips cache;
+          central best-fit \\
+        Cache &
           Cap \(256\rightarrow512\) / class &
-          Not used on hot path \\
+          Off on hot path \\
         Arena &
-          One mmap free region
-          (same as v7) &
-          Small span + guard + large span \\
+          One mmap (like v7) &
+          Small + guard + large \\
         Align &
-          Page-align @ 64\,KiB
-          (same as v7) &
-          64-byte @ \(\ge\)2\,KiB;
-          page @ 2\,MiB \\
+          Page @ 64\,KiB (like v7) &
+          64-byte if \(\ge\)2\,KiB;
+          page only @ 2\,MiB \\
         Remainders &
-          64-byte quantum
-          (same idea as v7) &
-          Exact used size (packed stride) \\
+          Round to 64-byte quantum &
+          Exact size (packed stride) \\
         Locking &
           \texttt{std::mutex} &
           \texttt{pthread} + recent-large \\
         Extra &
-          Occupied-bin bitmaps;
-          metrics + scripts &
+          Bin bitmaps; metrics; scripts &
           Matrix packing policies \\
         \bottomrule
     \end{tabular}
-    }
 
-    \vspace{0.45em}
-    {\footnotesize Our v8 = better tiny-object cache.
+    \vspace{0.75em}
+    \raggedright
+    {\small Our v8 = better tiny-object cache.\quad
     AI version = pack reused medium rows.}
 \end{frame}
 

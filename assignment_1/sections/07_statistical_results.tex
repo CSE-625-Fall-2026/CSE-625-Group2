@@ -127,7 +127,7 @@ v1.0.0 & 2 & Medium & 11,695.7222 & $4.3838\times10^{-8}$ & 41.7714 & No & Yes \
 \par\smallskip\parbox{0.95\textwidth}{\scriptsize Negative change means lower overloaded runtime.}
 \end{table}
 
-In long term tests, the Matrix resuls show significant improvements only for versions 6 and 8 of the custom memory allocator. This 
+In long term tests, the Matrix results show significant improvements only for versions 6 and 8 of the custom memory allocator. 
 
 See Appendix~\ref{AnovaUniformNodes}, Appendix~\ref{AnovaMemoryStress}, and Appendix~\ref{AnovaLinkedList} for ANOVA tables for the other workloads.
 
@@ -147,7 +147,7 @@ df &= 1, \\
 p &= \Pr\!\left(\chi^2_1\ge\chi^2_{\mathrm{observed}}\right).
 \end{align}
 
-Like the ANOVA test, this is separated into 4 tables based on workload. Only rows resulting in significance are shown.
+Like the ANOVA test, this is separated into four tables based on workload. Only rows resulting in significance are shown.
 
 \begin{table}[H]\caption{Matrix: Chi-Square by Run Length (Significance: $p$-value $<0.05$)}
 \centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
@@ -175,77 +175,12 @@ v2.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
 v1.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
 v1.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
 \bottomrule\end{tabular}
-\par\smallskip\parbox{0.95\textwidth}{\scriptsize Rows retain source order. Repeated version/run-length rows represent different environments.}
+\par\smallskip\parbox{0.95\textwidth}{\scriptsize Repeated version/run-length rows represent different environments.}
 \end{table}
 
-\begin{table}[H]\caption{Uniform Nodes: Chi-Square by Run Length (Significance: $p$-value $<0.05$)}
-\centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{llllllll}
-\toprule
-Version & Run Length & Increases & Decreases & Chi-Square & p-value & Significant & Direction \\ \midrule
-v7.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v7.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v7.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v6.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v6.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v6.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v5.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v5.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v5.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v5.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v5.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v5.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v5.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v4.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v4.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v4.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v4.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v4.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v4.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v4.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v3.0.0 & Short & 0 & 5 & 5 & 0.0253 & Yes & improved \\
-v3.0.0 & Medium & 0 & 5 & 5 & 0.0253 & Yes & improved \\
-v2.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-\bottomrule\end{tabular}
-\par\smallskip\parbox{0.95\textwidth}{\scriptsize Rows retain source order. Repeated version/run-length rows represent different environments.}
-\end{table}
+The Chi-Square test differs from the ANOVA test in that the low number of runs (3) results in a low number of degrees of freedom, which can result in a significant p-value even when the mean change is small. Because of a time crunch, the version 8.0.0 results were ran at 3 runs instead of 5 which prevented the improvement over regular from being statistically significant. 
+However, version 6.0.0 still shows a significant improvement over regular runs. while each other significant result shows a worsened performance from the custom memory allocator.
 
-\begin{table}[H]\caption{Memory Stress: Chi-Square by Run Length (Significance: $p$-value $<0.05$)}
-\centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{llllllll}
-\toprule
-Version & Run Length & Increases & Decreases & Chi-Square & p-value & Significant & Direction \\ \midrule
-v7.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v7.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v7.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v6.0.0 & Short & 0 & 5 & 5 & 0.0253 & Yes & improved \\
-v6.0.0 & Medium & 0 & 5 & 5 & 0.0253 & Yes & improved \\
-v6.0.0 & Long & 0 & 5 & 5 & 0.0253 & Yes & improved \\
-v3.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v3.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v2.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v2.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v2.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-\bottomrule\end{tabular}
-\par\smallskip\parbox{0.95\textwidth}{\scriptsize Rows retain source order. Repeated version/run-length rows represent different environments.}
-\end{table}
-
-\begin{table}[H]\caption{Linked List: Chi-Square by Run Length (Significance: $p$-value $<0.05$)}
-\centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{llllllll}
-\toprule
-Version & Run Length & Increases & Decreases & Chi-Square & p-value & Significant & Direction \\ \midrule
-v7.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v7.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v7.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v6.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v6.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v6.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v2.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v2.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-v2.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
-\bottomrule\end{tabular}
-\par\smallskip\parbox{0.95\textwidth}{\scriptsize Rows retain source order. Repeated version/run-length rows represent different environments.}
-\end{table}
+See Appendix~\ref{ChiUniformNodes}, Appendix~\ref{ChiMemoryStress}, and Appendix~\ref{ChiLinkedList} for Chi-Square tables for the other workloads.
 
 

@@ -112,7 +112,7 @@ v3.0.0 & 1 & Medium & 1,313.8206 & $3.4584\times10^{-6}$ & -19.5403 & Yes & Yes 
 v2.0.0 & 1 & Short & 24.4281 & 0.0078 & 0.818 & No & Yes \\
 \bottomrule\end{tabular}
 \label{AnovaUniformNodes}
-\par\smallskip\parbox{0.95\textwidth}{\scriptsize ID is the final component of Table ID. Negative change means lower overloaded runtime. All v8.0.0 rows are retained.}
+\par\smallskip\parbox{0.95\textwidth}{\scriptsize Negative change means lower overloaded runtime.}
 \end{table}
 
 \begin{table}[H]\caption{Memory Stress: Runtime ANOVA by Run Length (Significance: $p$-value $<0.05$)}
@@ -133,7 +133,7 @@ v2.0.0 & 1 & Medium & 3,828.1053 & $4.0872\times10^{-7}$ & 2,959.08 & No & Yes \
 v2.0.0 & 1 & Long & 1,972.656 & $1.5367\times10^{-6}$ & 3,595.8985 & No & Yes \\
 \bottomrule\end{tabular}
 \label{AnovaMemoryStress}
-\par\smallskip\parbox{0.95\textwidth}{\scriptsize ID is the final component of Table ID. Negative change means lower overloaded runtime. All v8.0.0 rows are retained.}
+\par\smallskip\parbox{0.95\textwidth}{\scriptsize Negative change means lower overloaded runtime.}
 \end{table}
 
 \begin{table}[H]\caption{Linked List: Runtime ANOVA by Run Length (Significance: $p$-value $<0.05$)}
@@ -152,5 +152,79 @@ v2.0.0 & 1 & Medium & 4,005.8189 & $3.7329\times10^{-7}$ & 36,521.4313 & No & Ye
 v2.0.0 & 1 & Long & 671.1798 & $1.3188\times10^{-5}$ & 56,572.7853 & No & Yes \\
 \bottomrule\end{tabular}
 \label{AnovaLinkedList}
-\par\smallskip\parbox{0.95\textwidth}{\scriptsize ID is the final component of Table ID. Negative change means lower overloaded runtime. All v8.0.0 rows are retained.}
+\par\smallskip\parbox{0.95\textwidth}{\scriptsize Negative change means lower overloaded runtime.}
+\end{table}
+
+
+\begin{table}[H]\caption{Uniform Nodes: Chi-Square by Run Length (Significance: $p$-value $<0.05$)}
+\centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{llllllll}
+\toprule
+Version & Run Length & Increases & Decreases & Chi-Square & p-value & Significant & Direction \\ \midrule
+v7.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v7.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v7.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v6.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v6.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v6.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v5.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v5.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v5.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v5.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v5.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v5.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v5.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v4.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v4.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v4.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v4.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v4.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v4.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v4.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v3.0.0 & Short & 0 & 5 & 5 & 0.0253 & Yes & improved \\
+v3.0.0 & Medium & 0 & 5 & 5 & 0.0253 & Yes & improved \\
+v2.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+\bottomrule\end{tabular}
+\label{ChiUniformNodes}
+\par\smallskip\parbox{0.95\textwidth}{\scriptsize Repeated version/run-length rows represent different environments.}
+\end{table}
+
+\begin{table}[H]\caption{Memory Stress: Chi-Square by Run Length (Significance: $p$-value $<0.05$)}
+\centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{llllllll}
+\toprule
+Version & Run Length & Increases & Decreases & Chi-Square & p-value & Significant & Direction \\ \midrule
+v7.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v7.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v7.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v6.0.0 & Short & 0 & 5 & 5 & 0.0253 & Yes & improved \\
+v6.0.0 & Medium & 0 & 5 & 5 & 0.0253 & Yes & improved \\
+v6.0.0 & Long & 0 & 5 & 5 & 0.0253 & Yes & improved \\
+v3.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v3.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v2.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v2.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v2.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+\bottomrule\end{tabular}
+\label{ChiMemoryStress}
+\par\smallskip\parbox{0.95\textwidth}{\scriptsize Repeated version/run-length rows represent different environments.}
+\end{table}
+
+\begin{table}[H]\caption{Linked List: Chi-Square by Run Length (Significance: $p$-value $<0.05$)}
+\centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{llllllll}
+\toprule
+Version & Run Length & Increases & Decreases & Chi-Square & p-value & Significant & Direction \\ \midrule
+v7.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v7.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v7.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v6.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v6.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v6.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v2.0.0 & Short & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v2.0.0 & Medium & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+v2.0.0 & Long & 5 & 0 & 5 & 0.0253 & Yes & worsened \\
+\bottomrule\end{tabular}
+\label{ChiLinkedList}
+\par\smallskip\parbox{0.95\textwidth}{\scriptsize Repeated version/run-length rows represent different environments.}
 \end{table}

@@ -10,7 +10,7 @@ All recorded rows use project commit \texttt{12617e0f943a7b68d8334aa5477dfa403a7
 
 \subsection{Machines}
 
-\begin{table*}[!t]
+\begin{table}[H]
 \centering
 \caption{The two machines used in the supplied run files.}
 \label{tab:machines}
@@ -28,14 +28,14 @@ Compiler & Apple clang 17.0.0 (\texttt{clang-1700.6.3.2}) & Ubuntu \texttt{c++} 
 Used for & matrix v1--v7 (all scales); v6 four-workload campaign & v7 four-workload campaign \\
 \bottomrule
 \end{tabularx}
-\end{table*}
+\end{table}
 
-\begin{table}[!t]
+\begin{table}[H]
 \centering
 \caption{macOS versions recorded on the Apple M3 Max, by campaign.}
 \label{tab:macos-campaigns}
 \footnotesize
-\setlength{\tabcolsep}{4pt}
+\setlength{\tabcolsep}{8pt}
 \begin{tabular}{@{}llll@{}}
 \toprule
 Campaign & Scale(s) & macOS version & OS build \\
@@ -57,7 +57,7 @@ The combined CSV
 includes \texttt{machine\_id} only.
 Processor, OS, architecture, and memory for the combined CSV come from adjacent \texttt{environment.txt} files.
 
-\begin{table*}[!t]
+\begin{table}[H]
 \centering
 \caption{Environment-field differences between the two supplied CSVs.}
 \label{tab:csv-field-diff}
@@ -74,9 +74,9 @@ memory & no column & no column \\
 \texttt{project\_commit} & yes (\texttt{12617e0f\ldots}) & no column (present in adjacent \texttt{environment.txt}) \\
 \bottomrule
 \end{tabularx}
-\end{table*}
+\end{table}
 
-\begin{table*}[!t]\caption{Test Inventory (Part 1 of 2)}
+\begin{table}[H]\caption{Test Inventory (Part 1 of 2)}
 \centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.27\textwidth}}
 \toprule
@@ -107,9 +107,9 @@ v4.0.0\textbar{} Linked List\textbar{} 1 & Not specified & -- \\
 v4.0.0\textbar{} Matrix Array\textbar{} 2 & Assignee: \textbar{}  Liam Seymour, Group 1 \textbar{}  Intel i5-6400, 4 logical cores \textbar{}  12 GB RAM \textbar{}  Arch Linux (Kernel 7.2.4) \textbar{}  Averages & -- \\
 \bottomrule\end{tabular}
 
-\end{table*}
+\end{table}
 
-\begin{table*}[!t]\caption{Test Inventory (Part 2 of 2)}
+\begin{table}[H]\caption{Test Inventory (Part 2 of 2)}
 \centering\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.27\textwidth}}
 \toprule
@@ -132,4 +132,4 @@ v1.0.0\textbar{} Linked List\textbar{} 1 & Not specified & -- \\
 v1.0.0\textbar{} Matrix Array\textbar{} 2 & Assignee: \textbar{}  Liam Seymour, Group 1 \textbar{}  Intel i5-6400, 4 logical cores \textbar{}  12 GB RAM \textbar{}  Arch Linux (Kernel 7.2.4) \textbar{}  Averages & -- \\
 \bottomrule\end{tabular}
 
-\end{table*}
+\end{table}

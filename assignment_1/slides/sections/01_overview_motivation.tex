@@ -1,10 +1,28 @@
-\section{Overview and Motivation}
+\section{1 --- Introduction}
 
-\begin{frame}{Why Allocator Design Matters}
+\begin{frame}{Who we are}
+    \begin{center}
+    {\large\textbf{CSE-625 Group 2}}
+
+    \vspace{0.8em}
+    \begin{tabular}{ll}
+        Jacob Nance & Fernanda Gonzalez \\
+        Francisco Chagua & Nicholas Hooper \\
+        Nicholas Johnson & Mohamed Konsowa \\
+    \end{tabular}
+    \end{center}
 \end{frame}
 
-\begin{frame}{What This Study Compares}
-\end{frame}
-
-\begin{frame}{Research Questions}
+\begin{frame}{What the assignment asked}
+    \begin{itemize}
+        \item Compare \textbf{regular} C++ \texttt{new}/\texttt{delete} to a
+              \textbf{custom memory allocator} (CMA)
+        \item CMA: one \texttt{mmap} pool; overloaded \texttt{new} hands out pieces
+        \item Profile \textbf{v1--v7} (course tags) on four workloads:
+              matrix, uniform nodes, nested stress, linked list
+        \item Short / medium / long scales; elapsed time + OS metrics
+              (\texttt{time}: RSS, faults, context switches)
+        \item Each team also ships an improved \textbf{v8} and reports results
+        \item We also profiled a \textbf{pthreads} matrix workload with CMA vs regular
+    \end{itemize}
 \end{frame}

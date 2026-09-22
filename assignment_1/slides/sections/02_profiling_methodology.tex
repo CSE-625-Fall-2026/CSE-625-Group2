@@ -1,16 +1,47 @@
-\section{Profiling Methodology}
+\section{2 --- CMA v1--v7}
 
-\begin{frame}{Experimental Design}
-\end{frame}
+\begin{frame}{How the seven versions evolved}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            {\scriptsize
+            \renewcommand{\arraystretch}{1.45}
+            \begin{tabular}{@{}c p{0.82\linewidth}@{}}
+                \toprule
+                \textbf{Ver.} & \textbf{Mechanism} \\
+                \midrule
+                \textbf{v1} & One free list, first-fit, merge on free \\
+                \textbf{v2} & Same list, best-fit \\
+                \textbf{v3} & \(\log_2\) size bins (less search) \\
+                \textbf{v4} & Per-thread small-object cache \\
+                \bottomrule
+            \end{tabular}
+            }
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            {\scriptsize
+            \renewcommand{\arraystretch}{1.45}
+            \begin{tabular}{@{}c p{0.82\linewidth}@{}}
+                \toprule
+                \textbf{Ver.} & \textbf{Mechanism} \\
+                \midrule
+                \textbf{v5} & Deferred coalesce (merge on miss) \\
+                \textbf{v6} & Batch cache refill + 4\,MiB cap \\
+                \textbf{v7} & Adaptive cache \(16\rightarrow256\) \\
+                & \\
+                \bottomrule
+            \end{tabular}
+            }
+        \end{column}
+    \end{columns}
 
-\begin{frame}{The Four Workload Pairs}
-\end{frame}
-
-\begin{frame}{Environments Used}
-\end{frame}
-
-\begin{frame}{Standardizing Test Conditions}
-\end{frame}
-
-\begin{frame}{What We Measure}
+    \vspace{0.7em}
+    \begin{block}{Direction of the lineage}
+        \begin{itemize}
+            \item v1--v3: find / organize free blocks
+            \item v4--v7: avoid the central lock with a \textbf{thread cache}
+              --- great for millions of tiny nodes
+            \item Matrix rows are \textbf{medium} and reused --- that cache can
+              \textbf{scatter} packing and hurt locality
+        \end{itemize}
+    \end{block}
 \end{frame}

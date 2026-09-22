@@ -1,8 +1,9 @@
 \section{5 --- v8 results}
 
-\begin{frame}{v8 matrix results (vs regular \texttt{new})}
-    {\footnotesize Negative \% = overloaded faster. Two environments;
-    different args --- do not treat as a pure machine effect.}
+\begin{frame}{AI-generated v8 matrix results (vs regular)}
+    {\footnotesize Negative \% = overloaded faster. These numbers are from the
+    \textbf{AI-generated} v8, not Fernanda's cache-tuned branch.
+    Two environments; different args.}
 
     \vspace{0.35em}
     {\scriptsize
@@ -24,8 +25,8 @@
 
     \vspace{0.45em}
     \begin{itemize}
-        \item \textbf{E1:} significant win at all scales --- design target hit
+        \item \textbf{E1:} significant win at all scales --- matrix target hit
         \item \textbf{E2:} mixed / often worse --- environment + params matter
-        \item Same ANOVA family: v7 often slower on matrix (\(+5\%\) to \(+11\%\))
+        \item Contrast: v7 (and Fernanda's cache-first line) often slower on matrix
     \end{itemize}
 \end{frame}

@@ -1,70 +1,135 @@
-\section{4 --- Building v8}
+\section{4 --- Two Group~2 v8 attempts}
 
-\begin{frame}{What we changed for v8 (from v7)}
+\begin{frame}{Two v8 attempts in Group~2}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Fernanda's v8 (\texttt{v8} branch)}
+                \footnotesize
+                Repo: \texttt{UsingMatrixClassFork},
+                branch \texttt{v8}
+                (\texttt{CustomMemoryAllocator\_v8}).
+
+                \vspace{0.3em}
+                \textbf{Direction:} improve v7's
+                \textbf{thread-cache} path ---
+                still cache-first for small objects.
+
+                \vspace{0.3em}
+                Higher cache cap, live-block
+                accounting, periodic retune,
+                occupied-bin bitmaps, optional
+                metrics + build scripts.
+            \end{block}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{block}{AI-generated v8 (ours)}
+                \footnotesize
+                Built/profiled for this report
+                (M3 Max matrix campaign).
+
+                \vspace{0.3em}
+                \textbf{Direction:} matrix
+                \textbf{row packing} --- turn the
+                hot-path cache \emph{off}.
+
+                \vspace{0.3em}
+                Split arena, 64-align medium rows,
+                page-align @ 2\,MiB, exact
+                remainders, \texttt{pthread} +
+                recent-large free.
+            \end{block}
+        \end{column}
+    \end{columns}
+
+    \vspace{0.35em}
+    {\footnotesize Results slides use the \textbf{AI-generated} v8 unless noted.}
+\end{frame}
+
+\begin{frame}{What Fernanda's v8 changed (from v7)}
     {\scriptsize
-    \renewcommand{\arraystretch}{1.55}
-    \setlength{\tabcolsep}{5pt}
-    \begin{tabular}{@{}p{0.18\textwidth}p{0.37\textwidth}p{0.37\textwidth}@{}}
+    \renewcommand{\arraystretch}{1.35}
+    \begin{tabular}{@{}p{0.34\textwidth}p{0.58\textwidth}@{}}
         \toprule
-        & \textbf{v7} & \textbf{Our v8} \\
+        Change & Effect \\
         \midrule
-        Hot path &
-          Thread cache + batch refill &
-          Central best-fit (cache skipped) \\
-        Arena &
-          One free mmap region &
-          Small span + guard + large span \\
-        Align \(\ge\)2\,KiB &
-          Default; page-align @ 64\,KiB &
-          Force 64-byte; page-align @ 2\,MiB \\
-        Remainders &
-          Round up to 64-byte quantum &
-          Exact used size (packed stride) \\
-        Locking &
-          \texttt{std::mutex} + \texttt{thread\_local} &
-          \texttt{pthread} mutex/key + recent-large free \\
+        Max cache / class \(256\rightarrow512\) &
+          Larger per-class LIFO retention \\
+        Live-block \texttt{CacheAccounting} &
+          Track how many blocks of each class are live \\
+        Retune every 256 allocs &
+          Raise/lower targets from peak live use
+          (cushion 4; min 8) \\
+        Occupied-bin bitmaps &
+          Skip empty size classes in search \\
+        Optional metrics build &
+          Hits/misses, refills, flushes, mutex takes,
+          coalesce events \\
+        Scripts (\texttt{v8-builds.sh}, \ldots) &
+          Build metrics + Release; run workload pairs \\
         \bottomrule
     \end{tabular}
     }
 
-    \vspace{0.55em}
-    \begin{block}{Why these changes}
-        Matrix = many reused medium rows.
-        v7's LIFO cache \textbf{scatters} them; v8 keeps them \textbf{packed}.
-    \end{block}
+    \vspace{0.4em}
+    {\footnotesize Still like v7 on the big policy: \textbf{hot path uses
+    \texttt{takeCachedBlock}}; \texttt{std::mutex}; page-align @ 64\,KiB.}
 \end{frame}
 
-\begin{frame}{Pattern-optimized --- not one hardcoded size}
-    \textbf{What we optimized for (the pattern)}
-    \begin{itemize}
-        \item Many \textbf{separate row allocations} (not one giant matrix blob)
-        \item Rows are \textbf{medium} (kilobytes of doubles), stay live, get reused
-        \item Win = packed layout / locality, not a tiny-object LIFO cache
-    \end{itemize}
-
-    \vspace{0.3em}
-    \textbf{Where ``360 / \(\sim\)2880\,B'' comes from}
-    \begin{itemize}
-        \item Our profiled campaign used \(n{=}360\) \(\Rightarrow\)
-              \(360\times 8\,B \approx 2880\,B\) per row
-        \item Thresholds (\(\ge\)2048\,B \(\rightarrow\) 64-align, no hot cache,
-              split arena) are \textbf{policies for that pattern}, not
-              ``if size == 2880''
-        \item Same ideas help other matrix sizes with the same allocate-rows
-              shape; they do \textbf{not} help millions of tiny list nodes
-    \end{itemize}
+\begin{frame}{Side-by-side: Fernanda v8 vs AI v8}
+    {\scriptsize
+    \renewcommand{\arraystretch}{1.4}
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{@{}p{0.20\textwidth}p{0.36\textwidth}p{0.36\textwidth}@{}}
+        \toprule
+        & \textbf{Fernanda v8} & \textbf{AI-generated v8} \\
+        \midrule
+        Goal &
+          Smarter tiny-object cache &
+          Packed matrix rows \\
+        Hot path &
+          Thread cache (kept) &
+          Cache skipped \\
+        Arena &
+          One mmap region &
+          Small + guard + large \\
+        Cache cap &
+          Up to 512 / class &
+          Not used on hot path \\
+        Align &
+          Page @ 64\,KiB &
+          64-byte @ \(\ge\)2\,KiB; page @ 2\,MiB \\
+        Locking &
+          \texttt{std::mutex} &
+          \texttt{pthread} + recent-large \\
+        Best for &
+          Many small allocs (list-ish) &
+          Reused medium rows (matrix) \\
+        \bottomrule
+    \end{tabular}
+    }
 \end{frame}
 
-\begin{frame}{Why lists break under this v8}
-    \begin{itemize}
-        \item Millions of \textbf{tiny} nodes + payloads
-        \item Cache off \(\Rightarrow\) every \texttt{new}/\texttt{delete} locks
-              and walks bins
-        \item 16\,MiB small arena fills; small allocs spill into the large region
-        \item Deferred coalesce becomes the common path, not the rare one
-    \end{itemize}
+\begin{frame}{What the AI v8 changed (and why lists break)}
+    {\scriptsize
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{@{}p{0.30\textwidth}p{0.62\textwidth}@{}}
+        \toprule
+        Change & Why \\
+        \midrule
+        Skip thread cache & LIFO cache scatters packed rows \\
+        Split arena + guard & Tiny frees cannot punch row region \\
+        64-byte align \(\ge\)2\,KiB & Double rows without page waste \\
+        Page-align only @ 2\,MiB & 64\,KiB page-align wastes KiB rows \\
+        Exact remainders & Packed stride between rows \\
+        \bottomrule
+    \end{tabular}
+    }
 
-    \vspace{0.5em}
-    {\footnotesize A version that wins matrix \emph{and} list needs both:
-    v7's tiny cache \textbf{and} v8's packed large region, with a size-based policy.}
+    \vspace{0.35em}
+    \textbf{Lists break:} millions of tiny nodes + cache off \(\Rightarrow\)
+    locked best-fit every time; 16\,MiB small arena spills.
+
+    \vspace{0.25em}
+    {\footnotesize Pattern-optimized (profiled \(n{=}360\)); not
+    \texttt{if (size==2880)}. Fernanda's cache path is the opposite bet.}
 \end{frame}

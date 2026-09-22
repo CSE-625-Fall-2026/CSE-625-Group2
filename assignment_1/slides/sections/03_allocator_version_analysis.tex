@@ -1,19 +1,71 @@
-\section{Allocator Version Analysis}
+\section{3 --- Results v1--v7}
 
-\begin{frame}{v1.0.0 Through v7.0.0 at a Glance}
+\begin{frame}{Matrix on Apple M3 Max (regular = baseline)}
+    {\footnotesize Size 360; 3 runs; 6 concurrent processes.
+    Negative \% = faster than regular \texttt{new}.}
+
+    \vspace{0.4em}
+    \begin{center}
+    {\scriptsize
+    \begin{tabular}{@{}lrrr@{}}
+        \toprule
+        Allocator & Short & Medium & Long \\
+        \midrule
+        Regular new & 0\% & 0\% & 0\% \\
+        \textbf{v1} & \(\mathbf{-3.83\%}\) & \(-3.48\%\) & \(\mathbf{-3.80\%}\) \\
+        \textbf{v2} & \(-3.79\%\) & \(\mathbf{-3.49\%}\) & \(-3.79\%\) \\
+        v3 & \(-2.97\%\) & \(-2.62\%\) & \(-2.93\%\) \\
+        v6 & \(-2.82\%\) & \(-2.40\%\) & \(-2.77\%\) \\
+        v4 & \(-2.51\%\) & \(-2.11\%\) & \(-2.47\%\) \\
+        v7 & \(+1.76\%\) & \(+1.74\%\) & \(+1.77\%\) \\
+        v5 & \(+2.66\%\) & \(+2.99\%\) & \(+2.50\%\) \\
+        \bottomrule
+    \end{tabular}
+    }
+    \end{center}
+
+    \vspace{0.5em}
+    \textbf{Takeaway:} v1/v2 win this matrix campaign.
+    v5/v7 (cache-heavy) are \emph{slower} than regular here.
 \end{frame}
 
-\begin{frame}{Structural Changes Impacting Performance Across Versions}
-\end{frame}
-
-\begin{frame}{Short Runs}
-\end{frame}
-
-\begin{frame}{Medium Runs}
-\end{frame}
-
-\begin{frame}{Long Runs}
-\end{frame}
-
-\begin{frame}{Regular vs Overloaded \texttt{new} Improvement}
+\begin{frame}{Bigger picture across workloads}
+    \begin{columns}[T]
+        \begin{column}{0.55\textwidth}
+            \begin{tikzpicture}
+            \begin{axis}[
+              ybar stacked, ymin=0, ymax=100,
+              width=\textwidth, height=3.6cm,
+              enlarge x limits=0.12,
+              ylabel={\% of testable runs},
+              ylabel style={font=\tiny},
+              xtick=data,
+              xticklabels={Matrix, Nodes, Stress, List},
+              tick label style={font=\tiny},
+              legend style={at={(0.5,-0.40)},anchor=north,legend columns=2,font=\tiny},
+              bar width=14pt, axis on top,
+              ymajorgrids, grid style={gray!30},
+            ]
+            \addplot coordinates {(0,33) (1,8) (2,27) (3,0)};
+            \addlegendentry{Sig.\ faster}
+            \addplot coordinates {(0,23) (1,8) (2,0) (3,0)};
+            \addlegendentry{NS faster}
+            \addplot coordinates {(0,37) (1,84) (2,73) (3,100)};
+            \addlegendentry{Sig.\ slower}
+            \addplot coordinates {(0,7) (1,0) (2,0) (3,0)};
+            \addlegendentry{Other}
+            \end{axis}
+            \end{tikzpicture}
+        \end{column}
+        \begin{column}{0.42\textwidth}
+            {\footnotesize
+            \begin{itemize}
+                \item \textbf{Matrix:} often improves
+                \item \textbf{List:} 100\% significant worse
+                \item \textbf{Nodes / stress:} mostly worse
+                \item Peak memory always higher under CMA
+            \end{itemize}
+            }
+        \end{column}
+    \end{columns}
 \end{frame}

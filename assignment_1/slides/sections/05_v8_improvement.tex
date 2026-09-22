@@ -1,10 +1,28 @@
-\section{v8 Allocator Improvement}
+\section{5 --- v8 results}
 
-\begin{frame}{Design: Starting from v7.0.0}
-\end{frame}
+\begin{frame}{v8 matrix results (vs regular \texttt{new})}
+    ANOVA on our matrix runs; negative = faster than regular.
 
-\begin{frame}{v8.0.0 Profiling Results}
-\end{frame}
+    \vspace{0.6em}
+    \begin{center}
+    {\small
+    \begin{tabular}{@{}lrrr@{}}
+        \toprule
+        Scale & Mean \% change & Improved & Significant \\
+        \midrule
+        Short  & \(\mathbf{-4.52\%}\) & Yes & Yes (\(p{\ll}0.05\)) \\
+        Medium & \(\mathbf{-4.97\%}\) & Yes & Yes \\
+        Long   & \(\mathbf{-5.11\%}\) & Yes & Yes \\
+        \bottomrule
+    \end{tabular}
+    }
+    \end{center}
 
-\begin{frame}{Improvements \& Shortcomings}
+    \vspace{0.7em}
+    \begin{itemize}
+        \item Significant speedups at all three scales
+        \item Contrast: v7 on the same ANOVA family often \textbf{slower}
+              (\(+5\%\) to \(+11\%\) on matrix)
+        \item Specialization worked for the design target
+    \end{itemize}
 \end{frame}

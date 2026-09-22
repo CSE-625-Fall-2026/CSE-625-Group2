@@ -1,7 +1,70 @@
-\section{Discussion of Environmental Effects}
+\section{4 --- Building v8}
 
-\begin{frame}{Machine Impact on Profiling Results}
+\begin{frame}{What we changed for v8 (from v7)}
+    {\scriptsize
+    \renewcommand{\arraystretch}{1.55}
+    \setlength{\tabcolsep}{5pt}
+    \begin{tabular}{@{}p{0.18\textwidth}p{0.37\textwidth}p{0.37\textwidth}@{}}
+        \toprule
+        & \textbf{v7} & \textbf{Our v8} \\
+        \midrule
+        Hot path &
+          Thread cache + batch refill &
+          Central best-fit (cache skipped) \\
+        Arena &
+          One free mmap region &
+          Small span + guard + large span \\
+        Align \(\ge\)2\,KiB &
+          Default; page-align @ 64\,KiB &
+          Force 64-byte; page-align @ 2\,MiB \\
+        Remainders &
+          Round up to 64-byte quantum &
+          Exact used size (packed stride) \\
+        Locking &
+          \texttt{std::mutex} + \texttt{thread\_local} &
+          \texttt{pthread} mutex/key + recent-large free \\
+        \bottomrule
+    \end{tabular}
+    }
+
+    \vspace{0.55em}
+    \begin{block}{Why these changes}
+        Matrix = many reused medium rows.
+        v7's LIFO cache \textbf{scatters} them; v8 keeps them \textbf{packed}.
+    \end{block}
 \end{frame}
 
-\begin{frame}{Idle vs Loaded System}
+\begin{frame}{Pattern-optimized --- not one hardcoded size}
+    \textbf{What we optimized for (the pattern)}
+    \begin{itemize}
+        \item Many \textbf{separate row allocations} (not one giant matrix blob)
+        \item Rows are \textbf{medium} (kilobytes of doubles), stay live, get reused
+        \item Win = packed layout / locality, not a tiny-object LIFO cache
+    \end{itemize}
+
+    \vspace{0.3em}
+    \textbf{Where ``360 / \(\sim\)2880\,B'' comes from}
+    \begin{itemize}
+        \item Our profiled campaign used \(n{=}360\) \(\Rightarrow\)
+              \(360\times 8\,B \approx 2880\,B\) per row
+        \item Thresholds (\(\ge\)2048\,B \(\rightarrow\) 64-align, no hot cache,
+              split arena) are \textbf{policies for that pattern}, not
+              ``if size == 2880''
+        \item Same ideas help other matrix sizes with the same allocate-rows
+              shape; they do \textbf{not} help millions of tiny list nodes
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Why lists break under this v8}
+    \begin{itemize}
+        \item Millions of \textbf{tiny} nodes + payloads
+        \item Cache off \(\Rightarrow\) every \texttt{new}/\texttt{delete} locks
+              and walks bins
+        \item 16\,MiB small arena fills; small allocs spill into the large region
+        \item Deferred coalesce becomes the common path, not the rare one
+    \end{itemize}
+
+    \vspace{0.5em}
+    {\footnotesize A version that wins matrix \emph{and} list needs both:
+    v7's tiny cache \textbf{and} v8's packed large region, with a size-based policy.}
 \end{frame}

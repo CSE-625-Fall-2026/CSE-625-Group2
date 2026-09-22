@@ -1,2 +1,323 @@
 \section{Workload Descriptions}
 \label{sec:workloads}
+
+UsingMatrixClass supplies four workload pairs.
+Each pair is one shared header and two thin \texttt{main} wrappers.
+The regular wrapper does nothing at start-up, so every \texttt{new} goes to
+the C library.
+The overloaded wrapper links the allocator's global \texttt{new} target.
+It initializes the memory pool before the workload starts and shuts that pool
+down after the workload ends.
+Nothing else differs between the two programs of a pair.
+The descriptions below are taken from the workload headers in the
+UsingMatrixClass source tree.
+
+\subsection{Properties shared by every workload}
+
+\paragraph{Deterministic input.}
+No workload reads the clock or the environment.
+The matrix workloads fill matrices from a fixed deterministic generator, and
+the linked list draws every decision from a generator with a fixed seed.
+The regular and overloaded programs therefore execute the same sequence of
+allocations, frees, and arithmetic.
+Only the allocator differs.
+
+\paragraph{Checksum.}
+Every workload folds its results into a checksum and prints it on completion.
+Matching checksums between the regular and overloaded runs prove that both did
+the same work and that the overloaded allocator returned usable memory.
+All 240 v6 and v7 runs and every M3~Max matrix row report matching checksums
+(\Cref{sec:statistical-results}).
+
+\paragraph{Pool sizing.}
+The overloaded program has to tell the allocator how much memory to reserve
+before the workload starts.
+This is because the pool is one fixed \texttt{mmap} region that never grows.
+Each workload computes that number from its own arguments.
+The matrix workloads use the matrix size and count, the linked list uses its
+maximum length, and the stress workload uses a fixed 512~MiB.
+The regular program ignores the number.
+One consequence matters when reading the results.
+The overloaded program's peak memory reflects the pages it touched
+inside that reservation, not the size of the reservation itself.
+
+\paragraph{Single thread.}
+Each workload program runs on one thread, and none of them creates additional
+threads.
+The allocator versions from v4 onward are built to be used by many threads at
+once.
+They add per-thread caches and lock-free ownership checks
+(\Cref{sec:allocator-versions}).
+However, the allocator does not create threads either.
+In these experiments, therefore, the pool mutex is never contended and every
+thread cache has exactly one owner.
+What v4--v7 save here is the cost of the central bin search on a cache hit,
+not time spent waiting for a lock.
+The allocator's behavior under real concurrency is measured separately with
+the multi-threaded matrix programs in \Cref{sec:pthreads-experiments}.
+
+\subsection{Matrix array}
+
+The matrix array workload lives in
+\texttt{Matrix\allowbreak Array\allowbreak Workload.hpp}.
+It creates 256 matrices of the same size $n$ and keeps them in one array for
+the whole run.
+The only command-line argument is the matrix size.
+A matrix in MatrixClassDemo allocates each of its rows separately.
+As a result, building one matrix costs $n$ allocations of about $8n$ bytes
+each.
+
+The program then runs 640 replacement passes.
+During a pass, every matrix is replaced by a new matrix computed from the one
+before it in the array.
+Most of the time that computation is an addition.
+For the 8 matrices whose index is a multiple of 32, it is a multiplication
+instead.
+Each computation produces a temporary result matrix, which is then copied into
+the array slot and destroyed.
+In other words, every pass allocates and frees 256 temporary matrices, and each
+of those is $n$ row allocations.
+
+The important thing about this workload is the balance between arithmetic and
+allocation.
+The allocations all have the same shape, so the allocator sees the same request
+size over and over.
+Meanwhile, the 8 multiplications in every pass each cost on the order of
+$n^{3}$ floating-point operations, and they take up most of the run time.
+It tests whether an overloaded allocator slows down a program that barely
+needs it.
+It is also the workload most sensitive to how rows are laid out in memory, which
+is the reason the v8 redesign targeted it.
+
+\subsection{Uniform matrix nodes}
+
+The uniform nodes workload lives in
+\texttt{Uniform\allowbreak Matrix\allowbreak Nodes.hpp}.
+It also uses 256 matrices of one size $n$.
+The difference is that each matrix is owned by its own separately allocated
+node instead of sitting in a shared array.
+The arguments are the matrix size and the number of replacement passes.
+
+Each pass works the same way as the matrix array.
+Every node is replaced by a new one computed from the node before it, using
+addition most of the time and multiplication for every 32nd node.
+However, replacing a node now means destroying the old node object and
+allocating a brand new one to hold the result.
+Because of that, the node's address changes on every pass, and each object
+lives for only one pass rather than the whole run.
+
+Since every matrix has the same size, the allocator sees only a few request
+sizes.
+These are the node object itself and the $n$ rows of its matrix.
+Those sizes are requested and released constantly.
+This is exactly the pattern that the v4--v7 thread cache and the v6--v7 slab
+refills were designed for.
+A block freed at one size is very likely to be requested again at that same
+size a moment later.
+Comparing this workload with the matrix array therefore isolates one thing.
+The arithmetic is identical, so any difference between the two comes from the
+added cost of destroying and recreating the node objects.
+
+\subsection{Nested matrix stress}
+
+The stress workload lives in
+\texttt{Nested\allowbreak Matrix\allowbreak Stress.hpp}.
+Instead of one flat array, it builds two trees of matrices.
+There are six three-level trees (\texttt{Matrix***}) and four four-level trees
+(\texttt{Matrix****}).
+Each leaf of a tree holds between 6 and 18 matrices.
+Unlike the other matrix workloads, the matrices here are not all the same
+size.
+Their dimensions are picked from twelve values ranging from 16 to 256.
+That means row sizes range from 128 to 2048 bytes and whole matrices from
+2~KiB to 512~KiB.
+The only argument is a round count.
+
+The leaf matrices are grouped in threes.
+In each round, the program visits every group and stores the result of an
+operation on the first two matrices into the third.
+The operation is an addition most of the time and a multiplication every third
+time.
+Each operation allocates a fresh result matrix.
+After the arithmetic, the round picks one outer branch of each tree at random,
+destroys the whole branch, and rebuilds it with new random shapes.
+
+This is the fragmentation workload.
+Destroying a branch frees a large number of blocks of mixed sizes all at once.
+The rebuild then immediately asks for a different mix of sizes.
+That pattern puts pressure on the free-block data structure, which is a single
+list in v1--v2 and size bins from v3 onward.
+It also exercises the rule for splitting a block and returning the leftover.
+Most of all, it separates the two coalescing policies.
+Versions v1--v4 merge neighboring free blocks right away, while v5--v8 delay
+merging until an allocation fails.
+Finally, peak memory on this workload shows internal fragmentation.
+The allocator rounds requests up to a 64-byte quantum, and most of the twelve
+row sizes do not land on a quantum boundary, so some space is wasted in every
+block.
+
+\subsection{Linked list}
+
+The linked list workload lives in
+\texttt{Linked\allowbreak List\allowbreak Workload.hpp}.
+It maintains a doubly linked list of \texttt{Node} objects.
+A node is 72 bytes and holds two links, an index, a count, a pointer, six
+integers, three characters, and four booleans.
+Each node also owns a separately allocated array of 5 to 10 integers.
+The only argument is the maximum list length, and the program performs 200
+operations for every node of that maximum.
+
+Every operation is chosen at random from a fixed mix.
+Twenty percent of operations append a node.
+Another twenty percent insert a node before a random existing node.
+Twenty percent erase a random node.
+Twenty-five percent update the fields of a random node without allocating.
+The remaining fifteen percent replace a random node's integer array with a new
+one of a different random length.
+Once the list is full, append and insert turn into erase instead.
+As a result, the list stays close to its maximum length for most of the run.
+
+This workload is different from the other three because it does no matrix
+arithmetic at all.
+Each operation is a short pointer walk plus, in four of the five cases, one or
+two allocations or frees of a few dozen bytes.
+That makes it the pure allocator benchmark.
+Run time is dominated by \texttt{new}, \texttt{delete}, and the cache misses
+from touching millions of small objects scattered through memory.
+It is also the workload where the allocator's own bookkeeping is proportionally
+largest.
+The header, back-pointer, and canaries described in
+\Cref{sec:allocator-versions} add up to 64 bytes, which is almost as much as
+the 72-byte node they are attached to.
+
+\subsection{Run scales and parameter selection}
+
+The assignment defines three run scales by how long they last.
+Short runs take 3 to 5 minutes, medium runs take 2 to 3 hours, and long runs
+take more than 6 hours.
+Each scale requires five regular runs and five overloaded runs.
+The parameters for each scale were chosen through calibration runs on each
+machine, and those calibration runs do not count as measurements.
+Because machines differ in speed, the same scale means different parameters on
+different hosts.
+\Cref{tab:workload-parameters} records the values that were run in every
+campaign.
+
+There were two different ways to make a run last longer, and they answer
+different questions.
+
+The first way is to repeat the same work.
+The Group~2 campaigns on the Apple M3~Max and the Ryzen 7900X kept the program
+arguments fixed and launched the executable several times in a row.
+All of those launches were timed together as one run using
+\texttt{repeat\allowbreak\_workload.sh}.
+For example, a medium matrix run on the Ryzen host is \texttt{regular\_new 360}
+launched 42 times in sequence, and a long run launches it 117 times.
+In this approach the working set, the request sizes, and the pool size are the
+same at every scale.
+Only the number of repetitions changes.
+As a result, these campaigns show almost no change in peak memory across
+scales, and the gap between regular and overloaded \texttt{new} stays flat from
+short to long.
+One side effect is that start-up costs, such as the pool \texttt{mmap} and the
+first-touch page faults, are paid once per repetition rather than once per
+run.
+
+The second way is to make the problem bigger.
+The v2 campaign on the Core i7-1165G7 and the Group~1 campaigns launched each
+executable once per measurement with a larger argument at each scale.
+For example, the v2 matrix runs used sizes of 275, 800, and 1225, and the v2
+linked list runs used maximum lengths of 125\,000, 580\,000, and 875\,000.
+Here the working set grows along with the run time.
+A larger matrix changes the row size and therefore the allocator's size class.
+A longer list means more live blocks for a free-list search to walk through.
+Peak memory grows as well.
+This approach shows how an allocator responds to problem size.
+However, a change from short to long cannot be blamed on duration alone.
+
+These two approaches should not be compared with each other.
+The flat scale behavior seen in the v6 and v7 campaigns should not be expected
+in the v2 or Group~1 results.
+Likewise, the very large v2 regressions on the stress and linked list
+workloads at the long scale reflect a much bigger problem, not a longer clock.
+\Cref{sec:statistical-results} keeps the two approaches in separate tables for
+this reason.
+
+\begin{table*}[!t]
+\centering
+\caption{Workload parameters that were run, by campaign. ``Reps'' is the
+number of back-to-back executions timed as one run under the repeat strategy.
+Values are from the campaign CSVs and \texttt{environment.txt} files; Group~1
+values are from the shared data-collection sheet
+(\Cref{sec:environments}). A dash means the scale was not run or not
+recorded.}
+\label{tab:workload-parameters}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{@{}l l l L L L l@{}}
+\toprule
+Campaign (host) & Versions & Workload & Short & Medium & Long & Strategy \\
+\midrule
+Group 2, Apple M3 Max & v1--v7 & Matrix array & 360, 1 rep & 360, 37 reps & 360, 97 reps & repeat (3 runs) \\
+Group 2, Apple M3 Max & v6 & Matrix array & 360, 1 rep & 360, 37 reps & 360, 97 reps & repeat \\
+ & & Uniform nodes & 350 700, 1 rep & 350 700, 37 reps & 350 700, 97 reps & repeat \\
+ & & Nested stress & 800, 1 rep & 800, 34 reps & 800, 93 reps & repeat \\
+ & & Linked list & 6\,500\,000, 1 rep & 6\,500\,000, 32 reps & 6\,500\,000, 84 reps & repeat \\
+Group 2, Ryzen 9 7900X (WSL) & v7 & Matrix array & 360, 1 rep & 360, 42 reps & 360, 117 reps & repeat \\
+ & & Uniform nodes & 350 700, 1 rep & 350 700, 42 reps & 350 700, 115 reps & repeat \\
+ & & Nested stress & 800, 1 rep & 800, 38 reps & 800, 102 reps & repeat \\
+ & & Linked list & 3\,512\,841, 1 rep & 3\,512\,841, 43 reps & 3\,512\,841, 120 reps & repeat \\
+Group 2, Apple M3 Max & v8 & Matrix array & 360 & 360 & 360 & repeat \\
+Group 2, Core i7-1165G7 (Ubuntu) & v2 & Matrix array & 275 & 800 & 1225 & grow \\
+ & & Uniform nodes & 285 600 & 900 600 & 1200 600 & grow \\
+ & & Nested stress & 100 & 440 & 900 & grow \\
+ & & Linked list & 125\,000 & 580\,000 & 875\,000 & grow \\
+Group 2, ThinkPad X13 (WSL) & v3 & Uniform nodes & 225 600 & 800 600 & -- & grow \\
+ & & Nested stress & 200 & 1000 & -- & grow \\
+Group 1, Ryzen 7 7800X3D (WSL2) & v4, v5 & Uniform nodes & 100 35\,000 & 100 1\,335\,000 & 100 4\,100\,000 & grow \\
+Group 1, Apple M5 Pro & v4, v5 & Uniform nodes & 100 35\,000 & 100 1\,335\,000 & 100 4\,100\,000 & grow \\
+Group 1, Core i5-6400 (Arch) & v5 & Matrix array & 400 & 900 & -- & grow \\
+ & & Uniform nodes & 400 500 & -- & -- & grow \\
+Group 1, Core i7-11800H & v5 & Matrix array & -- & -- & -- & not recorded \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\subsection{Expected sensitivity of each workload}
+
+Reading the workload headers alongside the allocator versions in
+\Cref{sec:allocator-versions} suggests where each pair should show a
+difference and where it should not.
+These expectations are written down here so that the results in
+\Cref{sec:statistical-results,sec:charts-comparisons} can be judged against
+them.
+
+\begin{itemize}
+  \item \textbf{Matrix array} should show the smallest effect of any version
+    in either direction.
+    The 8 matrix multiplications in each pass cost on the order of $n^{3}$
+    operations each, and they swamp the 256 temporary-matrix allocations.
+    Any difference that does appear is more likely to come from how rows are
+    placed in memory than from allocation speed.
+  \item \textbf{Uniform nodes} should reward versions that quickly reuse a
+    freed block of the same size.
+    That favors the v4--v7 thread cache and the v6--v7 slabs.
+    It should penalize versions with an expensive free path, such as the
+    v1--v2 address-ordered insertion with immediate merging.
+  \item \textbf{Nested stress} should separate the two coalescing policies.
+    Immediate merging in v1--v4 keeps large free spans available for the next
+    rebuild.
+    Deferred merging in v5--v8 makes each free cheap but risks a failed search
+    followed by a full-region merge.
+    This workload should also show the largest internal-fragmentation penalty
+    in peak memory.
+  \item \textbf{Linked list} should be the hardest workload for every custom
+    version.
+    The 64-byte header plus alignment and quantum rounding roughly triples the
+    footprint of a 72-byte node.
+    Meanwhile, the C library's small size classes and per-thread cache are
+    already tuned for exactly this case.
+\end{itemize}
+
+Whether the measurements bear these expectations out is the subject of the
+next two sections.

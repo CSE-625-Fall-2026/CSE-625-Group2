@@ -1,2 +1,84 @@
 \section{Conclusions}
 \label{sec:conclusions}
+
+This project compared regular global \texttt{new} with overloaded global
+\texttt{new} backed by eight versions of CustomMemoryAllocator.
+We ran four workloads at three time scales across several machines, and we
+measured elapsed time, peak memory, page faults, and context switches.
+
+\subsection{No custom version was faster everywhere}
+
+Version v7 lost to the system allocator in all twelve combinations of workload
+and scale on the Ryzen host.
+It was about 9.7 percent slower on the matrix array, 9.7 percent slower on
+uniform nodes, 4.5 percent slower on nested stress, and 12 percent slower on
+the linked list.
+Version v6 on the Apple M3~Max did better, but only on two workloads.
+It improved the matrix array by 2.3 percent and uniform nodes by 3.1 percent,
+while losing 6.4 percent on nested stress and matching the system allocator on
+the linked list.
+In other words, the workload decided the outcome more than the allocator
+version did.
+
+\subsection{Newer versions were not better versions}
+
+The matrix campaign ran all seven released versions on one machine with one set
+of parameters.
+The two simplest allocators won.
+Version v1 used a single address-ordered free list with first-fit search and
+finished 3.8 percent faster than the system allocator.
+Version v2 was nearly identical.
+From there the results got worse rather than better.
+Version v5 was 2.7 percent slower than regular \texttt{new} and version v7 was
+1.8 percent slower.
+Each of those versions added machinery that was meant to help, such as
+deferred coalescing and adaptive per-thread caches.
+On this workload that machinery only added cost.
+
+\subsection{The custom allocator traded memory for system calls}
+
+The pool asks the operating system for memory once and never gives it back.
+That choice showed up clearly in the measurements.
+The overloaded programs took 97 to 99 percent fewer minor page faults than
+regular \texttt{new} and spent roughly ten times less time in the kernel.
+However, the savings did not cover the cost of the allocator's own
+bookkeeping.
+Peak memory tells the same story from the other side.
+The overhead was about 4 percent on the matrix array and 3 percent on uniform
+nodes, but it reached 28 percent on nested stress and 155 percent on the
+linked list.
+
+\subsection{Our improved allocator succeeded on its target and failed
+elsewhere}
+
+Version v8 started from v7 and changed the paths that matter for packed matrix
+rows.
+It beat regular \texttt{new} by 4.5 to 5.1 percent on the matrix array, and the
+result was statistically significant at every scale.
+The same changes made the linked list unusable.
+Those runs had to be killed before finishing.
+This is the clearest evidence in the project for the point that runs through
+all of our results.
+An allocator is tuned for an assumed pattern of requests, and it pays for that
+assumption whenever the pattern does not hold.
+
+\subsection{The environment mattered too}
+
+The same v7 code was about 5 percent slower than regular \texttt{new} on
+Group~1's Core i5-6400 and about 11 percent slower on our Ryzen host.
+The pthreads experiments showed the same sensitivity
+(\Cref{sec:pthreads-experiments}).
+The custom allocator hurt performance under Windows WSL but was statistically
+indistinguishable from regular \texttt{new} under native Linux.
+Results from one machine should not be treated as a general claim.
+
+\subsection{What we conclude}
+
+A general-purpose system allocator is hard to beat because it has been tuned
+for mixed workloads over decades.
+A custom allocator is worth building when profiling shows that allocation is on
+the critical path and the request pattern is known in advance.
+Our measurements support that conclusion in both directions.
+The custom versions won on the workload whose allocation pattern was regular
+and predictable, and they lost badly on the workload full of small,
+short-lived, irregular objects.

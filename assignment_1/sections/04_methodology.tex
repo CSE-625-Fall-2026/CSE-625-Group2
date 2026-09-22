@@ -1,2 +1,18 @@
 \section{Experimental Methodology}
 \label{sec:methodology}
+
+\subsection{Data Collection}
+The methodology for the data collection in this project was to split the data collection between groups. Each group was assigned 2-3 allocator versions to test, along with each team testing their own version 8.0.0 of the custom memory allocator.
+To simplify the testing process, Group 2 created bash scripts for each workload to run the short, medium, and long runs for a specified version. This allowed each version to be tested on the same environment so that the results can be accurately compared for regular vs overloaded runs. 
+However, this creates a limitation when comparing results between versions so the data analysis is more focused on the regular vs overloaded runs.
+
+When collecting the data, the gnu time command was used to collect the runtime, memory usage, CPU usage, Voluntary Context Switches, Involuntary Context Switches, Minor Faults, and Major Faults for each run. The data was then collected into a CSV file for analysis. Each run was repeated 5 times to ensure that the results were consistent and to account for any variability in the system.
+The data was then shared over Discord to a shared Excel file for comparison. This file consists of tables where each team can input their data.
+
+\subsection{Data Analysis}
+When performing the data analysis, an ANOVA test and Chi-Squared test were performed to determine if there is any statistically significant difference between the regular memory allocation and the custom allocator versions. 
+Another comparison was made between the test results between teams of the same allocator version and workload. Although the data was not confirmed to have the same parameters, the comparison was still made to show a basic comparison on whether the different environments have significant differences in the results.
+An additional ANOVA test was performed on all of the additional metrics collected by gnu time to determine what are significant contributors to the runtime differences between the regular memory allocation and the custom allocator versions.
+
+\subsection{V8.0.0 Priorities}
+When creating version 8.0.0 of the custom memory allocator, the team prioritized improving the performance of the allocator on the matrix workload. Additional details on the design process and decisions are in Section \ref{sec:improved-design}. 

@@ -1,0 +1,6 @@
+\begin{tikzpicture}\begin{axis}[width=.88\linewidth,height=\plotheight,axis lines=left,tick label style={font=\footnotesize},label style={font=\small},legend style={font=\footnotesize,draw=none},xbar stacked,bar width=12pt,xmin=0,xmax=100,y dir=reverse,ytick={0,1,2,3,4,5},yticklabels={Runtime,Peak memory,Major Faults,Minor Faults,Vol. CS,Invol. CS},xlabel={Testable comparisons (\%)},legend style={at={(.5,-.24)},anchor=north,legend columns=2,font=\scriptsize},enlarge y limits=.16]
+\addplot[fill=teal,draw=white] coordinates {(21.666666666666668,0) (0.0,1) (23.076923076923077,2) (74.07407407407408,3) (37.03703703703704,4) (48.148148148148145,5)};\addlegendentry{Significant improvement}
+\addplot[fill=lightteal,draw=white] coordinates {(15.0,0) (0.0,1) (0.0,2) (0.0,3) (3.7037037037037037,4) (11.11111111111111,5)};\addlegendentry{Non-significant improvement}
+\addplot[fill=burnt,draw=white] coordinates {(60.0,0) (100.0,1) (76.92307692307692,2) (25.925925925925927,3) (29.62962962962963,4) (40.74074074074074,5)};\addlegendentry{Significant worsening}
+\addplot[fill=gray!30,draw=white] coordinates {(3.3333333333333335,0) (0.0,1) (0.0,2) (0.0,3) (29.62962962962963,4) (0.0,5)};\addlegendentry{Other tested outcomes}
+\end{axis}\end{tikzpicture}

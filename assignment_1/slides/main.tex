@@ -1,68 +1,429 @@
 \documentclass[aspectratio=169,11pt]{beamer}
-
-% --- Theme ---
-% Madrid/whale are part of base Beamer, so this compiles with a stock
-% TeX Live installation and needs no extra font packages.
+% Based on the user's attached main(1).tex. Compile twice with pdflatex.
 \usetheme{Madrid}
 \usecolortheme{whale}
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{caption}[numbered]
-\setbeamerfont{footnote}{size=\tiny}
-
-% --- Encoding and fonts ---
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{lmodern}
-
-% --- Math ---
-\usepackage{amsmath}
-\usepackage{amssymb}
-
-% --- Figures and tables ---
-\usepackage{graphicx}
-\graphicspath{{figures/}{../figures/}}
-\usepackage{booktabs}
-
-\usepackage{listings}
-\lstset{
-    basicstyle=\ttfamily\scriptsize,
-    keywordstyle=\color{blue!60!black},
-    commentstyle=\itshape\color{gray},
-    breaklines=true,
-    showstringspaces=false,
-    language=C++,
-}
-
-% --- Title block ---
+\usepackage{lmodern,amsmath,amssymb,graphicx,booktabs,array,listings,pgfplots}
+\usepgfplotslibrary{groupplots}
+\pgfplotsset{compat=1.18}
+\definecolor{navy}{HTML}{204C70}
+\definecolor{burnt}{HTML}{B85932}
+\definecolor{teal}{HTML}{28786B}
+\definecolor{lightteal}{HTML}{A3C6BC}
+\graphicspath{{figures/}}
+\setbeamerfont{footnote}{size=\tiny}
+\setbeamertemplate{footline}{\leavevmode\hbox{\begin{beamercolorbox}[wd=.73\paperwidth,ht=2.6ex,dp=1ex,leftskip=1em]{author in head/foot}Group 2 \quad CSE-625 \quad Custom Memory Allocator Profiling\end{beamercolorbox}\begin{beamercolorbox}[wd=.27\paperwidth,ht=2.6ex,dp=1ex,rightskip=1em plus1fil]{date in head/foot}\hfill\insertframenumber/\inserttotalframenumber\end{beamercolorbox}}}
+\newcommand{\source}[1]{\par\vfill{\tiny\color{gray}#1\par}}
+\newcommand{\plotheight}{4.3cm}
+\newcommand{\barwidth}{14pt}
+\newcommand{\pointsize}{1.3pt}
+\newcommand{\takeaway}[1]{\par\medskip{\color{navy}\bfseries #1}\par}
+\lstset{basicstyle=\ttfamily\scriptsize,keywordstyle=\color{navy},commentstyle=\itshape\color{gray},breaklines=true,showstringspaces=false,language=C++}
 \title[Allocator Profiling]{Assignment 1 --- Custom Memory Allocator Profiling}
-\author[Group 2]{%
-    Jacob Nance \quad Fernanda Gonzalez \quad Francisco Chagua \\[0.3em]
-    Nicholas Hooper \quad Nicholas Johnson \quad Mohamed Konsowa
-}
+\subtitle{Workload choices, code behavior, and statistical evidence}
+\author[Group 2]{Jacob Nance \quad Fernanda Gonzalez \quad Francisco Chagua\\[.3em]Nicholas Hooper \quad Nicholas Johnson \quad Mohamed Konsowa}
 \institute[CSE-625]{CSE-625 --- Fall 2026}
 \date{September 22, 2026}
-
-\AtBeginSection[]{
-    \begin{frame}{Outline}
-        \tableofcontents[currentsection, hideothersubsections]
-    \end{frame}
-}
-
 \begin{document}
-
-\begin{frame}[plain]
-    \titlepage
+\begin{frame}[plain]\titlepage\end{frame}
+\begin{frame}{Research questions}
+\begin{enumerate}
+\item How can a limited workload suite expose general allocator tradeoffs?
+\item What happens when allocation policy meets pthreads and matrix arithmetic?
+\item Which performance claims survive statistical testing?
+\item How far do the results transfer across environments?
+\end{enumerate}
+\takeaway{The evidence supports workload-specific gains, with important failures and limits.}
+\source{Report Sections I, III, XII and XIV. Updated v8 analyses, September 22.}
 \end{frame}
 
-\begin{frame}{Outline}
-    \tableofcontents
+
+\begin{frame}{Why exhaustive profiling is impractical}
+A full search would cross allocator versions, request sizes, object lifetimes, thread counts, hardware, OS, compiler, and machine state.
+\medskip
+\begin{itemize}
+\item Even a simplified plan requires $8\times4\times3\times2\times5=960$ runs per environment: versions, workloads, scales, allocators, repeats.
+\item This is an illustrative complete design, not the number of completed measurements.
+\item Long runs take hours. More combinations also change thermal state, memory pressure, and background activity.
+\end{itemize}
+\takeaway{We sampled distinct allocation behaviors and compared matched programs within each environment.}
+\source{Report Sections IV, VI and XIV. The 960-run calculation illustrates the design space.}
 \end{frame}
 
-\input{sections/01_overview_motivation}
-\input{sections/02_profiling_methodology}
-\input{sections/03_allocator_version_analysis}
-\input{sections/04_environmental_effects}
-\input{sections/05_v8_improvement}
-\input{sections/06_limitations_conclusions}
+
+\begin{frame}{Four workloads cover different allocation behaviors}
+\small\centering
+\begin{tabular}{p{.20\textwidth}p{.34\textwidth}p{.35\textwidth}}\toprule
+Workload & Allocation pattern & Mechanism tested\\\midrule
+Matrix array & Repeated matrix rows & Row placement and arithmetic cost\\
+Uniform nodes & Repeated sizes plus node churn & Reuse and cache refill\\
+Nested matrix stress & Mixed sizes and branch rebuilds & Fragmentation and coalescing\\
+Linked list & Tiny objects, frequent updates & Metadata and search overhead\\
+\bottomrule\end{tabular}\par
+\medskip\raggedright
+\normalsize The suite tests representative mechanisms. It does not establish that any version is best for all applications.
+\source{Report Section VI, workload headers described in the report.}
+\end{frame}
+
+
+\begin{frame}{Comparison protocol and run-length labels}
+\begin{itemize}
+\item Regular and Overloaded use the same workload source, arguments, and deterministic input within a comparison.
+\item GNU time records elapsed time, peak memory, page faults, CPU use, and context switches. Checksums check output consistency.
+\item Many campaigns use five repeats. The existing v8 group has three pairs per size; the new v8 group has five.
+\end{itemize}
+\medskip
+\small\centering
+\begin{tabular}{p{.23\textwidth}p{.30\textwidth}p{.36\textwidth}}\toprule
+Strategy & What changes & Interpretation\\\midrule
+Repeat fixed workload & Number of launches & More duration, similar working set\\
+Grow the problem & Matrix or list size & Different memory and arithmetic demands\\
+\bottomrule\end{tabular}\par
+\takeaway{Short, medium, and long are within-campaign labels, not matched workloads across hosts.}
+\source{Report Sections IV and VI-F. New v8 CSV: Arg1 = 275/400/550.}
+\note{The newer v8 runs do not meet the original medium/long duration targets. Their labels denote increasing argument size. Pairing follows successive Regular/Overloaded records in each CSV cycle and is assumed.}
+\end{frame}
+
+
+\begin{frame}{Hardware and operating-system coverage}
+\small\centering
+\begin{tabular}{p{.31\textwidth}p{.32\textwidth}p{.27\textwidth}}\toprule
+Campaign / host & Architecture and OS & Scope\\\midrule
+Apple M3 Max, 48 GB & ARM64, macOS & Matrix v1--v7, v6 suite, v8 E1\\
+Ryzen 9 7900X, 32 GB & x86-64, Ubuntu under WSL & v7 four-workload suite\\
+Intel i7-1165G7, 16 GB & x86-64, Ubuntu 24.04.3 & Jacob v2 and new v8 E2\\
+Intel i7-11370H, 16 GB & x86-64, WSL and Linux Mint & 8-thread pthread comparison\\
+Shared-team inventory & M5 Pro, other Intel and Ryzen & macOS, Arch Linux, WSL\\
+\bottomrule\end{tabular}\par
+\medskip\raggedright\normalsize Coverage spans two architecture families and several OS/runtime environments. Versions and parameters are not balanced across them.
+\source{Report Tables II--V and XXII--XXIII, Section XII. Updated v8 inventory.}
+\note{Some inventory fields are missing. Campaign IDs on the M3 Max denote runs on the same Mac, not separate machines. OS and toolchain versions also differ by campaign.}
+\end{frame}
+
+
+\begin{frame}{Statistical evidence beyond descriptive summaries}
+\small\centering
+\begin{tabular}{p{.27\textwidth}p{.35\textwidth}p{.29\textwidth}}\toprule
+Question & Method & What it establishes\\\midrule
+Regular vs Overloaded & Paired, two-condition ANOVA & Mean within-pair difference\\
+More increases than decreases? & Directional $\chi^2$; exact sign test & Evidence about direction frequency\\
+v8 groups across environments & Welch ANOVA on paired \% changes & Difference between observed groups\\
+Four pthread methods & One-way ANOVA + Tukey HSD & Overall and adjusted pairwise differences\\
+Assumptions and scaling & Shapiro--Wilk, Levene, fitted models & Diagnostics and descriptive growth\\
+\bottomrule\end{tabular}\par
+\medskip\raggedright\normalsize Significance uses $\alpha=0.05$. A small $p$ value does not measure effect size or establish a causal mechanism.
+\source{Report VII and XII. Updated v8 methods. Tukey controls its pairwise family; v8 p values are unadjusted.}
+\end{frame}
+
+
+\begin{frame}{Allocator evolution: search and reuse}
+\small\centering
+\begin{tabular}{p{.09\textwidth}p{.54\textwidth}p{.28\textwidth}}\toprule
+Version & Implementation described in the report & Tradeoff\\\midrule
+v1 & Address-ordered list, first-fit, merge on free & Simple path; list search\\
+v2 & Global best-fit on the same list & Tighter fit; full-list scan\\
+v3 & Size bins, bitmap, physical-neighbor metadata & Narrower search; bin bookkeeping\\
+v4 & Thread caches, 64 blocks/class, 8192-byte limit & Cheap cache hits; retained memory\\
+\bottomrule\end{tabular}\par
+\medskip\raggedright\normalsize The public API and global \texttt{new/delete} interception stay consistent. The free-block policy changes.
+\source{Report Section III and Table I. Code details are reported descriptions, not a new source-code audit.}
+\end{frame}
+
+
+\begin{frame}{Allocator evolution: deferred work and specialization}
+\small\centering
+\begin{tabular}{p{.09\textwidth}p{.54\textwidth}p{.28\textwidth}}\toprule
+Version & Implementation described in the report & Tradeoff\\\midrule
+v5 & Merge only after allocation cannot be satisfied & Cheaper free; expensive miss path\\
+v6 & Batch refill up to 32 slabs; 4 MiB cache cap & Amortized refill; reserved capacity\\
+v7 & Per-class targets grow from 16 to 256 & Adapts to misses; extra accounting\\
+v8 & Packed row layout, split regions, cache bypass & Matrix focus; tiny-object regression\\
+\bottomrule\end{tabular}\par
+\takeaway{A newer policy can improve one request pattern while making another worse.}
+\source{Report Section III and Table I.}
+\end{frame}
+
+
+\begin{frame}{What happens when the program requests memory}
+\begin{enumerate}
+\item A matrix operation constructs a result. Each matrix row requests its own allocation.
+\item Global \texttt{new} routes the request to the initialized custom pool.
+\item The version-specific path checks reuse structures, finds a block, and splits it when possible.
+\item Metadata, alignment, back-pointer, and canaries surround the payload.
+\item On deletion, ownership and canary checks precede caching or insertion into free bins. Merge timing depends on the version.
+\end{enumerate}
+\takeaway{We can explain the path and its costs. Total runtime does not reveal how much time each step consumed.}
+\source{Report Sections III and VI.}
+\note{The singleton uses static storage and placement new to avoid allocator recursion. An uninitialized pool falls back to malloc/posix_memalign. The presentation does not claim to have independently audited the repository.}
+\end{frame}
+
+
+\begin{frame}{Simpler versions led the M3 Max matrix campaign}
+\begin{columns}[T]\begin{column}{.69\textwidth}\centering\input{figures/matrix_versions.tex}\end{column}
+\begin{column}{.29\textwidth}\small
+Size 360, short runs, three observations per allocator.
+\medskip
+v1: $-3.83\%$\\v2: $-3.79\%$\\v7: $+1.76\%$
+\medskip
+Negative change means lower runtime.
+\medskip
+These descriptive results belong to this campaign, not the shared-workbook v7 environment.
+\end{column}\end{columns}
+\source{Report Table VI. Six concurrent processes per batch reported in VII-A.}
+\end{frame}
+
+
+\begin{frame}{Pthreads experiment: implementation and allocator are separate}
+\begin{itemize}
+\item Same Intel i7-11370H machine, 16 GB RAM, eight threads, matrix size $n=800$, multiplication involving 200 matrices.
+\item \textbf{Pthreads v4}: queues and mutexes, simpler implementation.
+\item \textbf{Pthreads v6}: removes those mechanisms to improve locality and throughput, with more implementation complexity.
+\item Each runs with Regular new or \textbf{CMA v7}, under Windows WSL and native Linux Mint.
+\end{itemize}
+\takeaway{Pthreads v4/v6 name workload implementations. CMA v7 names the allocator.}
+\source{Report Section XII-A.}
+\end{frame}
+
+
+\begin{frame}{Pthreads runtime depends on the environment}
+\centering\input{figures/pthreads_means.tex}
+\par\small Bars are means and whiskers are sample standard deviations. CMA helps the simpler v4 implementation on native Linux.
+\source{Report Tables XII and XVI. Means and SD copied from the report, not recalculated from raw pthread runs.}
+\end{frame}
+
+
+\begin{frame}{Pthreads pairwise tests qualify the claim of worsening}
+\small\centering
+\begin{tabular}{llrll}\toprule
+Environment & Pthreads & CMA change & Tukey $p$ & Significant\\\midrule
+WSL & v4 & +0.47\% & 0.8495 & No\\
+WSL & v6 & +2.78\% & 0.0135 & Yes\\
+Linux & v4 & -29.15\% & $<0.0001$ & Yes\\
+Linux & v6 & +0.84\% & 0.4965 & No\\
+\bottomrule\end{tabular}\par
+\medskip\raggedright\normalsize
+\begin{itemize}
+\item Under WSL, v6 slows by 2.78\% with CMA. The v4 difference is not significant.
+\item Under Linux, CMA reduces v4 runtime by 29.15\%. The v6 difference is not significant.
+\end{itemize}
+\takeaway{The report does not support a general claim that CMA made pthreads much worse.}
+\source{Report Tables XIV and XVIII. Percentage changes calculated from Tables XII and XVI.}
+\end{frame}
+
+
+\begin{frame}{Why allocation policy can hurt parallel matrix work}
+\begin{columns}[T]
+\begin{column}{.48\textwidth}\textbf{Mechanisms described by the code}
+\begin{itemize}\item Cache misses and refills reach a central mutex.\item Search, splitting, and coalescing add work.\item Row layout and metadata change memory access.\item Queue synchronization in pthreads v4 adds another cost.\end{itemize}\end{column}
+\begin{column}{.48\textwidth}\textbf{What the measurements establish}
+\begin{itemize}\item Runtime differs across method and environment.\item Page-fault and context-switch totals are symptoms, not attribution.\item No lock-wait, cache-miss, or allocation-latency breakdown isolates a cause.\end{itemize}\end{column}\end{columns}
+\takeaway{Contention and locality are plausible explanations. They are not directly measured causal findings.}
+\source{Report Sections III, XII and XIV.}
+\note{Useful next measurements: per-thread allocator call counts, mutex wait time, cache/TLB misses, CPU migrations and time in findBestFit/coalescing. Hardware counters and traces should be collected on matched workloads.}
+\end{frame}
+
+
+\begin{frame}{The report’s scaling graph shows a remaining tradeoff}
+\begin{columns}[c]\begin{column}{.52\textwidth}\centering\includegraphics[height=5.6cm]{report_pthreads_scaling.pdf}\end{column}
+\begin{column}{.45\textwidth}\small
+Native Linux, $n=400$--$1800$.
+\medskip
+Simpler pthreads v4 + CMA v7 remains about \textbf{8.5--37.9\% slower} than pthreads v6 + Regular over the measured range.
+\medskip
+Reported power exponents: 3.064 and 2.938.
+\medskip
+One run per size supports descriptive scaling, not a reliable significance claim at each size. Extrapolation is uncertain.
+\end{column}\end{columns}
+\source{Original report Figure 5 and Table XXI, p. 19. Figure preserved from the supplied PDF.}
+\end{frame}
+
+
+\begin{frame}{V8 deliberately targets matrix row layout}
+\begin{itemize}
+\item Target: separately allocated rows in a $360\times360$ matrix, about 2880 bytes per row of doubles.
+\item Split small/large regions with a reserved guard and preserve exact split sizes.
+\item Use 64-byte alignment from 2048 bytes; defer page alignment until 2 MiB.
+\item Bypass the small-object thread cache on the hot allocation path and retain deferred coalescing.
+\end{itemize}
+\takeaway{Yes, we changed the allocator for a specific implementation.}
+\small The report says v8 linked-list runs were terminated before completion. They are incomplete trials, not finite slowdown estimates.
+\source{Report Sections III-J/K and XVI-D. Row-locality benefits remain an implementation-based explanation.}
+\end{frame}
+
+
+\begin{frame}{V8 Regular versus Overloaded observations}
+\centering\input{figures/v8_pairs.tex}
+\par\scriptsize E1: M3 Max campaign, Arg1=360. E2: Jacob’s Ubuntu host, Arg1=275/400/550. Lines connect presumed pairs, black ticks show means. Each panel uses its own zero-based scale.
+\source{Updated v8 data and figures. E1 n=3; E2 n=5. Do not compare raw time across unmatched workloads.}
+\end{frame}
+
+
+\begin{frame}{V8 gains do not transfer uniformly to the new group}
+\small\centering\begin{tabular}{llrrll}\toprule
+Group & Run length & $n$ & Mean change & ANOVA $p$ & Decision\\\midrule
+E1 & Short & 3 & -4.52\% & $3.45\times10^{-6}$ & Improvement\\
+E1 & Medium & 3 & -4.97\% & $3.42\times10^{-6}$ & Improvement\\
+E1 & Long & 3 & -5.11\% & $7.66\times10^{-9}$ & Improvement\\
+E2 & Short & 5 & +37.67\% & $4.75\times10^{-4}$ & Worsening\\
+E2 & Medium & 5 & +19.71\% & $3.71\times10^{-4}$ & Worsening\\
+E2 & Long & 5 & -6.42\% & 0.0566 & Not significant\\
+\bottomrule\end{tabular}\par
+\medskip\raggedright\normalsize E2 short and medium runs worsen significantly. E2 long runs average 6.42\% faster, but $p=0.0566$ exceeds 0.05.
+\par\small Change is the mean of paired percentages. ANOVA tests differences in elapsed seconds. All v8 rows appear, including non-significant results.
+\source{Updated Runtime Results By Run Length. Paired ANOVA, unadjusted p values; pairing and normality assumptions apply.}
+\end{frame}
+
+
+\begin{frame}{ANOVA and chi-square answer different questions}
+\begin{columns}[T]\begin{column}{.48\textwidth}
+\textbf{Paired ANOVA: mean difference}
+\[d_i=O_i-R_i,\qquad F=\frac{n\bar d^2}{s_d^2}\]
+\[F\sim F_{1,n-1}\quad\text{under }H_0\]
+Uses the magnitude of each paired runtime difference. For two conditions, $F=t^2$.
+\end{column}\begin{column}{.48\textwidth}
+\textbf{Directional test: sign counts}
+\[I=\#(O_i>R_i),\quad D=\#(O_i<R_i)\]
+\[\chi^2=\frac{(I-D)^2}{I+D}\]
+Counts directions and discards magnitudes. Ties are excluded.
+\end{column}\end{columns}
+\takeaway{We conducted both analyses. ANOVA does not implement chi-square analysis.}
+\small Paired ANOVA assumes valid pairing, independent pairs, and approximately normal differences.
+\source{Report VII-B/C. Exact small-sample correction in the updated v8 analysis.}
+\end{frame}
+
+
+\begin{frame}{Small samples require an exact directional test}
+\small\centering
+\begin{tabular}{lrrrrr}\toprule
+Group / run length & Increases & Decreases & $\chi^2$ & Approx. $p$ & Exact $p$\\\midrule
+E1, each length & 0 & 3 & 3 & 0.0833 & 0.2500\\
+E2, short / medium & 5 & 0 & 5 & 0.0253 & 0.0625\\
+E2, long & 0 & 5 & 5 & 0.0253 & 0.0625\\
+\bottomrule\end{tabular}\par
+\medskip\raggedright\normalsize
+Expected counts are 1.5 or 2.5 in each direction, too small for a reliable chi-square approximation.
+\medskip
+For v8 we use the exact two-sided sign test, $I\sim\operatorname{Binomial}(I+D,0.5)$, for significance.
+\takeaway{None of these v8 directional tests is significant at 0.05.}
+\small Different ANOVA and sign-test conclusions are possible because they test different features of the data.
+\source{Updated Chi-Square By Run Length. Legacy non-v8 directional flags have not been revalidated.}
+\end{frame}
+
+
+\begin{frame}{Between-environment differences are confounded by workload}
+\begin{columns}[T]\begin{column}{.66\textwidth}\centering\input{figures/v8_environments.tex}\end{column}
+\begin{column}{.32\textwidth}\small
+\textbf{Welch ANOVA $p$}\\Short: 0.000383\\Medium: 0.000173\\Long: 0.6057
+\medskip
+Compare paired percentage changes, with 3 versus 5 observations.
+\medskip
+Bars: mean. Whiskers: SD. Dots: pairs.
+\medskip
+Arg1 and repetition strategy differ. These tests cannot isolate a hardware or OS effect.
+\end{column}\end{columns}
+\source{Updated Environment ANOVA, v8 rows. Lower runtime change favors Overloaded.}
+\note{A low p value means the observed group means are difficult to reconcile with equality under the test assumptions. It is not a direct measure of the amount of environment variation or proof of environment causation.}
+\end{frame}
+
+
+\begin{frame}{Lower page-fault counts do not guarantee faster runtime}
+\small\centering\begin{tabular}{lrlrl}\toprule
+Run length & Peak memory & ANOVA $p$ & Minor faults & ANOVA $p$\\\midrule
+Short & +4.39\% & $2.35\times10^{-9}$ & -77.52\% & $1.53\times10^{-4}$\\
+Medium & +3.49\% & $4.21\times10^{-10}$ & -77.46\% & $5.74\times10^{-5}$\\
+Long & +1.48\% & $5.24\times10^{-8}$ & -76.84\% & $8.59\times10^{-6}$\\
+\bottomrule\end{tabular}\par
+\medskip\raggedright\normalsize
+\begin{itemize}\item E2 uses more peak memory and incurs fewer minor faults at every size.\item Short and medium runtime still worsens. These metrics do not identify a causal contribution to runtime.\item Major faults are zero for every E2 run. Their percentage change and ANOVA are undefined.\end{itemize}
+\small Metric changes use $100(\bar O-\bar R)/\bar R$. These are selected diagnostic rows, including changes below the original 10\% display filter.
+\source{Updated Metric ANOVA, v8 E2. n=5 per size; all p values unadjusted and exploratory.}
+\end{frame}
+
+
+\begin{frame}{Runtime outcomes across the shared analysis}
+\centering\renewcommand{\plotheight}{4.1cm}\input{figures/runtime_outcomes.tex}
+\par\scriptsize Testable comparisons: Matrix 33, Uniform Nodes 25, Memory Stress 11, Linked List 9. Each row has equal weight. Other tested outcomes include non-significant worsening and zero changes.
+\source{Updated runtime chart. Uses all testable rows, not only the significant rows selected for tables.}
+\end{frame}
+
+
+\begin{frame}{Metric outcomes across the shared analysis}
+\centering\renewcommand{\plotheight}{4.25cm}\input{figures/metric_outcomes.tex}
+\par\scriptsize CPU excluded. Denominators: Runtime 60, Peak memory 27, Major faults 13, Minor faults 27, Voluntary CS 27, Involuntary CS 27. Missing and untestable rows excluded.
+\source{Updated metric chart. Aggregate outcomes mix campaigns and are descriptive, not a common-effect meta-analysis.}
+\end{frame}
+
+
+\begin{frame}{What the evidence cannot establish}
+\begin{itemize}
+\item Versions, machines, parameters, and compilers are not fully crossed. Workload changes can accompany environment changes.
+\item Small samples limit precision and assumption checks. A non-significant Shapiro--Wilk or Levene test does not prove its assumption.
+\item Fixed run order, background use, cache state, CPU frequency, and thermals can affect independence and fairness.
+\item Runtime and resource totals do not separate arithmetic, allocator search, lock waiting, and memory-access costs.
+\item Missing E1 raw resource observations and incomplete v8 list runs constrain further tests.
+\end{itemize}
+\source{Report Section XIV and updated v8 methods.}
+\note{The main results use unadjusted v8 tests. The pthread report uses Tukey HSD for pairwise comparisons. The broad suite should be treated as exploratory rather than a single family of confirmatory hypotheses.}
+\end{frame}
+
+
+\begin{frame}{Conclusions supported by this study}
+\begin{enumerate}
+\item Representative workload patterns expose allocator tradeoffs without claiming exhaustive coverage.
+\item V8 targets packed matrix rows, but its runtime benefit varies across the two measured groups.
+\item Pthreads performance depends on implementation and environment. CMA can help the simpler implementation substantially.
+\item Claims need effect sizes and inferential tests, with assumptions and sample sizes stated.
+\item Code reading supports mechanisms. Dedicated profiling is still needed to attribute measured time to them.
+\end{enumerate}
+\source{Report and September 22 updates. Conclusions apply to tested configurations.}
+\end{frame}
+
+
+\appendix
+
+\begin{frame}{Appendix: paired ANOVA components for v8 E2}
+\scriptsize\centering
+\begin{tabular}{lrrrrrl}\toprule
+Length & $SS_{m cond}$ & $df_1$ & $SS_{m error}$ & $df_2$ & $F$ & $p$\\\midrule
+Short & 19,092.53 & 1 & 699.98 & 4 & 109.1038 & $4.75\times10^{-4}$\\
+Medium & 107,601.20 & 1 & 3,475.31 & 4 & 123.8465 & $3.71\times10^{-4}$\\
+Long & 124,347.03 & 1 & 70,491.33 & 4 & 7.0560 & 0.0566\\
+\bottomrule\end{tabular}\par
+\medskip\raggedright\normalsize
+\[SS_{\rm cond}=\frac{n\bar d^2}{2},\qquad SS_{\rm error}=\frac{\sum_i(d_i-\bar d)^2}{2}\]
+\[F=\frac{SS_{\rm cond}/1}{SS_{\rm error}/(n-1)}\]
+\small This table shows the condition and error components used for the paired contrast. Subject variation is blocked out. The directional test is a separate analysis.
+\source{Calculated from the five E2 pairs per size.}
+\end{frame}
+
+
+\begin{frame}{Appendix: reported pthread assumption and omnibus tests}
+\small\centering
+\begin{tabular}{lrrrr}\toprule
+Environment & Shapiro--Wilk $p$ & Levene $p$ & ANOVA $F$ & ANOVA $p$\\\midrule
+WSL & 0.0668 & 0.3466 & 1249.0073 & $3.560\times10^{-19}$\\
+Linux & 0.5985 & 0.2418 & 4023.3356 & $3.148\times10^{-23}$\\
+\bottomrule\end{tabular}\par
+\medskip\raggedright\normalsize The omnibus tests report differences among the four method means. Tukey HSD identifies the pairs that differ.
+\medskip
+\small These values are copied from the report. Raw pthread observations were not supplied for independent recomputation. The report does not fully specify the grouping used for each normality diagnostic.
+\source{Report Tables XIII, XVII, XIV and XVIII.}
+\end{frame}
+
+
+\begin{frame}{Appendix: evidence and reproducibility}
+\small
+\begin{itemize}
+\item \textbf{Report:} \emph{Custom Memory Allocator Profiling}, supplied PDF, 31 pages. Code descriptions: III/VI. Pthreads: XII. Threats: XIV.
+\item \textbf{Updated analysis:} supplied Tables workbook plus September 22 matrix CSV. E1 raw runtime values come from the prior v8 workbook.
+\item \textbf{New v8 statistics:} paired ANOVA, exact sign tests, and exploratory Welch comparisons. E2 has five presumed pairs per size.
+\item \textbf{Source conflicts:} the report’s older v8 tables/conclusion describe E1 only; current slides include E2. Its older chi-square flags do not incorporate the exact-test correction.
+\item \textbf{Parameter conflict:} the report lists v2 medium matrix size as 800 in Table V and 900 in the inventory. Neither value is used for new v8 E2, whose CSV specifies 400.
+\end{itemize}
+\source{Method references: NIST Sign Test; SciPy ttest\_rel and f\_oneway documentation. Full source mapping in README.md.}
+\end{frame}
 
 \end{document}

@@ -1,0 +1,4 @@
+\begin{tikzpicture}\begin{axis}[width=.94\linewidth,height=\plotheight,axis lines=left,tick label style={font=\footnotesize},label style={font=\small},legend style={font=\footnotesize,draw=none},ybar,xmin=-.6,xmax=3.6,ymin=0,ymax=460,xtick={0,1,2,3},xticklabels={WSL v4,WSL v6,Linux v4,Linux v6},ylabel={Mean runtime (s)},legend style={at={(.5,1.03)},anchor=south,legend columns=2},ymajorgrids=true]
+\addplot[ybar,bar width=\barwidth,fill=navy,draw=navy,error bars/.cd,y dir=both,y explicit] coordinates {(0,395.795) +- (0,3.762) (1,292.769) +- (0,1.618) (2,348.573) +- (0,2.909) (3,224.896) +- (0,1.057)};\addlegendentry{Regular}
+\addplot[ybar,bar width=\barwidth,fill=burnt,draw=burnt,error bars/.cd,y dir=both,y explicit] coordinates {(0,397.664) +- (0,6.023) (1,300.914) +- (0,.627) (2,246.981) +- (0,2.615) (3,226.776) +- (0,.843)};\addlegendentry{CMA v7}
+\end{axis}\end{tikzpicture}

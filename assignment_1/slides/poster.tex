@@ -1,0 +1,167 @@
+\documentclass[final]{beamer}
+\usepackage[size=a0,orientation=landscape,scale=1.15]{beamerposter}
+\usetheme{Madrid}
+\usecolortheme{whale}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,booktabs,array,graphicx,pgfplots}
+\pgfplotsset{compat=1.18}
+\definecolor{navy}{HTML}{204C70}
+\definecolor{burnt}{HTML}{B85932}
+\definecolor{teal}{HTML}{28786B}
+\definecolor{lightteal}{HTML}{A3C6BC}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}{}
+\setbeamertemplate{headline}{}
+\setbeamertemplate{itemize item}{\color{navy}\textbullet}
+\setbeamercolor{block title}{fg=white,bg=navy}
+\setbeamercolor{block body}{fg=black,bg=white}
+\setbeamerfont{block title}{size=\large,series=\bfseries}
+\setbeamerfont{block body}{size=\normalsize}
+\newcommand{\plotheight}{18cm}
+\newcommand{\barwidth}{65pt}
+\newcommand{\pointsize}{4pt}
+\setbeamersize{text margin left=1.5cm,text margin right=1.5cm}
+\newcommand{\smallsource}[1]{\par\medskip{\footnotesize\color{gray}#1\par}}
+\setlength{\tabcolsep}{10pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{document}
+\begin{frame}[t]
+\begin{center}
+{\fontsize{64}{72}\selectfont\color{navy}\bfseries Custom Memory Allocator Profiling\par}
+\vspace{.4cm}
+{\Large Workload-specific improvements across code paths and environments\par}
+\vspace{.6cm}
+{\large Jacob Nance \quad Fernanda Gonzalez \quad Francisco Chagua \quad Nicholas Hooper \quad Nicholas Johnson \quad Mohamed Konsowa\par}
+\vspace{.4cm}
+{\normalsize CSE-625, Group 2 \qquad Fall 2026 \qquad Updated September 22, 2026\par}
+\end{center}
+\vspace{.6cm}
+\begin{columns}[t,totalwidth=.96\paperwidth]
+\begin{column}{.30\paperwidth}
+\begin{block}{A representative path through a large design space}
+Exhaustive profiling would cross versions, request sizes, lifetimes, concurrency, hardware, operating systems, and machine state. Even a simplified $8\times4\times3\times2\times5$ design requires \textbf{960 runs per environment}.
+\medskip
+We chose workloads that expose different allocator costs:
+\medskip
+\small
+\begin{tabular}{p{.31\linewidth}p{.61\linewidth}}
+\toprule Workload & Mechanism tested \\\midrule
+Matrix array & Repeated row requests and placement \\
+Uniform nodes & Same-size reuse with object churn \\
+Nested stress & Mixed sizes, fragmentation, coalescing \\
+Linked list & Tiny objects, metadata, frequent allocation \\\bottomrule
+\end{tabular}\par
+\normalsize
+\medskip
+Matched Regular/Overloaded programs use the same workload, arguments, and deterministic input within each comparison. GNU time records elapsed time and resource metrics. Checksums check output consistency.
+\smallsource{Report IV and VI. The 960-run count illustrates a complete design, not completed coverage.}
+\end{block}
+\vspace{.6cm}
+\begin{block}{What v8 changes in the code}
+The allocator redirects global \texttt{new/delete} into a fixed pool. Search, splitting, alignment, metadata, and merge policy affect the cost of each request.
+\medskip
+V8 specifically targets separately allocated matrix rows:
+\begin{itemize}
+\item Split small/large regions with a reserved guard.
+\item Preserve exact split sizes for packed rows.
+\item Align requests of at least 2048 bytes to 64 bytes.
+\item Bypass the small-object thread cache and retain deferred coalescing.
+\end{itemize}
+The report’s v8 linked-list runs did not finish. This is a specialization tradeoff, not a general allocator improvement.
+\smallsource{Report III-J/K. Implementation descriptions support hypotheses; the study does not measure a per-function runtime breakdown.}
+\end{block}
+\vspace{.6cm}
+\begin{block}{Statistical evidence beyond averages}
+\textbf{Paired ANOVA} tests mean runtime differences, with $d_i=O_i-R_i$:
+\[
+F=\frac{n\bar d^2}{s_d^2},\qquad df=(1,n-1).
+\]
+\textbf{Directional chi-square} counts increases and decreases:
+\[
+\chi^2=\frac{(I-D)^2}{I+D}.
+\]
+For v8, expected counts are below five, so significance uses an \textbf{exact two-sided binomial sign test}. ANOVA and chi-square are separate analyses.
+\medskip
+The pthread report also uses Shapiro--Wilk, Levene, one-way ANOVA, and Tukey HSD. V8 environment comparisons use Welch ANOVA on paired percentage changes.
+\par\medskip
+V8 pairing follows run order. Paired ANOVA assumes valid pairs, independent observations across pairs, and approximately normal differences.
+\smallsource{Report VII/XII and updated analysis. Threshold $\alpha=0.05$; v8 p values are unadjusted and exploratory.}
+\end{block}
+\end{column}
+\begin{column}{.30\paperwidth}
+\begin{block}{V8 runtime gains vary across groups}
+\centering\renewcommand{\plotheight}{18cm}\input{figures/v8_environments.tex}
+\par\raggedright\small
+Bars: mean paired runtime change. Whiskers: SD. Dots: pairs. Negative values favor Overloaded.\par
+\medskip
+\begin{tabular}{llrr}
+\toprule Group & Length & Mean change & ANOVA $p$\\\midrule
+E1 & Short & $-4.52\%$ & $3.45\times10^{-6}$\\
+E1 & Medium & $-4.97\%$ & $3.42\times10^{-6}$\\
+E1 & Long & $-5.11\%$ & $7.66\times10^{-9}$\\
+E2 & Short & $+37.67\%$ & 0.000475\\
+E2 & Medium & $+19.71\%$ & 0.000371\\
+E2 & Long & $-6.42\%$ & 0.056607\\\bottomrule
+\end{tabular}\par
+\medskip\normalsize
+E1 is the M3 Max campaign ($n=3$, Arg1=360). E2 uses Jacob’s Intel/Ubuntu environment ($n=5$, Arg1=275/400/550). Workload parameters and repetition strategies differ, so these results cannot isolate an environment effect.
+\smallsource{Updated v8 data, September 22. Welch between-group p: short .000383, medium .000173, long .6057.}
+\end{block}
+\vspace{.6cm}
+\begin{block}{Sign consistency and mean differences are distinct}
+All three E1 pairs improve at each length. In E2, all five pairs worsen at short/medium lengths and improve at long length.\par
+\medskip
+\small
+\begin{tabular}{lrrr}
+\toprule Group & $\chi^2$ & Approximate $p$ & Exact $p$\\\midrule
+E1, each length & 3 & .0833 & .2500\\
+E2, each length & 5 & .0253 & .0625\\\bottomrule
+\end{tabular}\par
+\medskip\normalsize
+\textbf{No v8 directional test is significant at 0.05.} The exact test avoids misleading small-sample chi-square significance.
+\end{block}
+\vspace{.6cm}
+\begin{block}{A resource improvement can accompany a slowdown}
+In E2, minor faults decrease by approximately \textbf{77\%} at every size, while peak memory rises by \textbf{1.48--4.39\%}. Both effects are significant in the paired metric analyses.
+\medskip
+Short and medium runtime still increases. A lower fault count does not establish that allocation improves application runtime. All E2 major-fault counts are zero, so their percentage change and ANOVA are undefined.
+\smallsource{Updated Metric ANOVA. Changes compare means. Resource p values do not establish causal contributions to runtime.}
+\end{block}
+\end{column}
+\begin{column}{.30\paperwidth}
+\begin{block}{CMA did not consistently worsen pthreads}
+\centering\renewcommand{\plotheight}{17cm}\input{figures/pthreads_means.tex}
+\par\raggedright\small
+Same i7-11370H host, 16 GB RAM, eight threads, $n=800$. Means and SD from the report. Pthreads v4 uses queues/mutexes; v6 removes them. Both use CMA v7 or Regular new.\par
+\medskip
+\begin{tabular}{llrl}
+\toprule Environment & Pthreads & CMA change & Tukey $p$\\\midrule
+WSL & v4 & $+0.47\%$ & .8495\\
+WSL & v6 & $+2.78\%$ & .0135\\
+Linux & v4 & $-29.15\%$ & $<.0001$\\
+Linux & v6 & $+0.84\%$ & .4965\\\bottomrule
+\end{tabular}\par
+\medskip\normalsize
+Central locking, bin searches, and row placement can affect parallel execution. \textbf{Their individual costs were not isolated.} The report supports mixed outcomes, including a substantial Linux v4 improvement.
+\smallsource{Report XII, Tables XII, XIV, XVI and XVIII. Pthreads versions and allocator versions identify different components.}
+\end{block}
+\vspace{.6cm}
+\begin{block}{Breadth and limits of environmental variation}
+Tests span \textbf{ARM64 and x86-64}, including M3/M5, Intel, and Ryzen systems. Environments include macOS, native Linux, and Windows WSL. Toolchains and OS versions differ.
+\medskip
+Coverage is not a balanced factorial experiment. Fixed-size repetition and problem-size growth answer different questions. Background activity, thermals, caches, and execution order can affect results.
+\medskip
+Three or five observations provide limited assumption checks. A large Shapiro--Wilk or Levene p value means no detected violation, not proof that the assumption holds.
+\smallsource{Report V, VI-F and XIV; shared inventory and new v8 CSV. Some environment metadata remain missing.}
+\end{block}
+\vspace{.6cm}
+\begin{block}{Conclusion}
+\textbf{Allocator value depends on the request pattern and execution environment.} Representative workloads reveal tradeoffs. Effect sizes and inferential tests qualify claims. Code inspection suggests mechanisms; lock-wait and cache/TLB profiling would be needed to establish why a particular run wins or loses.
+\end{block}
+\vspace{.4cm}
+{\footnotesize Sources: Group 2, \emph{Custom Memory Allocator Profiling}, supplied 31-page report; updated v8 analysis and September 22 CSV. Methods: NIST Sign Test; SciPy paired-test and Welch ANOVA documentation. The accompanying slides and source bundle provide detailed tables and source mappings.}
+\end{column}
+\end{columns}
+\end{frame}
+\end{document}

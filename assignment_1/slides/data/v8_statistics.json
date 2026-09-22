@@ -1,0 +1,1411 @@
+{
+  "new_metrics": [
+    {
+      "Table ID": "v8.0.0|Matrix Array|2",
+      "Version": "v8.0.0",
+      "Data Structure": "Matrix Array",
+      "Environment": "Assignee: | Jacob Nance - Team 2 | Run on 4 consecutive 11th Gen Intel\u00ae Core\u2122 i7-1165G7  processors | 16GB Memory | Ubuntu 24.04.3 LTS\u00a0 OS | Averages",
+      "Size": "Short",
+      "Metric": "Runtime",
+      "N paired": 5,
+      "Regular Mean": 233.43800000000002,
+      "Overloaded Mean": 320.82800000000003,
+      "% Change": 37.436064393971854,
+      "Performance Improved": "No",
+      "F statistic": 109.10377328166139,
+      "p-value": 0.0004746679654378561,
+      "Significant (\u03b1=0.05)": "Yes",
+      "Interpretation": "Paired ANOVA (df=1,4); unadjusted p."
+    },
+    {
+      "Table ID": "v8.0.0|Matrix Array|2",
+      "Version": "v8.0.0",
+      "Data Structure": "Matrix Array",
+      "Environment": "Assignee: | Jacob Nance - Team 2 | Run on 4 consecutive 11th Gen Intel\u00ae Core\u2122 i7-1165G7  processors | 16GB Memory | Ubuntu 24.04.3 LTS\u00a0 OS | Averages",
+      "Size": "Short",
+      "Metric": "Peak Memory (KB)",
+      "N paired": 5,
+      "Regular Mean": 157319.2,
+      "Overloaded Mean": 164232.0,
+      "% Change": 4.394123539911205,
+      "Performance Improved": "No",
+      "F statistic": 50501.77950625636,
+      "p-value": 2.3522341951661992e-09,
+      "Significant (\u03b1=0.05)": "Yes",
+      "Interpretation": "Paired ANOVA (df=1,4); unadjusted p."
+    },
+    {
+      "Table ID": "v8.0.0|Matrix Array|2",
+      "Version": "v8.0.0",
+      "Data Structure": "Matrix Array",
+      "Environment": "Assignee: | Jacob Nance - Team 2 | Run on 4 consecutive 11th Gen Intel\u00ae Core\u2122 i7-1165G7  processors | 16GB Memory | Ubuntu 24.04.3 LTS\u00a0 OS | Averages",
+      "Size": "Short",
+      "Metric": "Major Faults",
+      "N paired": 5,
+      "Regular Mean": 0.0,
+      "Overloaded Mean": 0.0,
+      "% Change": null,
+      "Performance Improved": "No",
+      "F statistic": null,
+      "p-value": null,
+      "Significant (\u03b1=0.05)": "Not testable",
+      "Interpretation": "All five Regular and Overloaded values are zero: F, p and percentage change undefined."
+    },
+    {
+      "Table ID": "v8.0.0|Matrix Array|2",
+      "Version": "v8.0.0",
+      "Data Structure": "Matrix Array",
+      "Environment": "Assignee: | Jacob Nance - Team 2 | Run on 4 consecutive 11th Gen Intel\u00ae Core\u2122 i7-1165G7  processors | 16GB Memory | Ubuntu 24.04.3 LTS\u00a0 OS | Averages",
+      "Size": "Short",
+      "Metric": "Minor Faults",
+      "N paired": 5,
+      "Regular Mean": 113208.4,
+      "Overloaded Mean": 25454.2,
+      "% Change": -77.51562604895044,
+      "Performance Improved": "Yes",
+      "F statistic": 194.72135015967686,
+      "p-value": 0.00015296765312757958,
+      "Significant (\u03b1=0.05)": "Yes",
+      "Interpretation": "Paired ANOVA (df=1,4); unadjusted p."
+    },
+    {
+      "Table ID": "v8.0.0|Matrix Array|2",
+      "Version": "v8.0.0",
+      "Data Structure": "Matrix Array",
+      "Environment": "Assignee: | Jacob Nance - Team 2 | Run on 4 consecutive 11th Gen Intel\u00ae Core\u2122 i7-1165G7  processors | 16GB Memory | Ubuntu 24.04.3 LTS\u00a0 OS | Averages",
+      "Size": "Short",
+      "Metric": "Voluntary CS",
+      "N paired": 5,
+      "Regular Mean": 1.0,
+      "Overloaded Mean": 1.6,
+      "% Change": 60.00000000000001,
+      "Performance Improved": "No",
+      "F statistic": 1.0,
+      "p-value": 0.37390096630005887,
+      "Significant (\u03b1=0.05)": "No",
+      "Interpretation": "Paired ANOVA (df=1,4); unadjusted p."
+    },
+    {
+      "Table ID": "v8.0.0|Matrix Array|2",
+      "Version": "v8.0.0",
+      "Data Structure": "Matrix Array",
+      "Environment": "Assignee: | Jacob Nance - Team 2 | Run on 4 consecutive 11th Gen Intel\u00ae Core\u2122 i7-1165G7  processors | 16GB Memory | Ubuntu 24.04.3 LTS\u00a0 OS | Averages",
+      "Size": "Short",
+      "Metric": "Involuntary CS",
+      "N paired": 5,
+      "Regular Mean": 3668.4,
+      "Overloaded Mean": 3130.2,
+      "% Change": -14.671246319921499,
+      "Performance Improved": "Yes",
+      "F statistic": 0.5391294623987019,
+      "p-value": 0.5035133055409365,
+      "Significant (\u03b1=0.05)": "No",
+      "Interpretation": "Paired ANOVA (df=1,4); unadjusted p."
+    },
+    {
+      "Table ID": "v8.0.0|Matrix Array|2",
+      "Version": "v8.0.0",
+      "Data Structure": "Matrix Array",
+      "Environment": "Assignee: | Jacob Nance - Team 2 | Run on 4 consecutive 11th Gen Intel\u00ae Core\u2122 i7-1165G7  processors | 16GB Memory | Ubuntu 24.04.3 LTS\u00a0 OS | Averages",
+      "Size": "Short",
+      "Metric": "CPU (%)",
+      "N paired": 5,
+      "Regular Mean": 99.59859999999999,
+      "Overloaded Mean": 99.6806,
+      "% Change": 0.0823304745247502,
+      "Performance Improved": "Yes",
+      "F statistic": 0.5987000267117611,
+      "p-value": 0.48226156978577644,
+      "Significant (\u03b1=0.05)": "No",
+      "Interpretation": "Paired ANOVA (df=1,4); unadjusted p."
+    },
+    {
+      "Table ID": "v8.0.0|Matrix Array|2",
+      "Version": "v8.0.0",
+      "Data Structure": "Matrix Array",
+      "Environment": "Assignee: | Jacob Nance - Team 2 | Run on 4 consecutive 11th Gen Intel\u00ae Core\u2122 i7-1165G7  processors | 16GB Memory | Ubuntu 24.04.3 LTS\u00a0 OS | Averages",
+      "Size": "Medium",
+      "Metric": "Runtime",
+      "N paired": 5,
+      "Regular Mean": 1054.982,
+      "Overloaded Mean": 1262.444,
+      "% Change": 19.664980066010603,
+      "Performance Improved": "No",
+      "F statistic": 123.84651866870166,
+      "p-value": 0.0003709880154328457,
+      "Significant (\u03b1=0.05)": "Yes",
+      "Interpretation": "Paired ANOVA (df=1,4); unadjusted p."
+    },
+    {
+      "Table ID": "v8.0.0|Matrix Array|2",
+      "Version": "v8.0.0",
+      "Data Structure": "Matrix Array",
+      "Environment": "Assignee: | Jacob Nance - Team 2 | Run on 4 consecutive 11th Gen Intel\u00ae Core\u2122 i7-1165G7  processors | 16GB Memory | Ubuntu 24.04.3 LTS\u00a0 OS | Averages",
+      "Size": "Medium",
+      "Metric": "Peak Memory (KB)",
+      "N paired": 5,
+      "Regular Mean": 329347.2,
+      "Overloaded Mean": 340857.6,
+      "% Change": 3.4949135744891606,
+      "Performance Improved": "No",
+      "F statistic": 119385.5501730104,
+      "p-value": 4.209431714891692e-10,
+      "Significant (\u03b1=0.05)": "Yes",
+      "Interpretation": "Paired ANOVA (df=1,4); unadjusted p."
+    },
+    {
+      "Table ID": "v8.0.0|Matrix Array|2",
+      "Version": "v8.0.0",
+      "Data Structure": "Matrix Array",
+      "Environment": "Assignee: | Jacob Nance - Team 2 | Run on 4 consecutive 11th Gen Intel\u00ae Core\u2122 i7-1165G7  processors | 16GB Memory | Ubuntu 24.04.3 LTS\u00a0 OS | Averages",
+      "Size": "Medium",
+      "Metric": "Major Faults",
+      "N paired": 5,
+      "Regular Mean": 0.0,
+      "Overloaded Mean": 0.0,
+      "% Change": null,
+      "Performance Improved": "No",
+      "F statistic": null,
+      "p-value": null,
+      "Significant (\u03b1=0.05)": "Not testable",
+      "Interpretation": "All five Regular and Overloaded values are zero: F, p and percentage change undefined."
+    },
+    {
+      "Table ID": "v8.0.0|Matrix Array|2",
+      "Version": "v8.0.0",
+      "Data Structure": "Matrix Array",
+      "Environment": "Assignee: | Jacob Nance - Team 2 | Run on 4 consecutive 11th Gen Intel\u00ae Core\u2122 i7-1165G7  processors | 16GB Memory | Ubuntu 24.04.3 LTS\u00a0 OS | Averages",
+      "Size": "Medium",
+      "Metric": "Minor Faults",
+      "N paired": 5,
+      "Regular Mean": 261978.6,
+      "Overloaded Mean": 59040.2,
+      "% Change": -77.4637317704576,
+      "Performance Improved": "Yes",
+      "F statistic": 320.1022670875825,
+      "p-value": 5.7356488988150106e-05,
+      "Significant (\u03b1=0.05)": "Yes",
+      "Interpretation": "Paired ANOVA (df=1,4); unadjusted p."
+    },
+    {
+      "Table ID": "v8.0.0|Matrix Array|2",
+      "Version": "v8.0.0",
+      "Data Structure": "Matrix Array",
+      "Environment": "Assignee: | Jacob Nance - Team 2 | Run on 4 consecutive 11th Gen Intel\u00ae Core\u2122 i7-1165G7  processors | 16GB Memory | Ubuntu 24.04.3 LTS\u00a0 OS | Averages",
+      "Size": "Medium",
+      "Metric": "Voluntary CS",
+      "N paired": 5,
+      "Regular Mean": 17.8,
+      "Overloaded Mean": 28.0,
+      "% Change": 57.303370786516844,
+      "Performance Improved": "No",
+      "F statistic": 0.688368400158793,
+      "p-value": 0.45336422126542025,
+      "Significant (\u03b1=0.05)": "No",
+      "Interpretation": "Paired ANOVA (df=1,4); unadjusted p."
+    },
+    {
+      "Table ID": "v8.0.0|Matrix Array|2",
+      "Version": "v8.0.0",
+      "Data Structure": "Matrix Array",
+      "Environment": "Assignee: | Jacob Nance - Team 2 | Run on 4 consecutive 11th Gen Intel\u00ae Core\u2122 i7-1165G7  processors | 16GB Memory | Ubuntu 24.04.3 LTS\u00a0 OS | Averages",
+      "Size": "Medium",
+      "Metric": "Involuntary CS",
+      "N paired": 5,
+      "Regular Mean": 16609.4,
+      "Overloaded Mean": 13108.8,
+      "% Change": -21.076017195082315,
+      "Performance Improved": "Yes",
+      "F statistic": 2.455381122598805,
+      "p-value": 0.19218890741698477,
+      "Significant (\u03b1=0.05)": "No",
+      "Interpretation": "Paired ANOVA (df=1,4); unadjusted p."
+    },
+    {
+      "Table ID": "v8.0.0|Matrix Array|2",
+      "Version": "v8.0.0",
+      "Data Structure": "Matrix Array",
+      "Environment": "Assignee: | Jacob Nance - Team 2 | Run on 4 consecutive 11th Gen Intel\u00ae Core\u2122 i7-1165G7  processors | 16GB Memory | Ubuntu 24.04.3 LTS\u00a0 OS | Averages",
+      "Size": "Medium",
+      "Metric": "CPU (%)",
+      "N paired": 5,
+      "Regular Mean": 99.5716,
+      "Overloaded Mean": 99.8384,
+      "% Change": 0.2679478887554175,
+      "Performance Improved": "Yes",
+      "F statistic": 125.8659688085629,
+      "p-value": 0.0003594800250628996,
+      "Significant (\u03b1=0.05)": "Yes",
+      "Interpretation": "Paired ANOVA (df=1,4); unadjusted p."
+    },
+    {
+      "Table ID": "v8.0.0|Matrix Array|2",
+      "Version": "v8.0.0",
+      "Data Structure": "Matrix Array",
+      "Environment": "Assignee: | Jacob Nance - Team 2 | Run on 4 consecutive 11th Gen Intel\u00ae Core\u2122 i7-1165G7  processors | 16GB Memory | Ubuntu 24.04.3 LTS\u00a0 OS | Averages",
+      "Size": "Long",
+      "Metric": "Runtime",
+      "N paired": 5,
+      "Regular Mean": 3448.004,
+      "Overloaded Mean": 3224.982,
+      "% Change": -6.468147948784281,
+      "Performance Improved": "Yes",
+      "F statistic": 7.056018443087399,
+      "p-value": 0.0566073750369195,
+      "Significant (\u03b1=0.05)": "No",
+      "Interpretation": "Paired ANOVA (df=1,4); unadjusted p."
+    },
+    {
+      "Table ID": "v8.0.0|Matrix Array|2",
+      "Version": "v8.0.0",
+      "Data Structure": "Matrix Array",
+      "Environment": "Assignee: | Jacob Nance - Team 2 | Run on 4 consecutive 11th Gen Intel\u00ae Core\u2122 i7-1165G7  processors | 16GB Memory | Ubuntu 24.04.3 LTS\u00a0 OS | Averages",
+      "Size": "Long",
+      "Metric": "Peak Memory (KB)",
+      "N paired": 5,
+      "Regular Mean": 618612.8,
+      "Overloaded Mean": 627763.2,
+      "% Change": 1.4791805148551576,
+      "Performance Improved": "No",
+      "F statistic": 10695.97710828598,
+      "p-value": 5.241307973309726e-08,
+      "Significant (\u03b1=0.05)": "Yes",
+      "Interpretation": "Paired ANOVA (df=1,4); unadjusted p."
+    },
+    {
+      "Table ID": "v8.0.0|Matrix Array|2",
+      "Version": "v8.0.0",
+      "Data Structure": "Matrix Array",
+      "Environment": "Assignee: | Jacob Nance - Team 2 | Run on 4 consecutive 11th Gen Intel\u00ae Core\u2122 i7-1165G7  processors | 16GB Memory | Ubuntu 24.04.3 LTS\u00a0 OS | Averages",
+      "Size": "Long",
+      "Metric": "Major Faults",
+      "N paired": 5,
+      "Regular Mean": 0.0,
+      "Overloaded Mean": 0.0,
+      "% Change": null,
+      "Performance Improved": "No",
+      "F statistic": null,
+      "p-value": null,
+      "Significant (\u03b1=0.05)": "Not testable",
+      "Interpretation": "All five Regular and Overloaded values are zero: F, p and percentage change undefined."
+    },
+    {
+      "Table ID": "v8.0.0|Matrix Array|2",
+      "Version": "v8.0.0",
+      "Data Structure": "Matrix Array",
+      "Environment": "Assignee: | Jacob Nance - Team 2 | Run on 4 consecutive 11th Gen Intel\u00ae Core\u2122 i7-1165G7  processors | 16GB Memory | Ubuntu 24.04.3 LTS\u00a0 OS | Averages",
+      "Size": "Long",
+      "Metric": "Minor Faults",
+      "N paired": 5,
+      "Regular Mean": 512035.2,
+      "Overloaded Mean": 118595.8,
+      "% Change": -76.8383501759254,
+      "Performance Improved": "Yes",
+      "F statistic": 832.5851547356882,
+      "p-value": 8.586663161847612e-06,
+      "Significant (\u03b1=0.05)": "Yes",
+      "Interpretation": "Paired ANOVA (df=1,4); unadjusted p."
+    },
+    {
+      "Table ID": "v8.0.0|Matrix Array|2",
+      "Version": "v8.0.0",
+      "Data Structure": "Matrix Array",
+      "Environment": "Assignee: | Jacob Nance - Team 2 | Run on 4 consecutive 11th Gen Intel\u00ae Core\u2122 i7-1165G7  processors | 16GB Memory | Ubuntu 24.04.3 LTS\u00a0 OS | Averages",
+      "Size": "Long",
+      "Metric": "Voluntary CS",
+      "N paired": 5,
+      "Regular Mean": 33.0,
+      "Overloaded Mean": 24.4,
+      "% Change": -26.060606060606062,
+      "Performance Improved": "Yes",
+      "F statistic": 0.3359375,
+      "p-value": 0.5932611959546755,
+      "Significant (\u03b1=0.05)": "No",
+      "Interpretation": "Paired ANOVA (df=1,4); unadjusted p."
+    },
+    {
+      "Table ID": "v8.0.0|Matrix Array|2",
+      "Version": "v8.0.0",
+      "Data Structure": "Matrix Array",
+      "Environment": "Assignee: | Jacob Nance - Team 2 | Run on 4 consecutive 11th Gen Intel\u00ae Core\u2122 i7-1165G7  processors | 16GB Memory | Ubuntu 24.04.3 LTS\u00a0 OS | Averages",
+      "Size": "Long",
+      "Metric": "Involuntary CS",
+      "N paired": 5,
+      "Regular Mean": 50737.4,
+      "Overloaded Mean": 49927.2,
+      "% Change": -1.59684966119668,
+      "Performance Improved": "Yes",
+      "F statistic": 0.0918441834470623,
+      "p-value": 0.7769532066905442,
+      "Significant (\u03b1=0.05)": "No",
+      "Interpretation": "Paired ANOVA (df=1,4); unadjusted p."
+    },
+    {
+      "Table ID": "v8.0.0|Matrix Array|2",
+      "Version": "v8.0.0",
+      "Data Structure": "Matrix Array",
+      "Environment": "Assignee: | Jacob Nance - Team 2 | Run on 4 consecutive 11th Gen Intel\u00ae Core\u2122 i7-1165G7  processors | 16GB Memory | Ubuntu 24.04.3 LTS\u00a0 OS | Averages",
+      "Size": "Long",
+      "Metric": "CPU (%)",
+      "N paired": 5,
+      "Regular Mean": 99.6704,
+      "Overloaded Mean": 92.56819999999999,
+      "% Change": -7.125686261919297,
+      "Performance Improved": "No",
+      "F statistic": 1855.116370004943,
+      "p-value": 1.7372000621548186e-06,
+      "Significant (\u03b1=0.05)": "Yes",
+      "Interpretation": "Paired ANOVA (df=1,4); unadjusted p."
+    }
+  ],
+  "runtime": [
+    {
+      "size": "Short",
+      "arg1": 275,
+      "regular": [
+        213.52,
+        213.79,
+        257.12,
+        240.06,
+        242.7
+      ],
+      "overloaded": [
+        290.62,
+        308.02,
+        336.04,
+        356.90999999999997,
+        312.55
+      ],
+      "old_regular": [
+        248.09,
+        248.04,
+        248.11
+      ],
+      "old_overloaded": [
+        236.85,
+        236.87,
+        236.89
+      ],
+      "mean_change": 37.66690998422855,
+      "F": 109.10377328166139,
+      "p": 0.0004746679654378561,
+      "increases": 5,
+      "decreases": 0,
+      "chi2": 5.0,
+      "chi_approx_p": 0.025347318677468325,
+      "exact_p": 0.0625
+    },
+    {
+      "size": "Medium",
+      "arg1": 400,
+      "regular": [
+        992.93,
+        1018.77,
+        1074.63,
+        1141.08,
+        1047.5
+      ],
+      "overloaded": [
+        1168.05,
+        1211.18,
+        1298.1,
+        1314.59,
+        1320.3
+      ],
+      "old_regular": [
+        9156.25,
+        9155.58,
+        9157.82
+      ],
+      "old_overloaded": [
+        8701.48,
+        8701.34,
+        8700.83
+      ],
+      "mean_change": 19.713397108644475,
+      "F": 123.84651866870166,
+      "p": 0.0003709880154328457,
+      "increases": 5,
+      "decreases": 0,
+      "chi2": 5.0,
+      "chi_approx_p": 0.025347318677468325,
+      "exact_p": 0.0625
+    },
+    {
+      "size": "Long",
+      "arg1": 550,
+      "regular": [
+        3576.61,
+        3379.69,
+        3271.79,
+        3556.29,
+        3455.64
+      ],
+      "overloaded": [
+        3549.39,
+        3151.49,
+        3183.75,
+        3045.19,
+        3195.09
+      ],
+      "old_regular": [
+        24005.95,
+        24001.89,
+        24003.3
+      ],
+      "old_overloaded": [
+        22779.78,
+        22775.98,
+        22777.03
+      ],
+      "mean_change": -6.42312058356128,
+      "F": 7.056018443087399,
+      "p": 0.0566073750369195,
+      "increases": 0,
+      "decreases": 5,
+      "chi2": 5.0,
+      "chi_approx_p": 0.025347318677468325,
+      "exact_p": 0.0625
+    }
+  ],
+  "cross_environment": [
+    {
+      "size": "Short",
+      "old_mean": -4.518702515943322,
+      "new_mean": 37.66690998422855,
+      "F": 121.773921524967,
+      "p": 0.0003833647524745045,
+      "df2": 4.000035680754638
+    },
+    {
+      "size": "Medium",
+      "old_mean": -4.972759574002627,
+      "new_mean": 19.713397108644475,
+      "F": 183.14214144169583,
+      "p": 0.00017250553406945345,
+      "df2": 4.000187912099183
+    },
+    {
+      "size": "Long",
+      "old_mean": -5.1080291189045575,
+      "new_mean": -6.42312058356128,
+      "F": 0.3129571650141996,
+      "p": 0.6057128928646255,
+      "df2": 4.00000019695412
+    }
+  ],
+  "pairs": [
+    [
+      2,
+      "Short",
+      1,
+      "Runtime",
+      213.52,
+      290.62
+    ],
+    [
+      2,
+      "Short",
+      2,
+      "Runtime",
+      213.79,
+      308.02
+    ],
+    [
+      2,
+      "Short",
+      3,
+      "Runtime",
+      257.12,
+      336.04
+    ],
+    [
+      2,
+      "Short",
+      4,
+      "Runtime",
+      240.06,
+      356.90999999999997
+    ],
+    [
+      2,
+      "Short",
+      5,
+      "Runtime",
+      242.7,
+      312.55
+    ],
+    [
+      2,
+      "Short",
+      1,
+      "Peak Memory (KB)",
+      157412.0,
+      164228.0
+    ],
+    [
+      2,
+      "Short",
+      2,
+      "Peak Memory (KB)",
+      157336.0,
+      164272.0
+    ],
+    [
+      2,
+      "Short",
+      3,
+      "Peak Memory (KB)",
+      157248.0,
+      164220.0
+    ],
+    [
+      2,
+      "Short",
+      4,
+      "Peak Memory (KB)",
+      157352.0,
+      164220.0
+    ],
+    [
+      2,
+      "Short",
+      5,
+      "Peak Memory (KB)",
+      157248.0,
+      164220.0
+    ],
+    [
+      2,
+      "Short",
+      1,
+      "Major Faults",
+      0.0,
+      0.0
+    ],
+    [
+      2,
+      "Short",
+      2,
+      "Major Faults",
+      0.0,
+      0.0
+    ],
+    [
+      2,
+      "Short",
+      3,
+      "Major Faults",
+      0.0,
+      0.0
+    ],
+    [
+      2,
+      "Short",
+      4,
+      "Major Faults",
+      0.0,
+      0.0
+    ],
+    [
+      2,
+      "Short",
+      5,
+      "Major Faults",
+      0.0,
+      0.0
+    ],
+    [
+      2,
+      "Short",
+      1,
+      "Minor Faults",
+      113208.0,
+      37822.0
+    ],
+    [
+      2,
+      "Short",
+      2,
+      "Minor Faults",
+      113209.0,
+      6138.0
+    ],
+    [
+      2,
+      "Short",
+      3,
+      "Minor Faults",
+      113207.0,
+      39863.0
+    ],
+    [
+      2,
+      "Short",
+      4,
+      "Minor Faults",
+      113209.0,
+      17893.0
+    ],
+    [
+      2,
+      "Short",
+      5,
+      "Minor Faults",
+      113209.0,
+      25555.0
+    ],
+    [
+      2,
+      "Short",
+      1,
+      "Voluntary CS",
+      1.0,
+      1.0
+    ],
+    [
+      2,
+      "Short",
+      2,
+      "Voluntary CS",
+      1.0,
+      1.0
+    ],
+    [
+      2,
+      "Short",
+      3,
+      "Voluntary CS",
+      1.0,
+      1.0
+    ],
+    [
+      2,
+      "Short",
+      4,
+      "Voluntary CS",
+      1.0,
+      4.0
+    ],
+    [
+      2,
+      "Short",
+      5,
+      "Voluntary CS",
+      1.0,
+      1.0
+    ],
+    [
+      2,
+      "Short",
+      1,
+      "Involuntary CS",
+      2054.0,
+      2073.0
+    ],
+    [
+      2,
+      "Short",
+      2,
+      "Involuntary CS",
+      4392.0,
+      1282.0
+    ],
+    [
+      2,
+      "Short",
+      3,
+      "Involuntary CS",
+      3536.0,
+      4093.0
+    ],
+    [
+      2,
+      "Short",
+      4,
+      "Involuntary CS",
+      3751.0,
+      4721.0
+    ],
+    [
+      2,
+      "Short",
+      5,
+      "Involuntary CS",
+      4609.0,
+      3482.0
+    ],
+    [
+      2,
+      "Short",
+      1,
+      "CPU (%)",
+      99.386,
+      99.807
+    ],
+    [
+      2,
+      "Short",
+      2,
+      "CPU (%)",
+      99.673,
+      99.886
+    ],
+    [
+      2,
+      "Short",
+      3,
+      "CPU (%)",
+      99.65,
+      99.589
+    ],
+    [
+      2,
+      "Short",
+      4,
+      "CPU (%)",
+      99.696,
+      99.518
+    ],
+    [
+      2,
+      "Short",
+      5,
+      "CPU (%)",
+      99.588,
+      99.603
+    ],
+    [
+      1,
+      "Short",
+      1,
+      "Runtime",
+      248.09,
+      236.85
+    ],
+    [
+      1,
+      "Short",
+      2,
+      "Runtime",
+      248.04,
+      236.87
+    ],
+    [
+      1,
+      "Short",
+      3,
+      "Runtime",
+      248.11,
+      236.89
+    ],
+    [
+      2,
+      "Medium",
+      1,
+      "Runtime",
+      992.93,
+      1168.05
+    ],
+    [
+      2,
+      "Medium",
+      2,
+      "Runtime",
+      1018.77,
+      1211.18
+    ],
+    [
+      2,
+      "Medium",
+      3,
+      "Runtime",
+      1074.63,
+      1298.1
+    ],
+    [
+      2,
+      "Medium",
+      4,
+      "Runtime",
+      1141.08,
+      1314.59
+    ],
+    [
+      2,
+      "Medium",
+      5,
+      "Runtime",
+      1047.5,
+      1320.3
+    ],
+    [
+      2,
+      "Medium",
+      1,
+      "Peak Memory (KB)",
+      329376.0,
+      340912.0
+    ],
+    [
+      2,
+      "Medium",
+      2,
+      "Peak Memory (KB)",
+      329276.0,
+      340700.0
+    ],
+    [
+      2,
+      "Medium",
+      3,
+      "Peak Memory (KB)",
+      329356.0,
+      340916.0
+    ],
+    [
+      2,
+      "Medium",
+      4,
+      "Peak Memory (KB)",
+      329376.0,
+      340816.0
+    ],
+    [
+      2,
+      "Medium",
+      5,
+      "Peak Memory (KB)",
+      329352.0,
+      340944.0
+    ],
+    [
+      2,
+      "Medium",
+      1,
+      "Major Faults",
+      0.0,
+      0.0
+    ],
+    [
+      2,
+      "Medium",
+      2,
+      "Major Faults",
+      0.0,
+      0.0
+    ],
+    [
+      2,
+      "Medium",
+      3,
+      "Major Faults",
+      0.0,
+      0.0
+    ],
+    [
+      2,
+      "Medium",
+      4,
+      "Major Faults",
+      0.0,
+      0.0
+    ],
+    [
+      2,
+      "Medium",
+      5,
+      "Major Faults",
+      0.0,
+      0.0
+    ],
+    [
+      2,
+      "Medium",
+      1,
+      "Minor Faults",
+      261963.0,
+      63655.0
+    ],
+    [
+      2,
+      "Medium",
+      2,
+      "Minor Faults",
+      261996.0,
+      61632.0
+    ],
+    [
+      2,
+      "Medium",
+      3,
+      "Minor Faults",
+      261984.0,
+      77445.0
+    ],
+    [
+      2,
+      "Medium",
+      4,
+      "Minor Faults",
+      261985.0,
+      76894.0
+    ],
+    [
+      2,
+      "Medium",
+      5,
+      "Minor Faults",
+      261965.0,
+      15575.0
+    ],
+    [
+      2,
+      "Medium",
+      1,
+      "Voluntary CS",
+      1.0,
+      46.0
+    ],
+    [
+      2,
+      "Medium",
+      2,
+      "Voluntary CS",
+      35.0,
+      67.0
+    ],
+    [
+      2,
+      "Medium",
+      3,
+      "Voluntary CS",
+      23.0,
+      22.0
+    ],
+    [
+      2,
+      "Medium",
+      4,
+      "Voluntary CS",
+      24.0,
+      2.0
+    ],
+    [
+      2,
+      "Medium",
+      5,
+      "Voluntary CS",
+      6.0,
+      3.0
+    ],
+    [
+      2,
+      "Medium",
+      1,
+      "Involuntary CS",
+      15248.0,
+      13560.0
+    ],
+    [
+      2,
+      "Medium",
+      2,
+      "Involuntary CS",
+      15348.0,
+      11837.0
+    ],
+    [
+      2,
+      "Medium",
+      3,
+      "Involuntary CS",
+      23550.0,
+      11883.0
+    ],
+    [
+      2,
+      "Medium",
+      4,
+      "Involuntary CS",
+      15429.0,
+      12921.0
+    ],
+    [
+      2,
+      "Medium",
+      5,
+      "Involuntary CS",
+      13472.0,
+      15343.0
+    ],
+    [
+      2,
+      "Medium",
+      1,
+      "CPU (%)",
+      99.582,
+      99.795
+    ],
+    [
+      2,
+      "Medium",
+      2,
+      "CPU (%)",
+      99.602,
+      99.856
+    ],
+    [
+      2,
+      "Medium",
+      3,
+      "CPU (%)",
+      99.493,
+      99.849
+    ],
+    [
+      2,
+      "Medium",
+      4,
+      "CPU (%)",
+      99.606,
+      99.857
+    ],
+    [
+      2,
+      "Medium",
+      5,
+      "CPU (%)",
+      99.575,
+      99.835
+    ],
+    [
+      1,
+      "Medium",
+      1,
+      "Runtime",
+      9156.25,
+      8701.48
+    ],
+    [
+      1,
+      "Medium",
+      2,
+      "Runtime",
+      9155.58,
+      8701.34
+    ],
+    [
+      1,
+      "Medium",
+      3,
+      "Runtime",
+      9157.82,
+      8700.83
+    ],
+    [
+      2,
+      "Long",
+      1,
+      "Runtime",
+      3576.61,
+      3549.39
+    ],
+    [
+      2,
+      "Long",
+      2,
+      "Runtime",
+      3379.69,
+      3151.49
+    ],
+    [
+      2,
+      "Long",
+      3,
+      "Runtime",
+      3271.79,
+      3183.75
+    ],
+    [
+      2,
+      "Long",
+      4,
+      "Runtime",
+      3556.29,
+      3045.19
+    ],
+    [
+      2,
+      "Long",
+      5,
+      "Runtime",
+      3455.64,
+      3195.09
+    ],
+    [
+      2,
+      "Long",
+      1,
+      "Peak Memory (KB)",
+      618640.0,
+      627648.0
+    ],
+    [
+      2,
+      "Long",
+      2,
+      "Peak Memory (KB)",
+      618520.0,
+      627756.0
+    ],
+    [
+      2,
+      "Long",
+      3,
+      "Peak Memory (KB)",
+      618632.0,
+      627680.0
+    ],
+    [
+      2,
+      "Long",
+      4,
+      "Peak Memory (KB)",
+      618632.0,
+      627632.0
+    ],
+    [
+      2,
+      "Long",
+      5,
+      "Peak Memory (KB)",
+      618640.0,
+      628100.0
+    ],
+    [
+      2,
+      "Long",
+      1,
+      "Major Faults",
+      0.0,
+      0.0
+    ],
+    [
+      2,
+      "Long",
+      2,
+      "Major Faults",
+      0.0,
+      0.0
+    ],
+    [
+      2,
+      "Long",
+      3,
+      "Major Faults",
+      0.0,
+      0.0
+    ],
+    [
+      2,
+      "Long",
+      4,
+      "Major Faults",
+      0.0,
+      0.0
+    ],
+    [
+      2,
+      "Long",
+      5,
+      "Major Faults",
+      0.0,
+      0.0
+    ],
+    [
+      2,
+      "Long",
+      1,
+      "Minor Faults",
+      512030.0,
+      142029.0
+    ],
+    [
+      2,
+      "Long",
+      2,
+      "Minor Faults",
+      512029.0,
+      135860.0
+    ],
+    [
+      2,
+      "Long",
+      3,
+      "Minor Faults",
+      512010.0,
+      113871.0
+    ],
+    [
+      2,
+      "Long",
+      4,
+      "Minor Faults",
+      512063.0,
+      133788.0
+    ],
+    [
+      2,
+      "Long",
+      5,
+      "Minor Faults",
+      512044.0,
+      67431.0
+    ],
+    [
+      2,
+      "Long",
+      1,
+      "Voluntary CS",
+      31.0,
+      66.0
+    ],
+    [
+      2,
+      "Long",
+      2,
+      "Voluntary CS",
+      30.0,
+      33.0
+    ],
+    [
+      2,
+      "Long",
+      3,
+      "Voluntary CS",
+      13.0,
+      16.0
+    ],
+    [
+      2,
+      "Long",
+      4,
+      "Voluntary CS",
+      46.0,
+      5.0
+    ],
+    [
+      2,
+      "Long",
+      5,
+      "Voluntary CS",
+      45.0,
+      2.0
+    ],
+    [
+      2,
+      "Long",
+      1,
+      "Involuntary CS",
+      50563.0,
+      57458.0
+    ],
+    [
+      2,
+      "Long",
+      2,
+      "Involuntary CS",
+      49126.0,
+      46713.0
+    ],
+    [
+      2,
+      "Long",
+      3,
+      "Involuntary CS",
+      47739.0,
+      48463.0
+    ],
+    [
+      2,
+      "Long",
+      4,
+      "Involuntary CS",
+      53880.0,
+      44277.0
+    ],
+    [
+      2,
+      "Long",
+      5,
+      "Involuntary CS",
+      52379.0,
+      52725.0
+    ],
+    [
+      2,
+      "Long",
+      1,
+      "CPU (%)",
+      99.697,
+      93.232
+    ],
+    [
+      2,
+      "Long",
+      2,
+      "CPU (%)",
+      99.691,
+      92.384
+    ],
+    [
+      2,
+      "Long",
+      3,
+      "CPU (%)",
+      99.66,
+      92.512
+    ],
+    [
+      2,
+      "Long",
+      4,
+      "CPU (%)",
+      99.613,
+      92.22
+    ],
+    [
+      2,
+      "Long",
+      5,
+      "CPU (%)",
+      99.691,
+      92.493
+    ],
+    [
+      1,
+      "Long",
+      1,
+      "Runtime",
+      24005.95,
+      22779.78
+    ],
+    [
+      1,
+      "Long",
+      2,
+      "Runtime",
+      24001.89,
+      22775.98
+    ],
+    [
+      1,
+      "Long",
+      3,
+      "Runtime",
+      24003.3,
+      22777.03
+    ]
+  ]
+}

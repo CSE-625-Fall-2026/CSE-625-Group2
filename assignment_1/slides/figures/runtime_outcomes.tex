@@ -1,0 +1,6 @@
+\begin{tikzpicture}\begin{axis}[width=.88\linewidth,height=\plotheight,axis lines=left,tick label style={font=\footnotesize},label style={font=\small},legend style={font=\footnotesize,draw=none},xbar stacked,bar width=12pt,xmin=0,xmax=100,y dir=reverse,ytick={0,1,2,3},yticklabels={Matrix Array,Uniform Nodes,Memory Stress,Linked List},xlabel={Testable comparisons (\%)},legend style={at={(.5,-.24)},anchor=north,legend columns=2,font=\scriptsize},enlarge y limits=.16]
+\addplot[fill=teal,draw=white] coordinates {(30.303030303030305,0) (8.0,1) (27.272727272727273,2) (0.0,3)};\addlegendentry{Significant improvement}
+\addplot[fill=lightteal,draw=white] coordinates {(24.242424242424242,0) (8.0,1) (0.0,2) (0.0,3)};\addlegendentry{Non-significant improvement}
+\addplot[fill=burnt,draw=white] coordinates {(39.39393939393939,0) (84.0,1) (72.72727272727273,2) (100.0,3)};\addlegendentry{Significant worsening}
+\addplot[fill=gray!30,draw=white] coordinates {(6.0606060606060606,0) (0.0,1) (0.0,2) (0.0,3)};\addlegendentry{Other tested outcomes}
+\end{axis}\end{tikzpicture}

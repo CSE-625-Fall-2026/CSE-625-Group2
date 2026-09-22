@@ -35,13 +35,12 @@
     \end{columns}
 
     \vspace{0.7em}
-    \begin{block}{Direction of the lineage}
-        \begin{itemize}
-            \item v1--v3: find / organize free blocks
-            \item v4--v7: avoid the central lock with a \textbf{thread cache}
-              --- great for millions of tiny nodes
-            \item Matrix rows are \textbf{medium} and reused --- that cache can
-              \textbf{scatter} packing and hurt locality
-        \end{itemize}
-    \end{block}
+    {\footnotesize
+    \textbf{Direction of the lineage.}
+    v1--v3: find / organize free blocks.
+    v4--v7: avoid the central lock with a \textbf{thread cache}
+    --- great for millions of tiny nodes.
+    Matrix rows are \textbf{medium} and reused --- that cache can
+    \textbf{scatter} packing and hurt locality.
+    }
 \end{frame}

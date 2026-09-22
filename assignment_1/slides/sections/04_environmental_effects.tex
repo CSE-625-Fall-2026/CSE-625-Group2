@@ -1,12 +1,14 @@
-\section{4 --- Our v8 vs the AI version}
+\section{Our v8 vs the AI version}
 
 \begin{frame}{Two different v8 designs}
-    Group~2 ended up with \textbf{two} v8s. They take opposite bets.
+    Group~2 has \textbf{two} v8s. They take opposite bets.
 
-    \vspace{0.5em}
+    \vspace{0.55em}
     \begin{columns}[T]
         \begin{column}{0.48\textwidth}
-            {\small\textbf{Our v8}}\\[0.25em]
+            {\large\textbf{Our v8}}
+
+            \vspace{0.35em}
             {\footnotesize
             Starts from v7 and keeps a
             \textbf{thread-cache-first} hot path.
@@ -15,14 +17,16 @@
             accounting, retune every 256 allocs,
             occupied-bin bitmaps, optional metrics
             and build scripts
-            (\texttt{UsingMatrixClassFork}, branch
-            \texttt{v8}).
+            (\texttt{UsingMatrixClassFork} /
+            branch \texttt{v8}).
             }
         \end{column}
         \begin{column}{0.48\textwidth}
-            {\small\textbf{The AI version}}\\[0.25em]
+            {\large\textbf{The AI version}}
+
+            \vspace{0.35em}
             {\footnotesize
-            AI-assisted redesign aimed at
+            AI-assisted redesign for
             \textbf{packed matrix rows}.
             Turns the hot-path cache \emph{off},
             splits the arena, 64-aligns medium
@@ -34,94 +38,74 @@
         \end{column}
     \end{columns}
 
-    \vspace{0.55em}
-    {\footnotesize Result tables below are for \textbf{the AI version}
+    \vspace{0.7em}
+    {\footnotesize Result tables later are for \textbf{the AI version}
     unless we say otherwise.}
 \end{frame}
 
-\begin{frame}{Our v8 --- what changed from v7}
+\begin{frame}{What changed from v7}
     {\scriptsize
     \renewcommand{\arraystretch}{1.4}
-    \begin{tabular}{@{}p{0.34\textwidth}p{0.58\textwidth}@{}}
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{@{}p{0.22\textwidth}p{0.35\textwidth}p{0.35\textwidth}@{}}
         \toprule
-        Change & Effect \\
+        & \textbf{Our v8} & \textbf{The AI version} \\
         \midrule
-        Max cache / class \(256\rightarrow512\) &
-          Larger per-class LIFO retention \\
-        Live-block accounting &
-          Track live blocks per size class \\
-        Retune every 256 allocs &
-          Raise/lower targets from peak live use
-          (cushion 4; min 8) \\
-        Occupied-bin bitmaps &
-          Skip empty size classes in search \\
-        Optional metrics + scripts &
-          Hits/misses, refills, flushes, mutex takes;
-          build/run helpers \\
+        Hot path &
+          Still thread cache; smarter
+          retune (peak live, every 256) &
+          Cache skipped; central best-fit \\
+        Cache size &
+          Cap \(256\rightarrow512\) / class &
+          Not used on hot path \\
+        Arena &
+          One mmap free region
+          (same as v7) &
+          Small span + guard + large span \\
+        Align &
+          Page-align @ 64\,KiB
+          (same as v7) &
+          64-byte @ \(\ge\)2\,KiB;
+          page @ 2\,MiB \\
+        Remainders &
+          64-byte quantum
+          (same idea as v7) &
+          Exact used size (packed stride) \\
+        Locking &
+          \texttt{std::mutex} &
+          \texttt{pthread} + recent-large \\
+        Extra &
+          Occupied-bin bitmaps;
+          metrics + scripts &
+          Matrix packing policies \\
         \bottomrule
     \end{tabular}
     }
 
     \vspace{0.45em}
-    {\footnotesize Big policy unchanged: hot path still uses
-    \texttt{takeCachedBlock}; \texttt{std::mutex}; page-align @ 64\,KiB.}
+    {\footnotesize Our v8 = better tiny-object cache.
+    AI version = pack reused medium rows.}
 \end{frame}
 
-\begin{frame}{Our v8 vs the AI version}
-    {\scriptsize
-    \renewcommand{\arraystretch}{1.45}
-    \setlength{\tabcolsep}{4pt}
-    \begin{tabular}{@{}p{0.20\textwidth}p{0.36\textwidth}p{0.36\textwidth}@{}}
-        \toprule
-        & \textbf{Our v8} & \textbf{The AI version} \\
-        \midrule
-        Goal &
-          Smarter tiny-object cache &
-          Packed matrix rows \\
-        Hot path &
-          Thread cache (kept) &
-          Cache skipped \\
-        Arena &
-          One mmap region &
-          Small + guard + large \\
-        Cache cap &
-          Up to 512 / class &
-          Not used on hot path \\
-        Align &
-          Page @ 64\,KiB &
-          64-byte @ \(\ge\)2\,KiB; page @ 2\,MiB \\
-        Locking &
-          \texttt{std::mutex} &
-          \texttt{pthread} + recent-large \\
-        Best for &
-          Many small allocs &
-          Reused medium rows \\
-        \bottomrule
-    \end{tabular}
-    }
-\end{frame}
+\begin{frame}{Why the AI version helps matrix / hurts lists}
+    \textbf{Matrix win}
+    \begin{itemize}
+        \item Many reused medium rows (profiled \(n{=}360\),
+              \(\sim\)2880\,B/row --- pattern, not a hardcoded size)
+        \item No LIFO cache \(\Rightarrow\) rows stay packed
+        \item Split arena keeps tiny frees out of the row region
+    \end{itemize}
 
-\begin{frame}{The AI version --- matrix packing (and list cost)}
-    {\scriptsize
-    \renewcommand{\arraystretch}{1.35}
-    \begin{tabular}{@{}p{0.30\textwidth}p{0.62\textwidth}@{}}
-        \toprule
-        Change & Why \\
-        \midrule
-        Skip thread cache & LIFO cache scatters packed rows \\
-        Split arena + guard & Tiny frees cannot punch row region \\
-        64-byte align \(\ge\)2\,KiB & Double rows without page waste \\
-        Page-align only @ 2\,MiB & 64\,KiB page-align wastes KiB rows \\
-        Exact remainders & Packed stride between rows \\
-        \bottomrule
-    \end{tabular}
-    }
+    \vspace{0.45em}
+    \textbf{List failure}
+    \begin{itemize}
+        \item Millions of tiny nodes + cache off \(\Rightarrow\)
+              lock + bin walk on every \texttt{new}/\texttt{delete}
+        \item 16\,MiB small arena fills and spills into the large region
+        \item Deferred coalesce becomes the common path
+    \end{itemize}
 
     \vspace{0.4em}
-    \textbf{Lists break:} millions of tiny nodes + cache off \(\Rightarrow\)
-    locked best-fit every time; 16\,MiB small arena spills.
-
-    \vspace{0.3em}
-    {\footnotesize Pattern-optimized (profiled \(n{=}360\)), not a hardcoded size.
-    Our v8's cache path is the opposite bet.}
+    {\footnotesize Our v8's cache path is the opposite bet --- better for
+    tiny objects, not a packing win.}
 \end{frame}

@@ -1,2 +1,170 @@
 \section{Responses to README Questions}
 \label{sec:readme-questions}
+
+The UsingMatrixClass README ends with seventeen questions.
+They are grouped below into four themes: profiling and measurement, allocator
+design and workload fit, hardware and operating system effects, and software
+engineering practice.
+Each question is quoted in italics before its response.
+
+\subsection{Profiling and Measurement}
+\label{sec:rq-measurement}
+
+\subsubsection{Profiling Scale}
+\emph{What do you notice as the profiling scale increases in each test case?}
+The performance gap between the custom allocator and regular \texttt{new}
+stayed roughly constant as scale increased.
+Peak memory barely changed between the short, medium, and long tests.
+This suggests the scale parameter repeats the same working set rather than
+enlarging it, which means the pool's memory overhead stayed fixed.
+Minor page faults grew almost exactly in proportion to elapsed time.
+Overall, the choice of test case mattered more than the scale.
+
+\subsubsection{Fixed Random Seed}
+\emph{Why is a fixed random seed important for a fair comparison?}
+It is important that all versions face the same seed to ensure fairness when
+comparing performance.
+This ensures that no one version is doing any more or less work than the
+others.
+A fixed seed also makes results reproducible.
+
+\subsubsection{Execution Order}
+\emph{How could execution order affect measured results?}
+Execution order matters because each test inherits the machine state left by
+whatever ran before it.
+That state includes the operating system's page cache, which already holds the
+executable and shared libraries after the first test has loaded them, as well
+as the CPU's frequency and thermal state.
+A test running second is therefore measured under different conditions than
+the same test running first: whichever test runs first pays that cost and
+whichever runs second gets it for free.
+
+\subsubsection{Repeated Runs and Median Times}
+\emph{Why should several runs and median times be used for profiling?}
+Several runs and median times should be used for profiling to avoid the data
+being skewed by outliers.
+This prevents an anomaly that slowed down one run from affecting the profiling
+data too much.
+
+\subsubsection{Measurements Beyond Elapsed Time}
+\emph{Which measurements should be collected in addition to elapsed time?}
+Because the results are collected across multiple teams, the environment must
+be recorded alongside the timing.
+This includes CPU model, core count, operating system version, and compiler
+version.
+Additionally, each run records CPU utilization and peak memory usage.
+Each run also records minor page faults, which showed that regular
+\texttt{new} incurred many times more of them than the overloaded version.
+
+\subsection{Allocator Design and Workload Fit}
+\label{sec:rq-policy}
+
+\subsubsection{Known Access Patterns and Heuristics}
+\emph{When could a known access pattern make an allocator heuristic
+effective?}
+A heuristic is effective when the workload matches the assumption it encodes.
+Knowing the pattern in advance lets you pick the heuristic that skips exactly
+the work your workload would never need.
+
+\subsubsection{System Allocator on Small Nodes}
+\emph{Why might the system allocator outperform a custom allocator for small
+nodes?}
+Our linked-list test was the worst case for the custom allocator.
+It was slower than regular \texttt{new} at every scale and had 2.55 times the
+peak memory.
+Our matrix-based tests differed by only 3--28\,\% in memory.
+The cause is that per-allocation overhead is a fixed cost regardless of object
+size, so it dominates when the objects are small.
+
+\subsubsection{Fragmentation}
+\emph{How does fragmentation affect allocation search time and memory use?}
+Fragmentation means free memory exists but is split into pieces too small to
+satisfy a request.
+This means an allocation can fail even when total free space is
+sufficient~\cite{wilson1995}.
+Search time grows because there are more free-list entries to examine.
+
+\subsubsection{Canaries and Allocation Metadata}
+\emph{How do canaries and allocation metadata affect speed and memory use?}
+In v7, \texttt{allocation\_overhead} is 64 bytes per allocation: a 48-byte
+header, an 8-byte owner pointer, and two 4-byte canaries.
+For the 72-byte linked-list node, header, alignment padding, and canaries bring
+the block to 144 bytes, which the slab refill then rounds up to 192 bytes.
+Every allocation writes two canaries and an owner pointer.
+Every deallocation reads and compares both canaries before freeing.
+This operation is cheap but can be significant when working with a small node.
+
+\subsubsection{Cache Limits and Size Classes}
+\emph{How should cache limits and size classes be selected for a workload?}
+They should be chosen by measuring the workload's actual request sizes rather
+than fixed in advance.
+Cache limits should be sized to each thread's working set per class and capped
+by a total byte budget multiplied across all threads.
+
+\subsubsection{Workload-Specific Optimization}
+\emph{When could an allocator optimized for one workload harm another
+workload?}
+Optimizations usually assume some specific scenario, so if that condition is
+not met, the optimization can cause unnecessary overhead in another workload
+compared to the ideal workload.
+
+\subsection{Hardware and Operating System Effects}
+\label{sec:rq-hardware}
+
+\subsubsection{Matrix Calculation Time}
+\emph{Why can matrix calculation time hide allocation improvements?}
+Since the allocator versions do not change the matrix arithmetic, we look at
+Amdahl's law~\cite{amdahl1967}.
+It states that an improvement to allocation is capped by allocation's share of
+total runtime.
+Matrix multiplication has $O(n^3)$ arithmetic over $O(n^2)$ memory.
+This means that as the matrix grows, the allocation share shrinks toward zero.
+
+\subsubsection{Cache-Line Padding and False Sharing}
+\emph{Several threads update adjacent objects. How could padding each object
+to a cache-line boundary waste space yet improve performance by reducing false
+sharing and cache coherence traffic?}
+Cache coherence works on whole cache lines~\cite{hennessy2019}.
+So, when two threads write to objects that share a line, each write
+invalidates the other thread's copy and the line bounces between them.
+Padding each object to a cache-line boundary wastes space, but it eliminates
+that false sharing by trading cheap memory for expensive coherence traffic that
+gets worse as thread count rises.
+
+\subsection{Software Engineering Practice}
+\label{sec:rq-engineering}
+
+\subsubsection{Namespaces and Multiple Allocators}
+\emph{How could namespaces support multiple allocators based on scope and
+purpose?}
+Namespaces let each subsystem use an allocator suited to its purpose.
+Scoping allocators this way also isolates each subsystem's statistics and
+failures, and a single namespace can swap a module's allocator without
+changing its code.
+
+\subsubsection{Custom Allocator Tradeoffs}
+\emph{What tradeoffs come with creating and maintaining a custom allocator?}
+A custom allocator can help maximize the efficiency of the program by reducing
+the number of system calls and potentially memory fragmentation.
+However, if the task is trivial, then the overhead from creating and
+maintaining the custom allocator could slow down the entire process.
+Overhead includes both runtime overhead and the overhead of writing, testing,
+and maintaining the custom allocator.
+The additional code can be complex and hard to read, which makes maintenance
+harder than using system calls.
+
+\subsubsection{Design, Portability, and Reusability}
+\emph{Why do good design, separation of concerns, portability, and reusability
+matter when code is shared across projects?}
+Shared code must be readable and maintainable by people who did not write it.
+This allows anyone to understand what a change will affect.
+Portability was a constraint in this project because the various environments
+handled the source code differently.
+
+\subsubsection{Single Source of Truth}
+\emph{Explain the importance of single source of truth in source code
+management.}
+A single source of truth means each piece of information is defined in exactly
+one authoritative place.
+This removes any ambiguity about which version is current when several people
+edit the same file.

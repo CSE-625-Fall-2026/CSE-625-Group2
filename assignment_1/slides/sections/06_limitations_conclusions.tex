@@ -25,24 +25,22 @@
         \item \textbf{WSL:} CMA slightly worse; v6+regular is best
         \item \textbf{Linux:} CMA \textbf{rescues} v4 (\(348{\rightarrow}247\));
               v6 \(\pm\) CMA not significantly different
-        \item Scaling \(n{=}400\)--\(1800\): \(\approx\)cubic;
-              v4+CMA still \(8.5\%\)--\(38\%\) slower than v6+regular in range
         \item Lesson: environment changes whether CMA helps threads
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Takeaways}
+\begin{frame}{Takeaways (from the latest report)}
     \begin{enumerate}
-        \item CMA vs regular is \textbf{workload-dependent}
-        \item On our matrix campaign: \textbf{v1/v2 \(>\) regular \(>\) v5/v7}
-        \item \textbf{v8} \(\approx\!-5\%\) vs regular by packing rows ---
-              not a general-purpose malloc
-        \item Linked lists need the opposite policy (tiny-object cache)
-        \item Pthreads: on Linux, CMA can make simpler code competitive;
-              WSL tells a different story
+        \item No CMA version was faster everywhere --- \textbf{workload decided}
+        \item Newer \(\neq\) better: on our matrix campaign,
+              \textbf{v1/v2 \(>\) regular \(>\) v5/v7}
+        \item CMA trades memory for fewer page faults / less kernel time
+        \item \textbf{v8} wins its matrix target (\(\approx\!-5\%\) on E1) and
+              fails on lists --- pattern-tuned, not general-purpose
+        \item Environment matters (machines, WSL vs Linux, args)
     \end{enumerate}
 
-    \vspace{0.6em}
+    \vspace{0.5em}
     \centering
     {\Large Questions?}
 \end{frame}

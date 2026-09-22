@@ -1,28 +1,31 @@
 \section{5 --- v8 results}
 
 \begin{frame}{v8 matrix results (vs regular \texttt{new})}
-    ANOVA on our matrix runs; negative = faster than regular.
+    {\footnotesize Negative \% = overloaded faster. Two environments;
+    different args --- do not treat as a pure machine effect.}
 
-    \vspace{0.6em}
-    \begin{center}
-    {\small
-    \begin{tabular}{@{}lrrr@{}}
+    \vspace{0.35em}
+    {\scriptsize
+    \renewcommand{\arraystretch}{1.25}
+    \begin{tabular}{@{}llrrr@{}}
         \toprule
-        Scale & Mean \% change & Improved & Significant \\
+        Env & Scale & Mean \% change & Improved & Significant \\
         \midrule
-        Short  & \(\mathbf{-4.52\%}\) & Yes & Yes (\(p{\ll}0.05\)) \\
-        Medium & \(\mathbf{-4.97\%}\) & Yes & Yes \\
-        Long   & \(\mathbf{-5.11\%}\) & Yes & Yes \\
+        E1 (M3 Max, \(n{=}360\)) & Short  & \(\mathbf{-4.52\%}\) & Yes & Yes \\
+        E1 & Medium & \(\mathbf{-4.97\%}\) & Yes & Yes \\
+        E1 & Long   & \(\mathbf{-5.11\%}\) & Yes & Yes \\
+        \midrule
+        E2 (Jacob, other args) & Short  & \(+37.7\%\) & No & --- \\
+        E2 & Medium & \(+19.7\%\) & No & --- \\
+        E2 & Long   & \(-6.4\%\) & Yes & --- \\
         \bottomrule
     \end{tabular}
     }
-    \end{center}
 
-    \vspace{0.7em}
+    \vspace{0.45em}
     \begin{itemize}
-        \item Significant speedups at all three scales
-        \item Contrast: v7 on the same ANOVA family often \textbf{slower}
-              (\(+5\%\) to \(+11\%\) on matrix)
-        \item Specialization worked for the design target
+        \item \textbf{E1:} significant win at all scales --- design target hit
+        \item \textbf{E2:} mixed / often worse --- environment + params matter
+        \item Same ANOVA family: v7 often slower on matrix (\(+5\%\) to \(+11\%\))
     \end{itemize}
 \end{frame}

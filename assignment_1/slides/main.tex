@@ -50,12 +50,12 @@
 \begin{frame}[plain]\titlepage\end{frame}
 \begin{frame}{Research questions}
 \begin{enumerate}
-\item How can a limited workload suite expose general allocator tradeoffs?
-\item What happens when allocation policy meets pthreads and matrix arithmetic?
-\item Which performance claims survive statistical testing?
-\item How far do the results transfer across environments?
+\item How did each version track free memory, handle memory blocks, align allocations, and account for metadata?
+\item What advantages and costs did those choices carry for fragmentation, allocation search cost, and lock contention?
+\item What costs did specializing a version for matrix arithmetic create for other allocation patterns?
+\item Could a simpler multi-threaded implementation be made competitive by pairing it with the custom allocator?
 \end{enumerate}
-\takeaway{The evidence supports workload-specific gains, with important failures and limits.}
+% \takeaway{The evidence supports workload-specific gains, with important failures and limits.}
 \source{Report Sections I, III, XII and XIV. Updated v8 analyses, September 22.}
 \end{frame}
 

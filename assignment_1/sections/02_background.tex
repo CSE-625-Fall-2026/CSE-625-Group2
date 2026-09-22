@@ -1,2 +1,19 @@
 \section{Background}
 \label{sec:background}
+
+In the C++ language, a program that calls \texttt{new} first asks an allocator for a block of free memory.
+The allocator then finds a free block large enough, records that the block is in
+use, and returns a pointer to it.
+\texttt{delete} will then return the block back so it can be used again.
+The base allocator supplied with the operating system serves every program on the
+machine, so it is built for the average case rather than for any one memory access
+pattern.
+Performance costs related to memory allocation can come from searching for a block that fits, from locking shared
+structures so that threads do not corrupt them, from the gaps left between
+blocks as memory is reused, and from the work the operating system does to
+supply memory as a program grows.
+Searching longer for a tighter fit wastes less space but takes more time, and
+holding more free memory in reserve avoids requests to the operating system at
+the cost of a larger footprint.
+When the memory access pattern of a program is known, opting for a custom memory allocator
+can improve performance by tuning the structure and algorithm of allocation to fit it. 

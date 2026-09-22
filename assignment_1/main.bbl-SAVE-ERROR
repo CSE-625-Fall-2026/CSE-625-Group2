@@ -16,5 +16,114 @@
   {}
 \endgroup
 
+
+\refsection{0}
+  \datalist[entry]{none/global//global/global}
+    \entry{wilson1995}{inproceedings}{}
+      \name{author}{4}{}{%
+        {{hash=8006b260919124cee9a33dac6cc481e5}{%
+           family={Wilson},
+           familyi={W\bibinitperiod},
+           given={Paul\bibnamedelima R.},
+           giveni={P\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+        {{hash=893afb452a595b18a4283b884125c25d}{%
+           family={Johnstone},
+           familyi={J\bibinitperiod},
+           given={Mark\bibnamedelima S.},
+           giveni={M\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+        {{hash=dd42665840236818af1fe8705358fccb}{%
+           family={Neely},
+           familyi={N\bibinitperiod},
+           given={Michael},
+           giveni={M\bibinitperiod}}}%
+        {{hash=9b3fd205689491453c137dafa1f2e0f5}{%
+           family={Boles},
+           familyi={B\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{9df85a2eb49d4319c621c847a73bcb0e}
+      \strng{fullhash}{2102634ee9435179ead0665050f9a388}
+      \strng{bibnamehash}{2102634ee9435179ead0665050f9a388}
+      \strng{authorbibnamehash}{2102634ee9435179ead0665050f9a388}
+      \strng{authornamehash}{9df85a2eb49d4319c621c847a73bcb0e}
+      \strng{authorfullhash}{2102634ee9435179ead0665050f9a388}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the International Workshop on Memory Management (IWMM)}
+      \field{series}{Lecture Notes in Computer Science}
+      \field{title}{Dynamic Storage Allocation: A Survey and Critical Review}
+      \field{volume}{986}
+      \field{year}{1995}
+      \field{pages}{1\bibrangedash 116}
+      \range{pages}{116}
+      \verb{doi}
+      \verb 10.1007/3-540-60368-9_19
+      \endverb
+    \endentry
+    \entry{amdahl1967}{inproceedings}{}
+      \name{author}{1}{}{%
+        {{hash=9d4382f1500ff84c4eca531179c994c7}{%
+           family={Amdahl},
+           familyi={A\bibinitperiod},
+           given={Gene\bibnamedelima M.},
+           giveni={G\bibinitperiod\bibinitdelim M\bibinitperiod}}}%
+      }
+      \strng{namehash}{9d4382f1500ff84c4eca531179c994c7}
+      \strng{fullhash}{9d4382f1500ff84c4eca531179c994c7}
+      \strng{bibnamehash}{9d4382f1500ff84c4eca531179c994c7}
+      \strng{authorbibnamehash}{9d4382f1500ff84c4eca531179c994c7}
+      \strng{authornamehash}{9d4382f1500ff84c4eca531179c994c7}
+      \strng{authorfullhash}{9d4382f1500ff84c4eca531179c994c7}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the AFIPS Spring Joint Computer Conference}
+      \field{title}{Validity of the Single Processor Approach to Achieving Large Scale Computing Capabilities}
+      \field{year}{1967}
+      \field{pages}{483\bibrangedash 485}
+      \range{pages}{3}
+      \verb{doi}
+      \verb 10.1145/1465482.1465560
+      \endverb
+    \endentry
+    \entry{hennessy2019}{book}{}
+      \name{author}{2}{}{%
+        {{hash=4a72d9e0de431dadafab463df2ea7b0f}{%
+           family={Hennessy},
+           familyi={H\bibinitperiod},
+           given={John\bibnamedelima L.},
+           giveni={J\bibinitperiod\bibinitdelim L\bibinitperiod}}}%
+        {{hash=95486d328725c1c6a933929c9442fe2a}{%
+           family={Patterson},
+           familyi={P\bibinitperiod},
+           given={David\bibnamedelima A.},
+           giveni={D\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Morgan Kaufmann}%
+      }
+      \strng{namehash}{f7c6979c0d2d2afa03b2d508432d429d}
+      \strng{fullhash}{f7c6979c0d2d2afa03b2d508432d429d}
+      \strng{bibnamehash}{f7c6979c0d2d2afa03b2d508432d429d}
+      \strng{authorbibnamehash}{f7c6979c0d2d2afa03b2d508432d429d}
+      \strng{authornamehash}{f7c6979c0d2d2afa03b2d508432d429d}
+      \strng{authorfullhash}{f7c6979c0d2d2afa03b2d508432d429d}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{6}
+      \field{title}{Computer Architecture: A Quantitative Approach}
+      \field{year}{2019}
+    \endentry
+  \enddatalist
+\endrefsection
 \endinput
 

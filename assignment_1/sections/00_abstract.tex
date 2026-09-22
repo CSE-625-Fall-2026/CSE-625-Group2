@@ -1,13 +1,15 @@
 \begin{abstract}
 Custom memory allocators can improve performance through control over memory
-layout and access patterns, but the benefit is largely dependent on the use
+layout and aiding access patterns, but the benefit is largely dependent on the use
 case. This paper profiles eight versions of a custom memory allocator against
-regular global new across four workload pairs: matrix array, uniform matrix
-nodes, nested matrix stress, and linked list. The versions progress by
+regular global new across four workload pairs. The pairs are matrix array,
+uniform matrix nodes, nested matrix stress, and linked list. The versions progress by
 addressing fragmentation, coalescing of free memory blocks, allocation search
-cost, and lock contention. Progression culminates with a proposed design specialized for optimizing memory access patterns for matrix arithmetic operations.
+cost, and lock contention. Progression culminates with a proposed design
+specialized for optimizing memory access patterns for matrix arithmetic operations.
 Each pair was ran at three time scales on several machines and
-operating systems, and a threaded matrix workload was examined as well. Elapsed time, peak memory, page faults, and context switches were
+operating systems, and a threaded matrix workload was examined as well. 
+Elapsed time, peak memory, page faults, and context switches were
 recorded across repeated runs using matching arguments, seeds, and build
 settings. 
 \end{abstract}

@@ -1,2 +1,36 @@
 \section{Introduction and Research Questions}
 \label{sec:introduction}
+
+Regular global \texttt{new} was compared with eight versions of a custom
+allocator.
+The custom allocator requested one large region of memory from the operating
+system and then handed out pieces from that region.
+Each workload was built twice from the same source, with one
+one using the built-in \texttt{new} and \texttt{delete}, and 
+the other redirecting every allocation in the program into the custom memory pool.
+
+The four workload pairs profiled were matrix array, uniform matrix nodes,
+nested matrix stress, and linked list.
+Each pair was run at three lengths, from a few minutes to more than six hours.
+Runs were made on several machines and operating systems using matching
+arguments, seeds, and build settings, with the results kept separate.
+Elapsed time was recorded for every run.
+Peak memory, page faults, and context switches were recorded where the
+profiling tools reported them.
+No single workload or machine was treated as evidence that one allocator is
+always faster than another.
+
+The investigation and analysis of this project addressed four main questions:
+
+\begin{itemize}
+  \item How did each version track free memory, select a free block, split and reuse
+    blocks, recombine neighboring blocks, align allocations, and account for
+    metadata?
+  \item What advantages and costs did those choices carry for fragmentation,
+    allocation search cost, and lock contention?
+  \item What did specializing a version for matrix arithmetic trade away on
+    other allocation patterns?
+  \item Could a simpler multi-threaded implementation be made competitive by
+    pairing it with the custom allocator?
+\end{itemize}
+

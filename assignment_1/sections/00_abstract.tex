@@ -1,4 +1,5 @@
-\begin{abstract}
+\section*{Abstract}
+
 Custom memory allocators can improve performance through control over memory
 layout and aiding access patterns, but the benefit is largely dependent on the use
 case. This paper profiles eight versions of a custom memory allocator against
@@ -8,8 +9,7 @@ addressing fragmentation, coalescing of free memory blocks, allocation search
 cost, and lock contention. Progression culminates with a proposed design
 specialized for optimizing memory access patterns for matrix arithmetic operations.
 Each pair was ran at three time scales on several machines and
-operating systems, and a threaded matrix workload was examined as well. 
+operating systems, and a threaded matrix workload was examined as well.
 Elapsed time, peak memory, page faults, and context switches were
 recorded across repeated runs using matching arguments, seeds, and build
-settings. 
-\end{abstract}
+settings.

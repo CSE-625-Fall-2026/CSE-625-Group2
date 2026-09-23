@@ -37,12 +37,12 @@ $$
 $$
 which would correspond to CMA requiring approximately 3.13 times the runtime, or about 213\% greater runtime, in the asymptotic limit of that fitted model. These extrapolations disagree substantially and are both based on a limited finite range. Furthermore, the size-dependent variability observed for pthreads v4 -- CMA v7 suggests that its runtime may be influenced by discrete or piecewise hardware effects involving memory allocation, cache behavior, paging, alignment, or related mechanisms. Consequently, the measured runtime ratios provide a more reliable characterization of performance within the tested range than either model provides for long-range extrapolation.
 
-\begin{table}[!t]
+\begin{table*}[!t]
 \centering
 \caption{Windows WSL Experiments -- Summary statistics by method.}
 \label{tab:pthreads-wsl-summary}
 \footnotesize
-\resizebox{\columnwidth}{!}{%
+\resizebox{0.8\textwidth}{!}{%
 \begin{tabular}{lrrrr}
 \toprule
 Method & Mean & Std.\ Dev. & Min & Max \\
@@ -54,14 +54,14 @@ pthreads v4.0.0 - CMA v7.0.0 & 397.664 & 6.023 & 388.333 & 402.081 \\
 \bottomrule
 \end{tabular}%
 }
-\end{table}
+\end{table*}
 
-\begin{table}[!t]
+\begin{table*}[!t]
 \centering
 \caption{Windows WSL Experiments -- Shapiro--Wilk, Levene, and one-way ANOVA results.}
 \label{tab:pthreads-wsl-tests}
 \footnotesize
-\resizebox{\columnwidth}{!}{%
+\resizebox{0.8\textwidth}{!}{%
 \begin{tabular}{lrrl}
 \toprule
 Test & Test Statistic & $p$-value & Result \\
@@ -72,14 +72,14 @@ One-way ANOVA & $F = 1249.0073$ & $3.560\times10^{-19}$ & Significant difference
 \bottomrule
 \end{tabular}%
 }
-\end{table}
+\end{table*}
 
-\begin{table}[!t]
+\begin{table*}[!t]
 \centering
 \caption{Windows WSL Experiments -- Tukey HSD pairwise comparisons ($\alpha = 0.05$).}
 \label{tab:pthreads-wsl-tukey}
 \footnotesize
-\resizebox{\columnwidth}{!}{%
+\resizebox{0.8\textwidth}{!}{%
 \begin{tabular}{llrl}
 \toprule
 Method A & Method B & $p$ & Significant \\
@@ -93,14 +93,14 @@ pthreads v6.0.0 - regular new & pthreads v6.0.0 - CMA v7.0.0 & 0.0135 & Yes \\
 \bottomrule
 \end{tabular}%
 }
-\end{table}
+\end{table*}
 
-\begin{table}[!t]
+\begin{table*}[!t]
 \centering
 \caption{Windows WSL Experiments -- Final ranking of methods.}
 \label{tab:pthreads-wsl-ranking}
 \footnotesize
-\resizebox{\columnwidth}{!}{%
+\resizebox{0.8\textwidth}{!}{%
 \begin{tabular}{clrl}
 \toprule
 Rank & Method & Mean Time (s) & Significance Group \\
@@ -112,14 +112,14 @@ Rank & Method & Mean Time (s) & Significance Group \\
 \bottomrule
 \end{tabular}%
 }
-\end{table}
+\end{table*}
 
-\begin{table}[!t]
+\begin{table*}[!t]
 \centering
 \caption{Linux Experiments -- Summary statistics by method.}
 \label{tab:pthreads-linux-summary}
 \footnotesize
-\resizebox{\columnwidth}{!}{%
+\resizebox{0.8\textwidth}{!}{%
 \begin{tabular}{lrrrr}
 \toprule
 Method & Mean & Std.\ Dev. & Min & Max \\
@@ -131,14 +131,14 @@ pthreads v4.0.0 - regular new & 348.573 & 2.909 & 343.810 & 351.048 \\
 \bottomrule
 \end{tabular}%
 }
-\end{table}
+\end{table*}
 
-\begin{table}[!t]
+\begin{table*}[!t]
 \centering
 \caption{Linux Experiments -- Shapiro--Wilk, Levene, and one-way ANOVA results.}
 \label{tab:pthreads-linux-tests}
 \footnotesize
-\resizebox{\columnwidth}{!}{%
+\resizebox{0.8\textwidth}{!}{%
 \begin{tabular}{lrrl}
 \toprule
 Test & Test Statistic & $p$-value & Result \\
@@ -149,14 +149,14 @@ One-way ANOVA & $F = 4023.3356$ & $3.148\times10^{-23}$ & Significant difference
 \bottomrule
 \end{tabular}%
 }
-\end{table}
+\end{table*}
 
-\begin{table}[!t]
+\begin{table*}[!t]
 \centering
 \caption{Linux Experiments -- Tukey HSD pairwise comparisons ($\alpha = 0.05$).}
 \label{tab:pthreads-linux-tukey}
 \footnotesize
-\resizebox{\columnwidth}{!}{%
+\resizebox{0.8\textwidth}{!}{%
 \begin{tabular}{llrl}
 \toprule
 Method A & Method B & $p$ & Significant \\
@@ -170,14 +170,14 @@ pthreads v6.0.0 - regular new & pthreads v6.0.0 - CMA v7.0.0 & 0.4965 & No \\
 \bottomrule
 \end{tabular}%
 }
-\end{table}
+\end{table*}
 
-\begin{table}[!t]
+\begin{table*}[!t]
 \centering
 \caption{Linux Experiments -- Final ranking of methods.}
 \label{tab:pthreads-linux-ranking}
 \footnotesize
-\resizebox{\columnwidth}{!}{%
+\resizebox{0.8\textwidth}{!}{%
 \begin{tabular}{clrl}
 \toprule
 Rank & Method & Mean Time (s) & Significance Group \\
@@ -189,14 +189,14 @@ Rank & Method & Mean Time (s) & Significance Group \\
 \bottomrule
 \end{tabular}%
 }
-\end{table}
+\end{table*}
 
-\begin{table}[!t]
+\begin{table*}[!t]
 \centering
 \caption{Linux vs Windows Significance Experiments -- Tukey HSD pairwise comparisons ($\alpha = 0.05$).}
 \label{tab:pthreads-linuxwindows-tukey}
 \footnotesize
-\resizebox{\columnwidth}{!}{%
+\resizebox{0.8\textwidth}{!}{%
 \begin{tabular}{llrl}
 \toprule
 Method & $p$ & Significant \\
@@ -208,21 +208,21 @@ pthreads v6.0.0 - CMA v7.0.0 & $<0.0001$ & Yes \\
 \bottomrule
 \end{tabular}%
 }
-\end{table}
+\end{table*}
 
-\begin{figure}[!t]
+\begin{figure*}[!t]
 \centering
-\includegraphics[width=\columnwidth]{pthreads_figure.png}
+\includegraphics[width=0.8\textwidth]{pthreads_figure.png}
 \caption{Runtime complexity comparison of pthreads v4 -- CMA v7 with pthreads v6 -- regular \texttt{new} on Linux.}
 \label{fig:pthreads-comparison}
-\end{figure}
+\end{figure*}
 
-\begin{table}[!t]
+\begin{table*}[!t]
 \centering
 \caption{Empirical runtime model fits.}
 \label{tab:pthreads-runtime-fits}
 \footnotesize
-\resizebox{\columnwidth}{!}{%
+\resizebox{0.9\textwidth}{!}{%
 \begin{tabular}{llll}
 \toprule
 Method & Fit Type & Fitted Model & $R^2$ \\
@@ -234,4 +234,6 @@ pthreads v6 -- regular new & Polynomial & {\small $4.232\times10^{-7}n^3 - 1.311
 \bottomrule
 \end{tabular}%
 }
-\end{table}
+\end{table*}
+
+\FloatBarrier

@@ -30,11 +30,12 @@ To publish a submission, tag the commit and push the tag. The same two PDFs
 are then attached to a GitHub Release as `<tag>-report.pdf` and
 `<tag>-slides.pdf`:
 
-### Example: 
+### Example:
 ```
 git tag v1.0.0
 git push origin v1.0.0
 ```
+
 
 ## Results:
 ### Table Inventory
@@ -126,7 +127,6 @@ git push origin v1.0.0
 | v1.0.0\|Memory Stress\|1 | Memory Stress (environment 1): insufficient paired runtime data. |
 | v1.0.0\|Linked List\|1 | Linked List (environment 1): insufficient paired runtime data. |
 | v1.0.0\|Matrix\|2 | Matrix (environment 2): overloaded runtime changed 22.58%; did not improve. Regular vs overloaded repeated-measures ANOVA: significant (p=0.01417). |
-
 
 ## Responses to README Questions
 

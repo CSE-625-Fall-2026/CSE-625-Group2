@@ -112,19 +112,19 @@
 \IEEEauthorblockN{Mohamed Konsowa}
 }
 
+\onecolumn
 \maketitle
 
 \input{sections/00_abstract}
+\clearpage
 \input{sections/01_introduction}
 \input{sections/02_background}
 \input{sections/03_allocator_versions}
-\input{sections/04_methodology}ks
+\input{sections/04_methodology}
 \input{sections/05_environments}
 \input{sections/06_workloads}
 \input{sections/07_statistical_results}
 \input{sections/08_charts_comparisons}
-\clearpage
-\twocolumn
 \input{sections/09_hardware_os_discussion}
 \input{sections/10_improved_design}
 \input{sections/11_improved_results}
@@ -138,12 +138,11 @@
 
 % --- Appendices ---
 \clearpage
-\onecolumn
 \input{sections/17_appendices}
 
 % --- References ---
 \clearpage
-\twocolumn
+\nocite{gfgKernelBuddySlab2026,tutorialspointSlabAllocation,rakosCustomAllocators2021,salykovMatmul2025,gfgBestFit2025,gloginicCacheTypes2022,stanfordMemAllocation2025,jhuLecture13Spring2024}
 \printbibliography
 
 \end{document}

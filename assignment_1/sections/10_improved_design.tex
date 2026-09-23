@@ -1,2 +1,219 @@
 \section{Improved Allocator Design}
 \label{sec:improved-design}
+
+\subsection{Design Goal}
+
+The goal of v8.0.0 was not to completely replace the allocator policy introduced by v7.0.0, but to improve
+the part of that design that too clumsy. In v7.0.0, the allocator already had segregated bins, thread-local
+small-block caches, batch refill, deferred coalescing, and bounded retained cache memory. However, the problem
+was that cache growth was still driven mainly by refill behavior. That policy could react to demand,
+but it did so through an indirect signal.
+
+The design goal in v8.0.0 was therefore to keep the same general architecture while changing how
+the allocator decides which small-size classes deserve more cached capacity. Instead of treating repeated
+refill events as the main indicator of importance, v8.0.0 measures live demand directly for exact reusable
+slab sizes and uses that information to retune cache targets. This makes the allocator more workload-aware
+without giving up the drop-in \texttt{new}/\texttt{delete} interface as they are part of the project's
+deliverables. That direction is consistent with the broader motivation for custom allocators: once the
+allocation pattern of a program is better understood, the allocator can be adapted to that pattern rather
+than paying the full generality cost of a one-size-fits-all design~\cite{rakosCustomAllocators2021}.
+
+\subsection{Baseline: What v7.0.0 Already Provided}
+
+Version~7.0.0 inherited most of the important structural changes introduced between v3.0.0 and v6.0.0. Free
+blocks were already grouped into segregated bins, which reduced the need to scan the entire heap for every
+request. Small allocations could often be served from a thread-local cache, which reduced repeated global
+locking on hot size classes. When those caches missed, the allocator could refill them in batches, gradually
+decreasing the cost of central-pool access across several future allocations.
+
+Version~7.0.0 no longer merged adjacent free blocks on every deallocation. Instead, it retained
+the deferred-coalescing strategy from v5.0.0 and v6.0.0, so adjacent blocks were merged only when an allocation
+request could not be satisfied directly. That design trades some fragmentation risk for lower steady-state
+deallocation cost, a tradeoff that is common in dynamic allocation systems~\cite{wilson1995}. V7.0.0 also
+limited retained cache bytes per thread, so cache growth was bounded even when a workload exercised the same
+classes heavily.
+
+These features matter because they define what V8.0.0 did \textit{not} need to change. The allocator already
+had a practical free-structure layout, a central best-fit style search within bins, a cache for small hot
+objects, and correctness machinery such as canaries and ownership checks. The main issue was not missing
+functionality, but that one piece of policy, cache sizing, was still too blunt.
+
+\subsection{Weakness in v7.0.0}
+
+The weakness in v7.0.0 was that cache growth was based mostly on refill frequency. If a particular bin missed
+repeatedly, the allocator interpreted that pattern as evidence that the class should keep more cached blocks.
+That idea is sensible at a high level, but refill count is not the same thing as measured working-set demand.
+A class can refill frequently because of a short burst, irregular reuse, or because the cached
+capacity is briefly too small even though the long-term live set is modest.
+
+This distinction matters because refill count is only an indirect signal. It tells the allocator that pressure
+occurred, but not how many blocks were actually needed live at once. In practice, that means a hot phase can
+leave a class overgrown after the workload shifts, while another class may deserve cached capacity for reasons
+that are not well captured by miss events alone. The result overly reactive policy that might not be reacting
+for the right reasons. V8.0.0 addresses exactly this problem by replacing refill-driven growth with measured
+occupancy-driven retuning.
+
+\subsection{High-Level V8.0.0 Strategy}
+
+At a high level, V8.0.0 keeps the cache policy of V7.0.0. The allocator still uses segregated small and large
+bins, still serves exact small slabs from a thread-local cache when possible, and still falls back to the
+central pool on cache misses. But V8.0.0 adds explicit accounting for live exact-slab allocations and uses
+that accounting to retune cache targets per size class.
+
+The implementation also makes the allocator more observable. V8.0.0 introduces a metrics surface that records
+cache hits, misses, searches, refills, flushes, tuning events, and mutex acquisitions. This does not directly
+make the allocator faster, but it makes the allocator easier to analyze. That is a real design improvement in
+the context of this assignment because elapsed time alone cannot explain why one workload improved while
+another regressed.
+
+\subsection{New Data Structures and Metrics}
+
+The most visible interface addition in V8.0.0 is the \texttt{AllocatorMetrics} structure. It exposes counters
+for thread-cache hits and misses, central-pool searches, searched free-list nodes, cache refills, cache
+flushes, target-driven and byte-limit-driven flush events, coalescing on allocation failure, central mutex
+acquisitions, and cache-policy tuning activity. Essentially turning the allocator into something that can
+be measured rather than only timed.
+
+The key internal addition is \texttt{CacheAccounting}. Each accounting record stores live-block counts for all
+small-bin classes. When a thread cache is registered, it receives one of these accounting records and uses it
+to track how many blocks of each exact slab size are live at the same time. Instead of inferring demand from
+miss history, V8.0.0 can observe demand directly. The code also extends \texttt{ThreadCache} with per-bin arrays
+for target sizes, peak live counts, and countdowns until the next tuning event.
+
+Metrics are optionally enabled through a compile-time macro. That decision is important because profiling
+counters are useful for analysis, but they can interfere with timing runs and skew data. The design therefore
+separates observability from baseline execution cost.
+
+\subsection{Exact Slab Classification}
+
+Another important change in V8.0.0 is that the small-object cache is restricted to exact slab classes. The
+helper \texttt{smallSlabSize} computes whether an allocation can be represented as one of these small exact
+slab sizes after metadata, alignment, and quantum rounding are accounted for. If so, the allocator may serve it
+from the thread cache; if not, the request follows the central-pool path.
+
+This is more precise than treating every request below a broad threshold as interchangeable. Exact slab
+classification means the cache is tuned around the actual reusable unit, not just the requested payload size.
+That keeps the policy cleaner and reduces the chance that slightly different requests contaminate the same
+reuse class. It also aligns naturally with the new accounting model, since occupancy is now tracked for the
+slab sizes that the allocator truly reuses.
+
+\subsection{Adaptive Cache Target Tuning}
+
+Adaptive target tuning is the core improvement in V8.0.0. For each exact cached slab class, the allocator
+tracks the current live count and the peak live count seen during a tuning window. After a fixed number of
+allocations in that class, the allocator resets the cache target to a bounded function of observed demand:
+
+\begin{equation}
+\begin{aligned}
+\text{new target} = {}& \operatorname{clamp}(\text{peak live blocks} + \text{cushion},\\
+& \text{minimum},\ \text{maximum}).
+\end{aligned}
+\end{equation}
+
+In the current implementation, the minimum cached target is eight blocks, the cushion is four blocks,
+the retuning interval is 256 allocations in the class, and the maximum cached target is 512 blocks. This
+policy is simple, but it is already more informative than refill-count doubling. A class grows because the
+program actually kept that many blocks live, not only because a short miss burst happened to occur.
+
+This retuning model still uses a heuristic, so it should not be described as optimal. However, it is a more
+direct approximation to working-set size than the V7.0.0 rule. It also fits the broader principle that cache
+effectiveness depends on matching capacity to the reuse pattern of the workload, not just reacting to misses
+after the fact~\cite{hennessy2019}.
+
+\subsection{Allocation and Deallocation Path Changes}
+
+On the allocation path, V8.0.0 still begins by validating size and alignment and by registering the thread
+cache if needed. If the request belongs to an exact small slab class, the allocator attempts a thread-cache
+hit first. A successful hit no longer only returns a block; it also increments the accounting state through
+\texttt{exactAllocationCounter}. If the request misses the thread cache, the allocator records the miss,
+searches the central pool, and refills the thread cache when the request still belongs to an exact reusable
+slab size.
+
+The deallocation path was updated to mirror that model. When a block came from an exact cached slab class,
+deallocation decrements the same live-count structure before the block is returned to the thread cache. This
+is essential. Without deallocation-side accounting, the allocator could see when pressure rises, but not when
+a class cools down. Updating both paths keeps the model synchronized with actual object lifetime.
+
+Outside those changes, the general slow path remains familiar. Free-list insertion and removal still happen
+in the central allocator, and coalescing still occurs only when allocation pressure requires it. That
+continuity is useful because it isolates the effect of the new policy rather than mixing it with a wholesale
+redesign of the free structure.
+
+\subsection{What Stayed the Same}
+
+Several important parts of the allocator did not change in v8.0.0. The allocator is still a singleton memory
+pool behind global \texttt{new}, \texttt{new[]}, \texttt{delete}, and \texttt{delete[]}. It still uses
+segregated small and large bins, retains a thread-local small-object cache, uses a central mutex for
+global free-list work, and preserves canary-based corruption detection and ownership validation.
+
+This continuity matters for interpretation. It means that v8.0.0 should not be described as an entirely new
+allocator, and any measured behavior should not be attributed to a change in the whole allocation architecture.
+Instead, the main change is a policy refinement inside an already established framework. That makes both the
+design argument and the later experimental comparison cleaner.
+
+\subsection{Why These Changes Were Chosen}
+
+These changes were chosen for three practical reasons. First, they improve signal quality. Measured live
+occupancy is closer to the true working set than refill count, so it is a better basis for deciding how much
+cache capacity a class deserves. Second, they improve observability. By recording allocator events directly,
+v8.0.0 makes it possible to explain results with evidence rather than only with conjecture. Third, they
+preserve compatibility. The allocator remains reusable and fetchable by another project, and it still acts
+as a drop-in replacement for the standard allocation interface.
+
+There is also a pragmatic engineering reason for preferring this approach over a full rewrite. A focused
+policy change is easier to validate, easier to compare against V7.0.0, and less likely to introduce unrelated
+regressions. For this assignment, that is a better trade than introducing an entirely different
+memory-management strategy and then trying to separate the effects afterward.
+
+\subsection{Expected Effect on the UsingMatrixClass Workloads}
+
+The expected effect of v8.0.0 depends on the workload. The matrix-array workload repeatedly creates and
+replaces many objects with highly regular sizes. That regularity should give the exact-slab cache policy a
+fair opportunity to discover stable hot classes and keep those classes warm. Uniform matrix nodes add more
+lifetime churn, but still retain a relatively regular size pattern, so they should also benefit when live
+occupancy remains concentrated in a narrow set of bins.
+
+Nested matrix stress is a more mixed case. It uses several matrix sizes and repeatedly rebuilds subtrees, so
+it exercises more classes and more transitions between them. This is a useful workload for testing whether
+adaptive targets actually follow demand rather than simply inflating over time. The linked-list workload is
+the most difficult case because it mixes many tiny nodes with additional dynamic arrays and highly active
+updates. Even if v8.0.0 does not always improve this case, the policy is still motivated, since it should be
+less likely than V7.0.0 to keep cold classes oversized after a burst.
+
+The key point is that v8.0.0 was designed to improve policy quality, not to guarantee universal speedup. A
+workload that benefits from stable exact slab reuse is a natural candidate for improvement. A workload
+dominated by tiny-object metadata costs or central-pool behavior may still expose limitations.
+
+\subsection{Validation and Test Support}
+
+The repository includes tests that support both correctness and the new policy claims. The cache-focused
+tests verify that reused small allocations can be served from the thread cache without forcing unnecessary
+central-pool work. The cache-policy tests verify that the adaptive mechanism actually tunes targets and is
+capable of both increasing and decreasing them over time. General memory-pool tests still cover best-fit reuse,
+coalescing behavior, multithreaded use, and canary detection, while global allocation tests verify that the
+allocator remains a correct replacement for ordinary \texttt{new} and \texttt{delete}.
+
+This matters for the report because it shows that the improved design was not only described conceptually.
+The design was implemented in a way that exposes measurable policy behavior and was tested at both the
+allocator-core level and the integration level.
+
+\subsection{Limitations}
+
+V8.0.0 still has important limitations. The central free structure remains protected by one mutex, so global
+allocator work is still serialized. Large allocations still depend on the same central allocator structure.
+Metadata and canary checks remain present, which is useful for safety but still costs time and space. The
+retuning policy itself is empirical and bounded by a few fixed constants, so it should be treated as a
+practical heuristic rather than a theoretically optimal rule.
+
+These limitations should be stated clearly because they define the scope of the contribution. V8.0.0
+improves cache sizing and allocator observability. It does not eliminate all contention, all fragmentation
+costs, or all workload-specific regressions.
+
+\subsection{Summary}
+
+Version~8.0.0 is best understood as a measured refinement of V7.0.0. It preserves the allocator family that
+earlier versions built, but replaces refill-driven cache growth with occupancy-driven retuning for exact
+reusable small slabs. At the same time, it introduces explicit metrics and accounting so allocator behavior
+can be studied directly. The result is not a brand-new allocator architecture, but a more informed and more
+analyzable one. That makes it a meaningful improvement for this project and a defensible basis for the
+experimental comparisons in the next section.

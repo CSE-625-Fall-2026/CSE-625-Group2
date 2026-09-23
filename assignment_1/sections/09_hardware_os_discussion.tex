@@ -1,2 +1,30 @@
 \section{Hardware and Operating System Discussion}
 \label{sec:hardware-os-discussion}
+
+The tested and referenced hardware used in this project includes the following:
+
+\begin{itemize}
+\item \textbf{Apple M3 Max, 48~GB unified memory, macOS, ARM64:} used for the
+matrix v1--v7 campaign, the v6 four-workload campaign, and one v8 matrix group.
+\item \textbf{MacBook Pro with Apple M2 Pro, 32~GB memory, macOS, ARM64:}
+v8.0.0 development, integration and unit testing, custom metric analysis
+\item \textbf{AMD Ryzen~9~7900X, 32~GB RAM, Ubuntu~24.04 under WSL, x86-64:}
+used for the v7 four-workload suite.
+\item \textbf{Intel i7-1165G7, 16~GB RAM, Ubuntu~24.04.3, x86-64:} used for
+Jacob's v2 measurements and the newer v8 matrix runs.
+\item \textbf{Intel i7-11370H, 16~GB RAM, WSL and Linux Mint, x86-64:} used for
+the pthread comparison runs.
+\item \textbf{Additional team systems:} newer Apple Silicon machines and other
+Intel and Ryzen hosts appeared in the shared team inventory, although not all
+of them contributed balanced measurements across allocator versions and
+workloads.
+\end{itemize}
+
+These hardware differences matter because allocator behavior is tied closely to cache hierarchy, memory bandwidth,
+scheduler behavior, and runtime overheads from the operating system environment. The Apple M3 Max results
+represent an ARM64 macOS platform with high memory bandwidth and unified memory, while the Ryzen and
+Intel hosts represent x86-64 Linux or WSL environments with different cache organizations, thread scheduling
+behavior, and background-system costs. For that reason, environment should be treated as a source of
+experimental variation rather than noise to be ignored. It cannot be assumed that a result that holds on one
+machine will behave identically on every processor and operating system and should instead be interpreted with
+the knowledge that the results may have been influenced by the machine they were run on.

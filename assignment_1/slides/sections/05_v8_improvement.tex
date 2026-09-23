@@ -1,5 +1,68 @@
 \section{5 --- v8 results}
 
+\begin{frame}{Why v8 was needed}
+    \begin{itemize}
+        \item \textbf{v7 already had} segregated bins, thread-local small-block
+              caches, batch refill, deferred coalescing, and bounded cache bytes
+        \item The weak point was the \textbf{growth signal}: a class grew when it
+              refilled often
+        \item Refill count is only an \textbf{indirect} demand signal
+        \item Short bursts can make a class look hot; old hot classes can stay
+              oversized after the workload shifts
+    \end{itemize}
+
+    \vspace{0.5em}
+    \begin{block}{Design goal}
+        Keep v7's fast path, but size each cache class from
+        \textbf{measured live demand} instead of refill pressure alone.
+    \end{block}
+\end{frame}
+
+\begin{frame}{What changed in code from v7 to v8}
+    {\scriptsize
+    \renewcommand{\arraystretch}{1.35}
+    \begin{tabular}{@{}p{0.26\textwidth}p{0.64\textwidth}@{}}
+        \toprule
+        Change & Why it matters \\
+        \midrule
+        \texttt{AllocatorMetrics} & Counts hits, misses, searches, refills,
+        flushes, tuning events, and mutex acquisitions \\
+        \texttt{CacheAccounting} & Tracks live small-slab blocks per size class \\
+        Exact slab policy & Cache fast path only serves exact reusable slab sizes \\
+        \texttt{exactAllocationCounter} & Retunes targets from observed peak live
+        demand \\
+        Deallocation accounting & Shrinks the same live-demand model when objects die \\
+        \bottomrule
+    \end{tabular}
+    }
+
+    \vspace{0.5em}
+    \begin{block}{Core policy}
+        New target = clamp(peak live blocks + cushion, minimum, maximum).
+        In our implementation: min 8, cushion 4, retune every 256 allocations,
+        max 512.
+    \end{block}
+\end{frame}
+
+\begin{frame}{Why we made those changes}
+    \begin{itemize}
+        \item \textbf{Better signal quality:} live occupancy is closer to the
+              real working set than refill count
+        \item \textbf{Better adaptation:} hot classes grow for a reason; cold
+              classes are less likely to stay overgrown
+        \item \textbf{Better evidence:} results can be explained with metrics,
+              not just elapsed time
+        \item \textbf{Preserved compatibility:} still a drop-in
+              \texttt{new}/\texttt{delete} replacement
+    \end{itemize}
+
+    \vspace{0.4em}
+    {\footnotesize
+    Honest limit: v8 improves \textbf{cache policy}, not the whole allocator
+    architecture. Global free-list work still uses one central mutex, and
+    metadata/canary costs remain.}
+\end{frame}
+
 \begin{frame}{v8 matrix results (vs regular \texttt{new})}
     ANOVA on our matrix runs; negative = faster than regular.
 
@@ -23,6 +86,7 @@
         \item Significant speedups at all three scales
         \item Contrast: v7 on the same ANOVA family often \textbf{slower}
               (\(+5\%\) to \(+11\%\) on matrix)
-        \item Specialization worked for the design target
+        \item The gain matches the design claim: \textbf{better informed caching}
+              for the target pattern
     \end{itemize}
 \end{frame}

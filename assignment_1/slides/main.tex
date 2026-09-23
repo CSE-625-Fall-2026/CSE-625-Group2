@@ -260,40 +260,7 @@ One run per size supports descriptive scaling, not a reliable significance claim
 \end{frame}
 
 
-\begin{frame}{V8 deliberately targets matrix row layout}
-\begin{itemize}
-\item Target: separately allocated rows in a $360\times360$ matrix, about 2880 bytes per row of doubles.
-\item Split small/large regions with a reserved guard and preserve exact split sizes.
-\item Use 64-byte alignment from 2048 bytes; defer page alignment until 2 MiB.
-\item Bypass the small-object thread cache on the hot allocation path and retain deferred coalescing.
-\end{itemize}
-\takeaway{Yes, we changed the allocator for a specific implementation.}
-\small The report says v8 linked-list runs were terminated before completion. They are incomplete trials, not finite slowdown estimates.
-\source{Report Sections III-J/K and XVI-D. Row-locality benefits remain an implementation-based explanation.}
-\end{frame}
-
-
-\begin{frame}{V8 Regular versus Overloaded observations}
-\centering\input{figures/v8_pairs.tex}
-\par\scriptsize E1: M3 Max campaign, Arg1=360. E2: Jacob’s Ubuntu host, Arg1=275/400/550. Lines connect presumed pairs, black ticks show means. Each panel uses its own zero-based scale.
-\source{Updated v8 data and figures. E1 n=3; E2 n=5. Do not compare raw time across unmatched workloads.}
-\end{frame}
-
-
-\begin{frame}{V8 gains do not transfer uniformly to the new group}
-\small\centering\begin{tabular}{llrrll}\toprule
-Group & Run length & $n$ & Mean change & ANOVA $p$ & Decision\\\midrule
-E1 & Short & 3 & -4.52\% & $3.45\times10^{-6}$ & Improvement\\
-E1 & Medium & 3 & -4.97\% & $3.42\times10^{-6}$ & Improvement\\
-E1 & Long & 3 & -5.11\% & $7.66\times10^{-9}$ & Improvement\\
-E2 & Short & 5 & +37.67\% & $4.75\times10^{-4}$ & Worsening\\
-E2 & Medium & 5 & +19.71\% & $3.71\times10^{-4}$ & Worsening\\
-E2 & Long & 5 & -6.42\% & 0.0566 & Not significant\\
-\bottomrule\end{tabular}\par
-\medskip\raggedright\normalsize E2 short and medium runs worsen significantly. E2 long runs average 6.42\% faster, but $p=0.0566$ exceeds 0.05.
-\par\small Change is the mean of paired percentages. ANOVA tests differences in elapsed seconds. All v8 rows appear, including non-significant results.
-\source{Updated Runtime Results By Run Length. Paired ANOVA, unadjusted p values; pairing and normality assumptions apply.}
-\end{frame}
+\input{sections/05_v8_improvement}
 
 
 \begin{frame}{ANOVA and chi-square answer different questions}
